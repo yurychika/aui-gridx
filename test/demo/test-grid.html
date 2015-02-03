@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html ng-app='app'>
 <title>test grid basic</title>
 <script type='text/javascript' src='../../lib/angular/angular.js'></script>
-<script type='text/javascript' src='../../src/js/bootstrap.js'></script>
-<script type='text/javascript' src='../../src/js/core/directives/aui-grid.js'></script>
+<script type='text/javascript' src='../../release/build.js'></script>
+<script type='text/javascript'>
+var app = angular.module('app', ['aui.grid']);
 
+// app.controller('main', function($scope) {});
+</script>
 
-<div aui-grid='auiGrid'></div>
+<body ng-controller='appController'>
+	<div aui-grid='auiGrid'></div>
+</body>
 </html>

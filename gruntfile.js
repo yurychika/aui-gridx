@@ -32,12 +32,36 @@ module.exports = function (grunt) {
 				src: [
 					'src/js/bootstrap.js',
 					'src/js/core/directives/aui-grid.js',
+					'release/.tmp/template.js'
 					// 'src/outro.js'
 				],
 				dest: 'release/build.js',
 			},
 		},
-		
+
+		ngtemplates: {
+			'aui-grid': {
+				// Look for templates in src and in feature template directories
+				src: ['src/templates/**/*.html'],
+				dest: 'release/.tmp/template.js',
+				options: {
+					module: 'aui.grid',
+					htmlmin: { collapseWhitespace: true, collapseBooleanAttributes: true },
+					// Strip .html extension
+					url: function(url) {
+						// Remove the src/templates/ prefix
+						url = url.replace(/^src\/templates\//, '');
+
+						// Replace feature prefix with just 'ui-grid'
+						url = url.replace(/^src\/features\/[^\/]+?\/templates/, 'ui-grid');
+
+						// Remove the .html extension
+						return url.replace('.html', '');
+					}
+				}
+			}
+		},
+
 		// The loader config should go here.
 		amdloader: {
 			// Here goes the config for the amd plugins build process.
@@ -102,7 +126,7 @@ module.exports = function (grunt) {
 
 	// Load vendor plugins.
 	grunt.loadNpmTasks("grunt-contrib-concat");
-	// grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-angular-templates');
 	// grunt.loadNpmTasks('grunt-contrib-clean');
 	// grunt.loadNpmTasks('grunt-contrib-uglify');
 
@@ -115,5 +139,5 @@ module.exports = function (grunt) {
 	grunt.registerTask( "css", ["copy"] );
 
 	// Default task.
-	grunt.registerTask("default", ["js", "css", "uglify"]);
+	grunt.registerTask("default", ["ngtemplates", "concat"]);
 };

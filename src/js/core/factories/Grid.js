@@ -1,10 +1,3 @@
-(function () {
-	'use strict';
-	angular.module('aui.grid.i18n', []);
-	angular.module('aui.grid', ['aui.grid.i18n']);
-})();
-
-
 (function(){
 angular.module('aui.grid')
 .factory('Grid', ['$q', '$compile', '$parse', '$timeout',
@@ -247,43 +240,3 @@ angular.module('aui.grid')
 		return Grid;
 	}]);
 });
-
-angular.module('aui.grid').run(['$templateCache', function($templateCache) {
-  'use strict';
-
-  $templateCache.put('aui-grid/aui-grid',
-    "<div>hello world</div>"
-  );
-
-}]);
-(function() {
-	'use strict';
-
-	var module = angular.module('aui.grid');
-
-	module.controller('auiGridController',
-		['$scope', '$element', '$attrs', 'Grid', function ($scope, $element, $attrs, Grid) {
-			console.log($scope);
-			
-
-		}]);
-
-	module.directive('auiGrid', function() {
-		return {
-			templateUrl: 'aui-grid/aui-grid',
-			scope: {
-				auiGrid: '=',
-				getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
-			},
-			replace: true,
-			transclude: true,
-			controller: 'auiGridController',
-			link: function($scope, $elem) {
-				console.log('this is the aui gridx instance');
-				console.log($scope.auiGrid);
-				console.log(123);
-				// console.log
-			}
-		};
-	});
-})();

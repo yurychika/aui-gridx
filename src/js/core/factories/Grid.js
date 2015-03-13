@@ -239,4 +239,4 @@ angular.module('aui.grid')
 
 		return Grid;
 	}]);
-});
+})();

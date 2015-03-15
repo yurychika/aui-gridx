@@ -64,23 +64,23 @@ angular.module('aui.grid')
 		},
 		//textDir bidi support end
 
-		Grid.prototype.coreModules = [
-			//Put default modules here!
-			Header,
-			View,
-			Body,
-			VLayout,
-			HLayout,
-			VScroller,
-			HScroller,
-			ColumnWidth,
-			Focus
-		],
+		// Grid.prototype.coreModules = [
+		// 	//Put default modules here!
+		// 	Header,
+		// 	View,
+		// 	Body,
+		// 	VLayout,
+		// 	HLayout,
+		// 	VScroller,
+		// 	HScroller,
+		// 	ColumnWidth,
+		// 	Focus
+		// ],
 
-		Grid.prototype.coreExtensions = [
-			//Put default extensions here!
-			Query
-		],
+		// Grid.prototype.coreExtensions = [
+		// 	//Put default extensions here!
+		// 	Query
+		// ],
 	
 		Grid.prototype.postCreate = function(){
 			// summary:

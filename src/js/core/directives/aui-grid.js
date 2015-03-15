@@ -6,6 +6,9 @@
 	module.controller('auiGridController',
 		['$scope', '$element', '$attrs', 'Grid', function ($scope, $element, $attrs, Grid) {
 			console.log($scope);
+			$scope.grid = new Grid();
+
+			console.log($scope.grid);
 			
 
 		}]);

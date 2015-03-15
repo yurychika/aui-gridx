@@ -66,7 +66,8 @@ angular.module('aui.grid')
 			var self = this;
 
 			this.isIE = false;
-			this.postCreate(options);
+			this.options = options;
+			this.postCreate();
 		};
 
 		Grid.prototype = GridCore.prototype;
@@ -284,6 +285,1047 @@ angular.module('aui.grid')
 	}]);
 })();
 
+(function(){
+	angular.module('aui.grid')
+	.factory('Model', ['$q', 'GridUtil', 'Sync', '$compile', '$parse', '$timeout', function($q, GridUtil, Sync) {
+/*=====
+	return declare([], {
+		// summary:
+		//		This class handles all of the data logic in grid.
+		// description:
+		//		It provides a clean and useful set of APIs to encapsulate complicated data operations, 
+		//		even for huge asynchronous (server side) data stores.
+		//		It is built upon a simple extension mechanism, allowing new (even user defined) data operaions to be pluged in.
+		//		An instance of this class can be regarded as a stand-alone logic grid providing consistent data processing 
+		//		functionalities. This class can even be instanticated alone without any grid UI.
+
+		clearCache: function(){
+		},
+
+		isId: function(){
+		},
+
+		byIndex: function(index, parentId){
+			// summary:
+			//		Get the row cache by row index.
+			// index: Integer
+			//		The row index
+			// parentId: String?
+			//		If parentId is valid, the row index means the child index under this parent.
+			// returns:
+			//		The row cache
+			return null;	//gridx.core.model.__RowCache
+		},
+
+		byId: function(id){
+			// summary:
+			//		Get the row cache by row id
+			// id: String
+			//		The row ID
+			// returns:
+			//		The row cache
+			return null;	//gridx.core.model.__RowCache
+		},
+
+		indexToId: function(index, parentId){
+			// summary:
+			//		Transform row index to row ID. If not exist, return undefined.
+			// index: Integer
+			//		The row index
+			// parentId: String?
+			//		If parentId is valid, the row index means the child index under this parent.
+			// returns:
+			//		The row ID
+			return '';	//String
+		},
+
+		idToIndex: function(id){
+			// summary:
+			//		Transform row ID to row index. If not exist, return -1.
+			// id: String
+			//		The row ID
+			// returns:
+			//		The row index
+			return -1;	//Integer
+		},
+
+		treePath: function(id){
+			// summary:
+			//		Get tree path of row by row ID
+			// id: String
+			//		The row ID
+			// returns:
+			//		An array of parent row IDs, from root to parent.
+			//		Root level rows have parent of id ""(empty string).
+			return [];	//String[]
+		},
+
+		parentId: function(id){
+			// summary:
+			//		Get the parent ID of the given row.
+			// id: String
+			//		The row ID
+			// returns:
+			//		The parent ID.
+			return [];
+		},
+
+		hasChildren: function(id){
+			// summary:
+			//		Check whether a row has children rows.
+			// id: String
+			//		The row ID
+			// returns:
+			//		Whether this row has child rows.
+			return false;	//Boolean
+		},
+
+		children: function(id){
+			// summary:
+			//		Get IDs of children rows.
+			// id: String
+			//		The row ID
+			// returns:
+			//		An array of row IDs
+			return [];	//Array
+		},
+
+		size: function(parentId){
+			// summary:
+			//		Get the count of rows under the given parent. 
+			// parentId: String?
+			//		The ID of a parent row. No parentId means root rows.
+			// returns:
+			//		The count of (child) rows
+			return -1;	//Integer
+		},
+
+		keep: function(id){
+			// summary:
+			//		Lock up a row cache in memory, avoid clearing it out when cache size is reached.
+			// id: String
+			//		The row ID
+		},
+
+		free: function(id){
+			// summary:
+			//		Unlock a row cache in memory, so that it could be cleared out when cache size is reached.
+			// id: String?
+			//		The row ID. If omitted, all kept rows will be freed.
+		},
+
+		when: function(args, callback, scope){
+			// summary:
+			//		Call this method to make sure all the pending data operations are executed and
+			//		all the needed rows are at client side.
+			// description:
+			//		This method makes it convenient to do various grid operations without worrying too much about server side
+			//		or client side store. This method is the only asynchronous public method in grid model, so that most of
+			//		the custom code can be written in synchronous way.
+			// args: Object|null?
+			//		Indicate what rows are needed by listing row IDs or row indexes.
+			//		Acceptable args include: 
+			//		1. A single row index.
+			//		e.g.: model.when(1, ...)
+			//		2. A single row index range object in form of: {start: ..., count: ...}.
+			//		If count is omitted, means all remaining rows.
+			//		e.g.: model.when({start: 10, count: 100}, ...)
+			//		3. An array of row indexes and row index ranges.
+			//		e.g.: model.when([0, 1, {start: 10, count: 3}, 100], ...)
+			//		4. An object with property "index" set to the array defined in 3.
+			//		e.g.: model.when({
+			//			index: [0, 1, {start: 10, count: 3}, 100]
+			//		}, ...)
+			//		5. An object with property "id" set to an array of row IDs.
+			//		e.g.: model.when({
+			//		id: ['a', 'b', 'c']
+			//		}, ...)
+			//		6. An object containing both contents defined in 4 and 5.
+			//		7. An empty object
+			//		The model will fetch the store size. Currently it is implemented by fetching the first page of data.
+			//		8. null or call this method without any arguments.
+			//		This is useful when we only need to execute pending data operations but don't need to fetch rows.
+			// callback: Function?
+			//		The callback function is called when all the pending data operations are executed and all
+			// returns:
+			//		A Deferred object indicating when all this process is finished. Note that in this Deferred object,
+			//		The needed rows might not be available since they might be cleared up to reduce memory usage.
+		},
+
+		scan: function(args, callback){
+			// summary:
+			//		Go through all the rows in several batches from start to end (or according to given args),
+			//		and execute the callback function for every batch of rows.
+			// args: Object
+			//		An object containing scan arguments
+			// callback: Function(rows,startIndex)
+			//		The callback function.
+			// returns:
+			//		If return true in this function, the scan process will end immediately.
+		},
+
+		onDelete: function(){
+			// summary:
+			//		Fired when a row is deleted from store
+			// tags:
+			//		callback
+		},
+
+		onNew: function(){
+			// summary:
+			//		Fired when a row is added to the store
+			// tags:
+			//		callback
+		},
+
+		onSet: function(){
+			// summary:
+			//		Fired when a row's data is changed
+			// tags:
+			//		callback
+		},
+
+		onSizeChange: function(){
+			// summary:
+			//		Fired when the size of the grid model is changed
+			// tags:
+			//		callback
+		}
+	});
+=====*/
+
+	var isArrayLike = GridUtil.isArray,
+		isString = GridUtil.isString;
+
+	function isId(it){
+		return it || it === 0;
+	}
+
+	function isIndex(it){
+		return typeof it == 'number' && it >= 0;
+	}
+
+	function isRange(it){
+		return it && isIndex(it.start);
+	}
+
+	function normArgs(self, args){
+		var i, rgs = [], ids = [],
+		res = {
+			range: rgs,
+			id: ids 
+		},
+		f = function(a){
+			if(isRange(a)){
+				rgs.push(a);
+			}else if(isIndex(a)){
+				rgs.push({start: a, count: 1});
+			}else if(isArrayLike(a)){
+				for(i = a.length - 1; i >= 0; --i){
+					if(isIndex(a[i])){
+						rgs.push({
+							start: a[i],
+							count: 1
+						});
+					}else if(isRange(a[i])){
+						rgs.push(a[i]);
+					}else if(isString(a)){
+						ids.push(a[i]);
+					}
+				}
+			}else if(isString(a)){
+				ids.push(a);
+			}
+		};
+		if(args && (args.index || args.range || args.id)){
+			f(args.index);
+			f(args.range);
+			if(isArrayLike(args.id)){
+				for(i = args.id.length - 1; i >= 0; --i){
+					ids.push(args.id[i]);
+				}
+			}else if(isId(args.id)){
+				ids.push(args.id);
+			}
+		}else{
+			f(args);
+		}
+		if(!rgs.length && !ids.length && self.size() < 0){
+			//first time load, try to load a page
+			rgs.push({start: 0, count: self._cache.pageSize || 1});
+		}
+		return res;
+	}
+	var Model = function Model(args) {
+		var t = this,
+			g = args,
+			cacheClass = args.cacheClass || Sync;
+		cacheClass = typeof cacheClass == 'string' ? require(cacheClass) : cacheClass;
+		t.store = args.store;
+		t._exts = {};
+		t._cmdQueue = [];
+		t._model = t._cache = new cacheClass(t, args);
+		t._createExts(args.modelExtensions || [], args);
+		var m = t._model;
+		t._cnnts = [
+			aspect.after(m, "onDelete", lang.hitch(t, "onDelete"), 1),
+			aspect.after(m, "onNew", lang.hitch(t, "onNew"), 1),
+			aspect.after(m, "onSet", lang.hitch(t, "onSet"), 1)
+		];
+	};
+
+	Model.prototype = {
+		constructor: function(args){
+		},
+	
+		destroy: function(){
+			array.forEach(this._cnnts, function(cnnt){
+				cnnt.remove();
+			});
+			for(var n in this._exts){
+				this._exts[n].destroy();
+			}
+			this._cache.destroy();
+		},
+
+		clearCache: function(){
+			this._cache.clear();
+		},
+
+		isId: isId,
+
+		setStore: function(store){
+			this.store = store;
+			this._cache.setStore(store);
+		},
+
+		//Public-------------------------------------------------------------------
+		when: function(args, callback, scope){
+			this._oldSize = this.size();
+			// execute pending operations and then fetch data
+			this._addCmd({
+				name: '_cmdRequest',
+				scope: this,
+				args: arguments,
+				async: 1
+			});
+			return this._exec();
+		},
+
+		scan: function(args, callback){
+			var d = new Deferred(),
+				start = args.start || 0,
+				pageSize = args.pageSize || this._cache.pageSize || 1,
+				count = args.count,
+				end = count > 0 ? start + count : Infinity,
+				scope = args.whenScope || this,
+				whenFunc = args.whenFunc || scope.when;
+			var f = function(s){
+				d.progress(s / (count > 0 ? s + count : scope.size()));
+				whenFunc.call(scope, {
+					id: [],
+					range: [{
+						start: s,
+						count: pageSize
+					}]
+				}, function(){
+					var i, r, rows = [];
+					for(i = s; i < s + pageSize && i < end; ++i){
+						r = scope.byIndex(i);
+						if(r){
+							rows.push(r);
+						}else{
+							end = -1;
+							break;
+						}
+					}
+					if(callback(rows, s) || i == end){
+						end = -1;
+					}
+				}).then(function(){
+					if(end == -1){
+						d.callback();
+					}else{
+						f(s + pageSize);
+					}
+				});
+			};
+			f(start);
+			return d;
+		},
+
+		_sizeAll: function(parentId, isWhole){
+			var size = this.size(parentId, isWhole),
+				count = 0,
+				i, childId;
+
+			size = size === -1 ? 0 : size;
+			count += size;
+			
+			for (i = 0; i < size; i++) {
+				childId = this.indexToId(i, parentId, isWhole);
+				count += this._sizeAll(childId, isWhole);
+			}
+
+			return count;
+		},
+
+		//Events---------------------------------------------------------------------------------
+		onDelete: function(/*id, index*/) {},
+
+		onNew: function(/*id, index, row*/) {},
+
+		onSet: function(/*id, index, row*/) {},
+
+		onSizeChange: function(/*size, oldSize*/) {},
+
+		//Package----------------------------------------------------------------------------
+		_msg: function(/* msg */){},
+
+		_addCmd: function(args){
+			//Add command to the command queue, and combine same kind of commands if possible.
+			var cmds = this._cmdQueue,
+				cmd = cmds[cmds.length - 1];
+			if(cmd && cmd.name == args.name && cmd.scope == args.scope){
+				cmd.args.push(args.args || []);
+			}else{
+				args.args = [args.args || []];
+				cmds.push(args);
+			}
+		},
+
+		//Private----------------------------------------------------------------------------
+		_onSizeChange: function(){
+			var t = this,
+				oldSize = t._oldSize,
+				size = t._oldSize = t.size();
+			if(oldSize != size){
+				t.onSizeChange(size, oldSize);
+			}
+		},
+
+		_onParentSizeChange: function(parentId, isAdd) {},
+
+		_cmdRequest: function(){
+			var t = this;
+			return new DeferredList(array.map(arguments, function(args){
+				var arg = args[0],
+					finish = function(){
+						t._onSizeChange();
+						//TODO: fire events here
+						//args[1] is callback, args[2] is scope
+						if(args[1]){
+							args[1].call(args[2]);
+						}
+					};
+				if(arg === null || !args.length){
+					var d = new Deferred();
+					finish();
+					d.callback();
+					return d;
+				}
+				return t._model._call('when', [normArgs(t, arg), finish]);
+			}), 0, 1);
+		},
+
+		_exec: function(){
+			//Execute commands one by one.
+			var t = this,
+				c = t._cache,
+				d = new Deferred(),
+				cmds = t._cmdQueue,
+				finish = function(d, err){
+					t._busy = 0;
+					if(c._checkSize){
+						c._checkSize();
+					}
+					if(err){
+						d.errback(err);
+					}else{
+						d.callback();
+					}
+				},
+				func = function(){
+					if(array.some(cmds, function(cmd){
+						return cmd.name == '_cmdRequest';
+					})){
+						try{
+							while(cmds.length){
+								var cmd = cmds.shift(),
+									dd = cmd.scope[cmd.name].apply(cmd.scope, cmd.args);
+								if(cmd.async){
+									Deferred.when(dd, func, lang.partial(finish, d));
+									return;
+								}
+							}
+						}catch(e){
+							finish(d, e);
+							return;
+						}
+					}
+					finish(d);
+				};
+			if(t._busy){
+				return t._busy;
+			}
+			t._busy = d;
+			func();
+			return d;
+		},
+
+		_createExts: function(exts, args){
+			//Ensure the given extensions are valid
+			exts = array.filter(array.map(exts, function(ext){
+				return typeof ext == 'string' ? require(ext) : ext;
+			}), function(ext){
+				return ext && ext.prototype;
+			});
+			//Sort the extensions by priority
+			exts.sort(function(a, b){
+				return a.prototype.priority - b.prototype.priority;
+			});
+			for(var i = 0, len = exts.length; i < len; ++i){
+				//Avoid duplicated extensions
+				//IMPORTANT: Assume extensions all have different priority values!
+				if(i == exts.length - 1 || exts[i] != exts[i + 1]){
+					var ext = new exts[i](this, args);
+					this._exts[ext.name] = ext;
+				}
+			}
+		}
+	};
+	
+	return Model;
+
+	}]);
+})();
+(function(){
+	angular.module('aui.grid')
+	.factory('Sync', ['$q', 'GridUtil', '$compile', '$parse', '$timeout', function($q, GridUtil) {
+
+		/*=====
+			return declare(_Extension, function(){
+				// summary:
+				//		Base cache class, providing cache data structure and some common cache functions.
+				//		Also directly support client side stores.
+			});
+		=====*/
+
+			var hitch = GridUtil.hitch,
+				mixin = GridUtil.mixin,
+				indexOf = [].indexOf;
+
+			function fetchChildren(self){
+				var s = self._struct,
+					pids = s[''].slice(1),
+					pid,
+					appendChildren = function(pid){
+						[].push.apply(pids, s[pid].slice(1));
+					};
+				while(pids.length){
+					pid = pids.shift();
+					self._storeFetch({
+						parentId: pid
+					}).then(lang.partial(appendChildren, pid));
+				}
+			}
+
+			var Sync = function Sync(model, args) {
+				var t = this;
+					t.setStore(args.store);
+					t.columns = lang.mixin({}, args.columnsById || args._columnsById);
+					// provide the following APIs to Model
+					t._mixinAPI('byIndex', 'byId', 'indexToId', 'idToIndex', 'size', 'treePath', 'rootId', 'parentId',
+						'hasChildren', 'children', 'keep', 'free', 'layerId', 'setLayer', 'layerUp');
+			};
+			Sync.prototype = {
+				// Assumption:
+				//		The parent id for root level rows is an empty string.
+				//
+				// Some internal data structures:
+				//
+				// _struct: the index structure of data
+				//		{
+				//			'': [undefined, 'id1', 'id2', ...], // root level
+				//			'id1': ['', 'child-id1', ...], // children of id1 
+				//			'id2': ['', ...],	// children of id2
+				//			'child-id1': ['id1', ...], // children of child-id1
+				//			...
+				//		}
+				//
+				// _cache: row data cache hashed by row id
+				//		{
+				//			'id1': {
+				//				data: {}, // formatted grid data, hashed by column id
+				//				rawData: {}, // raw store data, hashed by column id
+				//				item: {}	// original store item, defined by store, usually hashed by field name
+				//			},
+				//			'id2': {
+				//				data: {},
+				//				rawData: {},
+				//				item: {}
+				//			}
+				//		}
+				//
+				// _size: total size for every layer
+				//		{
+				//			'': 100		// root layer
+				//			'id1': 20		// id1 has 20 direct children
+				//		}
+				//
+				// _priority: array of row ids
+				//		provide an ordered list to decide which row to be removed from cache when cacheSize limit is reached.
+				//
+
+				constructor: function(model, args){
+				},
+
+				destroy: function(){
+					this.inherited(arguments);
+					this._layer = '';
+					this.clear();
+				},
+
+				setStore: function(store){
+					var t = this,
+						c = 'aspect',
+						old = store.fetch;
+					//Disconnect store events.
+					t.destroy();
+					t._cnnts = [];
+					t.store = store;
+					if(!old && store.notify){
+						//The store implements the dojo.store.Observable API
+						t[c](store, 'notify', function(item, id){
+							if(item === undefined){
+								t._onDelete(id);
+							}else if(id === undefined){
+								t._onNew(item);
+							}else{
+								t._onSet(item);
+							}
+						});
+					}else{
+						t[c](store, old ? "onSet" : "put", "_onSet");
+						t[c](store, old ? "onNew" : "add", "_onNew");
+						t[c](store, old ? "onDelete" : "remove", "_onDelete");
+					}
+				},
+
+				when: function(args, callback){
+					// For client side store, this method is a no-op
+					var d = new Deferred();
+					try{
+						if(callback){
+							callback();
+						}
+						d.callback();
+					}catch(e){
+						d.errback(e);
+					}
+					return d;
+				},
+
+				//Public----------------------------------------------
+				clear: function(){
+					var t = this;
+					t._filled = 0;
+					t._priority = [];
+					t._struct = {};
+					t._cache = {};
+					t._size = {};
+					//virtual root node, with id ''.
+					t._struct[''] = [];
+					t._size[''] = -1;
+					t.totalSize = undefined;
+				},
+
+				layerId: function(){
+					return this._layer;
+				},
+
+				setLayer: function(id){
+					this._layer = id;
+					this.model._msg('storeChange');
+					this.model._onSizeChange();
+				},
+
+				layerUp: function(){
+					var pid = this.parentId(this._layer);
+					this.setLayer(pid);
+				},
+
+				// Technically, byIndex is based on byId API.
+				byIndex: function(index, parentId){
+					this._init();
+					return this._cache[this.indexToId(index, parentId)];
+				},
+
+				byId: function(id){
+					this._init();
+					var row = this._cache[id];
+					if (row && !row.data && typeof row._data === 'function') {
+						row.data = row._data();
+					}
+					return this._cache[id];
+				},
+
+				indexToId: function(index, parentId){
+					this._init();
+					var items = this._struct[this.model.isId(parentId) ? parentId : this.layerId()];
+					return typeof index === 'number' && index >= 0 ? items && items[index + 1] : undefined;
+				},
+
+				idToIndex: function(id){
+					this._init();
+					var s = this._struct,
+						pid = s[id] && s[id][0],
+						index = indexOf(s[pid] || [], id);
+					return index > 0 ? index - 1 : -1;
+				},
+
+				treePath: function(id){
+					this._init();
+					var s = this._struct,
+						path = [];
+					while(id !== undefined){
+						path.unshift(id);
+						id = s[id] && s[id][0];
+					}
+					if(path[0] !== ''){
+						path = [];
+					}else{
+						path.pop();
+					}
+					return path;
+				},
+
+				rootId: function(id){
+					var path = this.treePath(id);
+					if(path.length > 1){
+						return path[1];
+					}else if(!path.length){
+						return null;
+					}
+					return id;
+				},
+
+				parentId: function(id){
+					return this.treePath(id).pop();
+				},
+
+				hasChildren: function(id){
+					var t = this,
+						s = t.store,
+						c;
+					t._init();
+					c = t.byId(id);
+					return s.hasChildren && s.hasChildren(id, c && c.item) && s.getChildren;
+				},
+
+				children: function(parentId){
+					this._init();
+					parentId = this.model.isId(parentId) ? parentId : '';
+					var size = this._size[parentId],
+						children = [],
+						i = 0;
+					for(; i < size; ++i){
+						children.push(this.indexToId(i, parentId));
+					}
+					return children;
+				},
+
+				size: function(parentId){
+					this._init();
+					var s = this._size[this.model.isId(parentId) ? parentId : this.layerId()];
+					return s >= 0 ? s : -1;
+				},
+
+				keep: function(){},
+				free: function(){},
+
+				//Events--------------------------------------------
+				onBeforeFetch: function(){},
+				onAfterFetch: function(){},
+				onLoadRow: function(){},
+
+				onSetColumns: function(columns){
+					var t = this, id, c, colId, col;
+					t.columns = lang.mixin({}, columns);
+					for(id in t._cache){
+						c = t._cache[id];
+						for(colId in columns){
+							col = columns[colId];
+							c.data = c._data();
+							c.data[colId] = t._formatCell(c.rawData, id, col.id);
+						}
+					}
+				},
+
+				//Protected-----------------------------------------
+				_init: function(){
+					var t = this;
+					if(!t._filled){
+						t._storeFetch({ start: 0 });
+						if(t.store.getChildren){
+							fetchChildren(t);
+						}
+						t.model._onSizeChange();
+					}
+				},
+
+				_itemToObject: function(item){
+					var s = this.store,
+						obj = {};
+					if(s.fetch){
+						array.forEach(s.getAttributes(item), function(attr){
+							obj[attr] = s.getValue(item, attr);
+						});
+						return obj;
+					}
+					return item;
+				},
+
+				_formatCell: function(rawData, rowId, colId){
+					var col = this.columns[colId],
+						t = this,
+						cellData; 
+
+					cellData = col.formatter ? col.formatter(rawData, rowId) : rawData[col.field || colId];
+					return (t.columns[colId] && t.columns[colId].encode === true && typeof cellData === 'string')? entities.encode(cellData) : cellData;
+				},
+
+				_formatRow: function(rowData, rowId){
+					var cols = this.columns, res = {}, colId;
+					for(colId in cols){
+						res[colId] = this._formatCell(rowData, rowId, colId);
+					}
+					return res;
+				},
+
+				_addRow: function(id, index, rowData, item, parentId){
+					var t = this,
+						st = t._struct,
+						pr = t._priority,
+						pid = t.model.isId(parentId) ? parentId : '',
+						ids = st[pid],
+						i;
+					if(!ids){
+						throw new Error("Fatal error of _Cache._addRow: parent item " + pid + " of " + id + " is not loaded");
+					}
+					var oldId = ids[index + 1];
+					if(t.model.isId(oldId) && oldId !== id){
+						console.error("Error of _Cache._addRow: different row id " + id + " and " + ids[index + 1] + " for same row index " + index);
+					}
+					ids[index + 1] = id;
+					st[id] = st[id] || [pid];
+					if(pid === ''){
+						i = indexOf(pr, id);
+						if(i >= 0){
+							pr.splice(i, 1);
+						}
+						pr.push(id);
+					}
+					t._cache[id] = {
+						_data: hitch(t, t._formatRow, rowData, id),
+						rawData: rowData,
+						item: item
+					};
+					t.onLoadRow(id);
+				},
+
+				_storeFetch: function(options, onFetched){
+		//            console.debug("\tFETCH parent: ",
+		//                    options.parentId, ", start: ",
+		//                    options.start || 0, ", count: ",
+		//                    options.count, ", end: ",
+		//                    options.count && (options.start || 0) + options.count - 1, ", options:",
+		//                    this.options);
+					var t = this,
+						s = t.store,
+						d = new Deferred(),
+						parentId = t.model.isId(options.parentId) ? options.parentId : '',
+						req = mixin({}, t.options || {}, options),
+						onError = hitch(d, d.errback),
+						results;
+					function onBegin(size){
+						t._size[parentId] = parseInt(size, 10);
+					}
+					function onComplete(items){
+						//FIXME: store does not support getting total size after filter/query, so we must change the protocal a little.
+						if(items.ioArgs && items.ioArgs.xhr){
+							var range = results.ioArgs.xhr.getResponseHeader("Content-Range");
+							if(range && (range = range.match(/(.+)\//))){
+								t.totalSize = +range[1];
+							}else{
+								t.totalSize = undefined;
+							}
+						}
+						try{
+							var start = options.start || 0,
+								i = 0,
+								item;
+							for(; item = items[i]; ++i){
+								t._addRow(s.getIdentity(item), start + i, t._itemToObject(item), item, parentId);
+							}
+							d.callback();
+						}catch(e){
+							d.errback(e);
+						}
+					}
+					t._filled = 1;
+					t.onBeforeFetch(req);
+					if(parentId === ''){
+						if(s.fetch){
+							s.fetch(mixin(req, {
+								onBegin: onBegin,
+								onComplete: onComplete,
+								onError: onError
+							}));
+						}else{
+							results = s.query(req.query || {}, req);
+							Deferred.when(results.total, onBegin);
+							Deferred.when(results, onComplete, onError);
+						}
+					}else if(t.hasChildren(parentId)){
+						results = s.getChildren(t.byId(parentId).item, req);
+						if('total' in results){
+							Deferred.when(results.total, onBegin);
+						}else{
+							Deferred.when(results, function(results){
+								onBegin(results.length);
+							});
+						}
+						Deferred.when(results, onComplete, onError);
+					}else{
+						d.callback();
+					}
+					d.then(function(){
+						t.onAfterFetch();
+					});
+					return d;
+				},
+
+				//--------------------------------------------------------------------------
+				_onSet: function(item, option) {
+					var t = this,
+						id = t.store.getIdentity(item),
+						index = t.idToIndex(id),
+						path = t.treePath(id),
+						old = t._cache[id];
+
+					if (path.length) {
+						t._addRow(id, index, t._itemToObject(item), item, path.pop());
+					}
+					if (!option || option.overwrite !== false) { // In new store, add() is using put().
+																 // Here to stop t.onSet when calling store.add()
+						t.onSet(id, index, t._cache[id], old);
+					}
+				},
+
+				_onNew: function(item, parentInfo){
+					var t = this,
+						s = t.store,
+						row = t._itemToObject(item),
+						parentItem = parentInfo && parentInfo[s.fetch ? 'item' : 'parent'],
+						parentId = parentItem ? s.getIdentity(parentItem) : '',
+						id = s.getIdentity(item),
+						size = t._size[''];
+					t.clear();
+					t.onNew(id, 0, {
+						_data: hitch(t, t._formatRow, row, id),
+						rawData: row,
+						item: item
+					});
+					if(!parentItem && size >= 0){
+						t._size[''] = size + 1;
+						if(t.totalSize >= 0){
+							t.totalSize = size + 1;
+						}
+						t.model._onSizeChange();
+					}
+					if (parentItem && parentId) {
+						t._size[parentId] = t._size[parentId] + 1;
+						t.model._onParentSizeChange(parentId, 1/*isAdd*/);
+					}
+				},
+
+				_onDelete: function(item){
+					var t = this,
+						s = t.store,
+						st = t._struct,
+						id = s.fetch ? s.getIdentity(item) : item,
+						path = t.treePath(id);
+					if(path.length){
+						var children, i, j,
+							ids = [id],
+							parentId = path[path.length - 1],
+							sz = t._size,
+							size = sz[''],
+							index = indexOf(st[parentId], id);
+						//This must exist, because we've already have treePath
+						st[parentId].splice(index, 1);
+						--sz[parentId];
+
+						for(i = 0; i < ids.length; ++i){
+							children = st[ids[i]];
+							if(children){
+								for(j = children.length - 1; j > 0; --j){
+									ids.push(children[j]);
+								}
+							}
+						}
+						for(i = ids.length - 1; i >= 0; --i){
+							j = ids[i];
+							delete t._cache[j];
+							delete st[j];
+							delete sz[j];
+							// only fire onDelete if it is a child
+							if (i !== (ids.length - 1)) {
+								t.onDelete(j, undefined, t.treePath(j));
+							}
+						}
+						i = indexOf(t._priority, id);
+						if(i >= 0){
+							t._priority.splice(i, 1);
+						}
+						t.onDelete(id, index - 1, path);
+						if(!parentId && size >= 0){
+							sz[''] = size - 1;
+							if(t.totalSize >= 0){
+								t.totalSize = size - 1;
+							}
+							t.model._onSizeChange();
+						}
+						if (parentId) {
+							t.model._onParentSizeChange(parentId, 0/*isDelete*/);
+						}
+					}else{
+						//FIXME: Don't know what to do if the deleted row was not loaded.
+						t.clear();
+						t.onDelete(id);
+		//                var onBegin = hitch(t, _onBegin),
+		//                    req = mixin({}, t.options || {}, {
+		//                        start: 0,
+		//                        count: 1
+		//                    });
+		//                setTimeout(function(){
+		//                    if(s.fetch){
+		//                        s.fetch(mixin(req, {
+		//                            onBegin: onBegin
+		//                        }));
+		//                    }else{
+		//                        var results = s.query(req.query, req);
+		//                        Deferred.when(results.total, onBegin);
+		//                    }
+		//                }, 10);
+					}
+				}
+			};
+
+			return Sync;
+	}]);
+})();
 (function() {
 /*=====
 	return declare([], {
@@ -398,7 +1440,7 @@ angular.module('aui.grid')
 	});
 =====*/
 angular.module('aui.grid')
-.factory('GridCore', ['GridUtil', '$compile', '$parse', '$timeout', function(GridUtil){
+.factory('GridCore', ['GridUtil', '$q', 'Model', '$compile', '$parse', '$timeout', function(GridUtil, $q, Model){
 	var delegate = GridUtil.delegate,
 		isFunc = GridUtil.isFunction,
 		isString = GridUtil.isString,
@@ -406,12 +1448,12 @@ angular.module('aui.grid')
 
 	function getDepends(mod){
 		var p = mod.moduleClass.prototype;
-		return (p.forced || []).concat(p.optional || []);
+		return (p.forced || []).concat(p.ial || []);
 	}
 
 	function configColumns(columns){
 		var cs = {}, c, i, len;
-		if(lang.isArray(columns)){
+		if(GridUtil.isArray(columns)){
 			for(i = 0, len = columns.length; i < len; ++i){
 				c = columns[i];
 				c.index = i;
@@ -603,8 +1645,8 @@ angular.module('aui.grid')
 			var t = this;
 			t.structure = columns;
 			//make a shallow copy of columns here so one structure can be used in different grids.
-			t._columns = array.map(columns, function(col){
-				return lang.mixin({}, col);
+			t._columns = columns.map(function(col){
+				return GridUtil.mixin({}, col);
 			});
 			t._columnsById = configColumns(t._columns);
 			
@@ -686,7 +1728,8 @@ angular.module('aui.grid')
 		//Private-------------------------------------------------------------------------------------
 		_init: function(){
 			var t = this, s,
-				d = t._deferStartup = new Deferred();
+				// d = t._deferStartup = new Deferred();
+				d = t._deferStartup = $q.defer();
 			t.modules = t.modules || [];
 			t.modelExtensions = t.modelExtensions || [];
 
@@ -698,19 +1741,19 @@ angular.module('aui.grid')
 				t.modules = t.modules.concat(t.desktopModules);
 			}
 
-			if(!t.store){
-				s = t._parseData(t.data);
-			}else{
+			// if(!t.store){
+			// 	s = t._parseData(t.data);
+			// }else{
 				s = t.store;
-			}
+			// }
 
-			Deferred.when(s, function(){
-				t.setColumns(t.structure);
+			// Deferred.when(s, function(){
+				t.setColumns(t.options.columnStructs);
 				
-				normalizeModules(t);
-				checkForced(t);
-				removeDuplicate(t);
-				checkModelExtensions(t);
+				// normalizeModules(t);
+				// checkForced(t);
+				// removeDuplicate(t);
+				// checkModelExtensions(t);
 
 				//Create model before module creation, so that all modules can use the logic grid from very beginning.
 				t.model = new Model(t);
@@ -720,7 +1763,7 @@ angular.module('aui.grid')
 				t._load(d).then(function(){
 					t.onModulesLoaded();
 				});
-			});
+			// });
 		},
 
 		_uninit: function(){
@@ -836,9 +1879,27 @@ angular.module('aui.grid')
 
 			isFunction: function() {},
 
-			isString: function() {},
+			isString: function(s) {
+				return angualr.isString(s);
+			},
+
+			isArray: function(a) {
+				return angular.isArray(a);
+			},
 			
-			hitch: function() {}
+			hitch: function() {},
+
+			mixin: function(a, b) {
+				var k;
+
+				for (k in b) {
+					if (!a.hasOwnProperty(k)) {
+						a[k] = b[k];
+					}
+				}
+
+				return a;
+			}
 		}
 
 		return s;

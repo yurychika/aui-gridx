@@ -33,6 +33,8 @@ module.exports = function (grunt) {
 					'src/js/bootstrap.js',
 					'src/js/core/directives/aui-grid.js',
 					'src/js/core/factories/Grid.js',
+					'src/js/core/factories/model/Model.js',
+					'src/js/core/factories/model/Sync.js',
 					'src/js/core/core.js',
 					'src/js/core/services/GridUtil.js',
 					'release/.tmp/template.js'

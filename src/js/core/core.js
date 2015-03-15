@@ -112,7 +112,7 @@
 	});
 =====*/
 angular.module('aui.grid')
-.factory('GridCore', ['GridUtil', '$compile', '$parse', '$timeout', function(GridUtil){
+.factory('GridCore', ['GridUtil', '$q', 'Model', '$compile', '$parse', '$timeout', function(GridUtil, $q, Model){
 	var delegate = GridUtil.delegate,
 		isFunc = GridUtil.isFunction,
 		isString = GridUtil.isString,
@@ -120,12 +120,12 @@ angular.module('aui.grid')
 
 	function getDepends(mod){
 		var p = mod.moduleClass.prototype;
-		return (p.forced || []).concat(p.optional || []);
+		return (p.forced || []).concat(p.ial || []);
 	}
 
 	function configColumns(columns){
 		var cs = {}, c, i, len;
-		if(lang.isArray(columns)){
+		if(GridUtil.isArray(columns)){
 			for(i = 0, len = columns.length; i < len; ++i){
 				c = columns[i];
 				c.index = i;
@@ -317,8 +317,8 @@ angular.module('aui.grid')
 			var t = this;
 			t.structure = columns;
 			//make a shallow copy of columns here so one structure can be used in different grids.
-			t._columns = array.map(columns, function(col){
-				return lang.mixin({}, col);
+			t._columns = columns.map(function(col){
+				return GridUtil.mixin({}, col);
 			});
 			t._columnsById = configColumns(t._columns);
 			
@@ -400,7 +400,8 @@ angular.module('aui.grid')
 		//Private-------------------------------------------------------------------------------------
 		_init: function(){
 			var t = this, s,
-				d = t._deferStartup = new Deferred();
+				// d = t._deferStartup = new Deferred();
+				d = t._deferStartup = $q.defer();
 			t.modules = t.modules || [];
 			t.modelExtensions = t.modelExtensions || [];
 
@@ -412,19 +413,19 @@ angular.module('aui.grid')
 				t.modules = t.modules.concat(t.desktopModules);
 			}
 
-			if(!t.store){
-				s = t._parseData(t.data);
-			}else{
+			// if(!t.store){
+			// 	s = t._parseData(t.data);
+			// }else{
 				s = t.store;
-			}
+			// }
 
-			Deferred.when(s, function(){
-				t.setColumns(t.structure);
+			// Deferred.when(s, function(){
+				t.setColumns(t.options.columnStructs);
 				
-				normalizeModules(t);
-				checkForced(t);
-				removeDuplicate(t);
-				checkModelExtensions(t);
+				// normalizeModules(t);
+				// checkForced(t);
+				// removeDuplicate(t);
+				// checkModelExtensions(t);
 
 				//Create model before module creation, so that all modules can use the logic grid from very beginning.
 				t.model = new Model(t);
@@ -434,7 +435,7 @@ angular.module('aui.grid')
 				t._load(d).then(function(){
 					t.onModulesLoaded();
 				});
-			});
+			// });
 		},
 
 		_uninit: function(){

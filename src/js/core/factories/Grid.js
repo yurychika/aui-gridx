@@ -28,7 +28,8 @@ angular.module('aui.grid')
 			var self = this;
 
 			this.isIE = false;
-			this.postCreate(options);
+			this.options = options;
+			this.postCreate();
 		};
 
 		Grid.prototype = GridCore.prototype;

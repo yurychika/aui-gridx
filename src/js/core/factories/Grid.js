@@ -1,8 +1,9 @@
 (function(){
 angular.module('aui.grid')
-.factory('Grid', ['$q', '$compile', '$parse', '$timeout',
-	function($q, $compile, $parse, $timeout) {
+.factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore',
+	function($q, $compile, $parse, $timeout, GridCore) {
 		console.log('in side grid constuctor');
+		console.log('Grid core', GridCore);
 		var dummyFunc = function(){};
 		var version = {
 			// summary:
@@ -27,7 +28,10 @@ angular.module('aui.grid')
 			var self = this;
 
 			this.isIE = false;
+			this.postCreate(options);
 		};
+
+		Grid.prototype = GridCore.prototype;
 
 		Grid.prototype.version = version;
 
@@ -64,6 +68,7 @@ angular.module('aui.grid')
 		},
 		//textDir bidi support end
 
+		Grid.prototype.coreModules = [];
 		// Grid.prototype.coreModules = [
 		// 	//Put default modules here!
 		// 	Header,
@@ -77,10 +82,10 @@ angular.module('aui.grid')
 		// 	Focus
 		// ],
 
-		// Grid.prototype.coreExtensions = [
-		// 	//Put default extensions here!
-		// 	Query
-		// ],
+		Grid.prototype.coreExtensions = [
+			//Put default extensions here!
+			// Query
+		],
 	
 		Grid.prototype.postCreate = function(){
 			// summary:
@@ -88,27 +93,27 @@ angular.module('aui.grid')
 			// tags:
 			//		protected extension
 			var t = this;
-			t.inherited(arguments);
-			if(t.touch === undefined){
-				t.touch = has('ios') || has('android');
-			}
-			if(t.touch){
-				domClass.add(t.domNode, 'gridxTouch');
-			}else{
-				domClass.add(t.domNode, 'gridxDesktop');
-			}
-			if(!t.isLeftToRight()){
-				domClass.add(t.domNode, 'gridxRtl');
-			}
-			if(t.summary){
-				t.domNode.setAttribute('summary', t.summary);
-			}
+			// t.inherited(arguments);
+			// if(t.touch === undefined){
+			// 	t.touch = has('ios') || has('android');
+			// }
+			// if(t.touch){
+			// 	domClass.add(t.domNode, 'gridxTouch');
+			// }else{
+			// 	domClass.add(t.domNode, 'gridxDesktop');
+			// }
+			// if(!t.isLeftToRight()){
+			// 	domClass.add(t.domNode, 'gridxRtl');
+			// }
+			// if(t.summary){
+			// 	t.domNode.setAttribute('summary', t.summary);
+			// }
 			//in case gridx is not a root level package, it should still work
-			t.nls = i18n.getLocalization('gridx', 'gridx', t.lang) || nls;
+			// t.nls = i18n.getLocalization('gridx', 'gridx', t.lang) || nls;
 			t._eventFlags = {};
 			t.modules = t.coreModules.concat(t.modules || []);
 			t.modelExtensions = t.coreExtensions.concat(t.modelExtensions || []);
-			t.lastFocusNode.setAttribute('tabIndex', t.domNode.getAttribute('tabIndex'));
+			// t.lastFocusNode.setAttribute('tabIndex', t.domNode.getAttribute('tabIndex'));
 			t._initEvents(t._compNames, t._eventNames);
 			t._init();
 			//resize the grid when zoomed in/out.
@@ -123,8 +128,8 @@ angular.module('aui.grid')
 			// tags:
 			//		public extension
 			if(!this._started){
-				this.inherited(arguments);
-				this._deferStartup.callback();
+				// this.inherited(arguments);
+				// this._deferStartup.callback();
 			}
 		},
 	
@@ -133,8 +138,8 @@ angular.module('aui.grid')
 			//		Destroy this grid widget
 			// tags:
 			//		public extension
-			this._uninit();
-			this.inherited(arguments);
+			// this._uninit();
+			// this.inherited(arguments);
 		},
 
 	/*=====

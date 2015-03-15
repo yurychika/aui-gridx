@@ -5,8 +5,8 @@
 
 	module.controller('auiGridController',
 		['$scope', '$element', '$attrs', 'Grid', function ($scope, $element, $attrs, Grid) {
-			console.log($scope);
-			$scope.grid = new Grid();
+			console.log($scope.auiGrid);
+			$scope.grid = new Grid($scope.auiGrid);
 
 			console.log($scope.grid);
 			
@@ -24,9 +24,7 @@
 			transclude: true,
 			controller: 'auiGridController',
 			link: function($scope, $elem) {
-				console.log('this is the aui gridx instance');
 				console.log($scope.auiGrid);
-				console.log(123);
 				// console.log
 			}
 		};

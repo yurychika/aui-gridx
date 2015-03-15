@@ -278,13 +278,13 @@
 		t._exts = {};
 		t._cmdQueue = [];
 		t._model = t._cache = new cacheClass(t, args);
-		t._createExts(args.modelExtensions || [], args);
+		// t._createExts(args.modelExtensions || [], args);
 		var m = t._model;
-		t._cnnts = [
-			aspect.after(m, "onDelete", lang.hitch(t, "onDelete"), 1),
-			aspect.after(m, "onNew", lang.hitch(t, "onNew"), 1),
-			aspect.after(m, "onSet", lang.hitch(t, "onSet"), 1)
-		];
+		// t._cnnts = [
+		// 	aspect.after(m, "onDelete", lang.hitch(t, "onDelete"), 1),
+		// 	aspect.after(m, "onNew", lang.hitch(t, "onNew"), 1),
+		// 	aspect.after(m, "onSet", lang.hitch(t, "onSet"), 1)
+		// ];
 	};
 
 	Model.prototype = {

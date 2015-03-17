@@ -2,6 +2,12 @@
 <html ng-app='app'>
 <title>test grid basic</title>
 <link rel='stylesheet' href='../../src/less/Gridx.css'>
+<style type='text/css'>
+.gridx {
+	width: 500px;
+}
+
+</style>
 <script type='text/javascript' src='../../lib/angular/angular.js'></script>
 <script type='text/javascript' src='../../release/build.js'></script>
 <script type='text/javascript'>
@@ -19,8 +25,14 @@ app.controller('appController', function($scope) {
 	];
 
 	$scope.gridOption.columnStructs = [
-		{id: 'name', field: 'name', name: 'my name'},
-		{id: 'age', field: 'age', name: 'my age'}
+		{id: 'name', field: 'name', name: 'my name', width: '70px'},
+		{id: 'age', field: 'age', name: 'my age', width: '70px'},
+		{id: 'name', field: 'name', name: 'my name', width: '70px'},
+		{id: 'age', field: 'age', name: 'my age', width: '70px'},
+		{id: 'age', field: 'age', name: 'my age', width: '70px'},
+		{id: 'name', field: 'name', name: 'my name', width: '70px'},
+		{id: 'age', field: 'age', name: 'my age', width: '70px'}
+
 	]
 });
 </script>

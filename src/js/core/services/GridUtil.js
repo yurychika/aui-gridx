@@ -4,7 +4,9 @@
 		var s = {
 			delegate: function() {},
 
-			isFunction: function() {},
+			isFunction: function() {
+				return angular.isFunction();
+			},
 
 			isString: function(s) {
 				return angualr.isString(s);

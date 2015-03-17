@@ -27,6 +27,7 @@ angular.module('aui.grid')
 		var Grid = function Grid(options){
 			var self = this;
 
+			this.name = 'aui gridx';
 			this.isIE = false;
 			this.options = options;
 			this.postCreate();

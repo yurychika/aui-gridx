@@ -118,9 +118,9 @@ angular.module('aui.grid')
 			t._initEvents(t._compNames, t._eventNames);
 			t._init();
 			//resize the grid when zoomed in/out.
-			t.connect(metrics, 'onFontResize', function(){
-				t.resize();
-			});
+			// t.connect(metrics, 'onFontResize', function(){
+			// 	t.resize();
+			// });
 		},
 	
 		Grid.prototype.startup = function(){

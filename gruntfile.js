@@ -32,6 +32,8 @@ module.exports = function (grunt) {
 				src: [
 					'src/js/bootstrap.js',
 					'src/js/core/directives/aui-grid.js',
+					'src/js/core/directives/aui-grid-header.js',
+					'src/js/core/directives/aui-grid-footer.js',
 					'src/js/core/factories/Grid.js',
 					'src/js/core/factories/model/Model.js',
 					'src/js/core/factories/model/Sync.js',

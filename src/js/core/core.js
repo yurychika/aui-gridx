@@ -432,9 +432,9 @@ angular.module('aui.grid')
 				t.when = hitch(t.model, t.model.when);
 				t._create();
 				t._preload();
-				t._load(d).then(function(){
-					t.onModulesLoaded();
-				});
+				// t._load(d).then(function(){
+				// 	t.onModulesLoaded();
+				// });
 			// });
 		},
 

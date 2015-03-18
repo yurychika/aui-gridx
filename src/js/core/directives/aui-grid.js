@@ -4,12 +4,26 @@
 	var module = angular.module('aui.grid');
 
 	module.controller('auiGridController',
-		['$scope', '$element', '$attrs', 'Grid', function ($scope, $element, $attrs, Grid) {
+		['$scope', '$element', '$attrs', 'Grid', 'GridBody', function ($scope, $element, $attrs, Grid, GridBody) {
+			var grid;
 			$scope.grid = new Grid($scope.auiGrid);
-			this.grid = $scope.grid;
+			grid = this.grid = $scope.grid;
+			grid.body = new GridBody('basic', grid);
+			console.log(grid.body.emptyMessage);
 
 			console.log('Grid instance:', $scope.grid);
+			console.log($scope.auiGrid.data);
 
+			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
+
+			function dataWatchFunction(newData) {
+				newData = newData || [];
+				grid.setData(newData);
+				grid.model.when({}, function() {
+					grid.redraw();
+				});
+				console.log('in data watch function;');
+			}
 		}]);
 
 	module.directive('auiGrid', function() {

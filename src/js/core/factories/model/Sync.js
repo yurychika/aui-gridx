@@ -110,7 +110,7 @@
 			var t = this;
 			// t = new _Extension(model);
 			_Extension.apply(t, [model]);
-			t.setStore(args.options.data);
+			t.setData(args.options.data);
 			t.columns = mixin({}, args.columnsById || args._columnsById);
 			// provide the following APIs to Model
 			t._mixinAPI('byIndex', 'byId', 'indexToId', 'idToIndex', 'size', 'treePath', 'rootId', 'parentId',
@@ -165,17 +165,17 @@
 				this.clear();
 			},
 
-			setStore: function(store){
+			setData: function(data){
 				var t = this,
 					c = 'aspect',
-					old = store.fetch;
-				//Disconnect store events.
+					old = data.fetch;
+				//Disconnect data events.
 				t.destroy();
 				t._cnnts = [];
-				t.store = store;
-				if(!old && store.notify){
-					//The store implements the dojo.store.Observable API
-					t[c](store, 'notify', function(item, id){
+				t.data = data;
+				if(!old && data.notify){
+					//The data implements the dojo.data.Observable API
+					t[c](data, 'notify', function(item, id){
 						if(item === undefined){
 							t._onDelete(id);
 						}else if(id === undefined){
@@ -185,22 +185,22 @@
 						}
 					});
 				}else{
-					// t[c](store, old ? "onSet" : "put", "_onSet");
-					// t[c](store, old ? "onNew" : "add", "_onNew");
-					// t[c](store, old ? "onDelete" : "remove", "_onDelete");
+					// t[c](data, old ? "onSet" : "put", "_onSet");
+					// t[c](data, old ? "onNew" : "add", "_onNew");
+					// t[c](data, old ? "onDelete" : "remove", "_onDelete");
 				}
 			},
 
 			when: function(args, callback){
 				// For client side store, this method is a no-op
-				var d = new Deferred();
+				var d = new $q.defer();
 				try{
 					if(callback){
 						callback();
 					}
-					d.callback();
+					d.resolve();
 				}catch(e){
-					d.errback(e);
+					d.reject(e);
 				}
 				return d;
 			},
@@ -259,7 +259,7 @@
 				this._init();
 				var s = this._struct,
 					pid = s[id] && s[id][0],
-					index = indexOf(s[pid] || [], id);
+					index = (s[pid] || []).indexOf(id);
 				return index > 0 ? index - 1 : -1;
 			},
 
@@ -295,7 +295,7 @@
 
 			hasChildren: function(id){
 				var t = this,
-					s = t.store,
+					s = t.data,
 					c;
 				t._init();
 				c = t.byId(id);
@@ -346,7 +346,7 @@
 				var t = this;
 				if(!t._filled){
 					t._storeFetch({ start: 0 });
-					if(t.store.getChildren){
+					if(t.data.getChildren){
 						fetchChildren(t);
 					}
 					t.model._onSizeChange();
@@ -354,7 +354,7 @@
 			},
 
 			_itemToObject: function(item){
-				var s = this.store,
+				var s = this.data,
 					obj = {};
 				if(s.fetch){
 					array.forEach(s.getAttributes(item), function(attr){
@@ -399,7 +399,7 @@
 				ids[index + 1] = id;
 				st[id] = st[id] || [pid];
 				if(pid === ''){
-					i = indexOf(pr, id);
+					i = pr.indexOf(id);
 					if(i >= 0){
 						pr.splice(i, 1);
 					}
@@ -407,6 +407,7 @@
 				}
 				t._cache[id] = {
 					_data: hitch(t, t._formatRow, rowData, id),
+					// _data: t._formatRow(rowData, id),
 					rawData: rowData,
 					item: item
 				};
@@ -421,8 +422,8 @@
 	//                    options.count && (options.start || 0) + options.count - 1, ", options:",
 	//                    this.options);
 				var t = this,
-					s = t.store,
-					d = new Deferred(),
+					s = t.data,
+					d = new $q.defer(),
 					parentId = t.model.isId(options.parentId) ? options.parentId : '',
 					req = mixin({}, t.options || {}, options),
 					onError = hitch(d, d.errback),
@@ -445,27 +446,31 @@
 							i = 0,
 							item;
 						for(; item = items[i]; ++i){
-							t._addRow(s.getIdentity(item), start + i, t._itemToObject(item), item, parentId);
+							t._addRow(item.id, start + i, t._itemToObject(item), item, parentId);
 						}
-						d.callback();
+						// d.callback();
+						d.resolve();
 					}catch(e){
-						d.errback(e);
+						// d.errback(e);
+						d.reject(e);
 					}
 				}
 				t._filled = 1;
 				t.onBeforeFetch(req);
 				if(parentId === ''){
-					if(s.fetch){
-						s.fetch(mixin(req, {
-							onBegin: onBegin,
-							onComplete: onComplete,
-							onError: onError
-						}));
-					}else{
-						results = s.query(req.query || {}, req);
-						Deferred.when(results.total, onBegin);
-						Deferred.when(results, onComplete, onError);
-					}
+					// if(s.fetch){
+					// 	s.fetch(mixin(req, {
+					// 		onBegin: onBegin,
+					// 		onComplete: onComplete,
+					// 		onError: onError
+					// 	}));
+					// }else{
+					// results = s.query(req.query || {}, req);
+					// Deferred.when(results.total, onBegin);
+					// Deferred.when(results, onComplete, onError);
+					onBegin(s.length);
+					onComplete(s);
+					// }
 				}else if(t.hasChildren(parentId)){
 					results = s.getChildren(t.byId(parentId).item, req);
 					if('total' in results){
@@ -479,7 +484,7 @@
 				}else{
 					d.callback();
 				}
-				d.then(function(){
+				d.promise.then(function(){
 					t.onAfterFetch();
 				});
 				return d;
@@ -488,7 +493,7 @@
 			//--------------------------------------------------------------------------
 			_onSet: function(item, option) {
 				var t = this,
-					id = t.store.getIdentity(item),
+					id = t.data.getIdentity(item),
 					index = t.idToIndex(id),
 					path = t.treePath(id),
 					old = t._cache[id];
@@ -504,7 +509,7 @@
 
 			_onNew: function(item, parentInfo){
 				var t = this,
-					s = t.store,
+					s = t.data,
 					row = t._itemToObject(item),
 					parentItem = parentInfo && parentInfo[s.fetch ? 'item' : 'parent'],
 					parentId = parentItem ? s.getIdentity(parentItem) : '',
@@ -531,7 +536,7 @@
 
 			_onDelete: function(item){
 				var t = this,
-					s = t.store,
+					s = t.data,
 					st = t._struct,
 					id = s.fetch ? s.getIdentity(item) : item,
 					path = t.treePath(id);
@@ -541,7 +546,7 @@
 						parentId = path[path.length - 1],
 						sz = t._size,
 						size = sz[''],
-						index = indexOf(st[parentId], id);
+						index = st[parentId].indexOf(id);
 					//This must exist, because we've already have treePath
 					st[parentId].splice(index, 1);
 					--sz[parentId];
@@ -564,7 +569,7 @@
 							t.onDelete(j, undefined, t.treePath(j));
 						}
 					}
-					i = indexOf(t._priority, id);
+					i = t._priority.indexOf(id);
 					if(i >= 0){
 						t._priority.splice(i, 1);
 					}

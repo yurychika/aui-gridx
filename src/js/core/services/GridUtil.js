@@ -9,14 +9,25 @@
 			},
 
 			isString: function(s) {
-				return angualr.isString(s);
+				return angular.isString(s);
 			},
 
 			isArray: function(a) {
 				return angular.isArray(a);
 			},
 			
-			hitch: function() {},
+			hitch: function(scope, method) {
+				scope = scope || window;
+				method = angular.isString(method) ? scope[method] : method;
+
+				if (arguments.length > 2) {
+					var args = [].slice(arguments, [2]);
+					// args = args.splice(0, 2);
+					return function() {return method.apply(scope, args.concat(arguments));}
+				}
+
+				return function() {return method.apply(scope, arguments || []);}
+			},
 
 			mixin: function(a, b) {
 				var k;

@@ -52,16 +52,21 @@ angular.module('aui.grid')
 			}
 		},
 
+		Grid.prototype.redraw = function() {
+			// debugger;
+			this.body.render();
+		};
+
 		Grid.prototype.getTextDir = function(colId, text){
 			var col = this._columnsById[colId],
 				textDir = (col && col.textDir) || this.textDir;
 			return textDir = (textDir === "auto") ? _BidiSupport.prototype._checkContextual(text) : textDir;
-		},
+		};
 
 		Grid.prototype.getTextDirStyle = function(colId, text){
 			var textDir = this.getTextDir(colId, text);
 			return textDir ? " direction:" + textDir + ";" : "";
-		},
+		};
 
 		Grid.prototype.enforceTextDirWithUcc = function(colId, text){
 			var textDir = this.getTextDir(colId, text);
@@ -218,7 +223,7 @@ angular.module('aui.grid')
 					this[evtName] = this[evtName] || dummyFunc;
 				}
 			}
-		},
+		};
 
 		Grid.prototype._connectEvents = function(node, connector, scope){
 			for(var t = this,
@@ -230,11 +235,11 @@ angular.module('aui.grid')
 				eventName = eventNames[i];
 				m._cnnts.push(on(node, eventName.toLowerCase(), lang.hitch(scope, connector, eventName)));
 			}
-		},
+		};
 	
 		Grid.prototype._isConnected = function(eventName){
 			return this[eventName] !== dummyFunc;
-		},
+		};
 		//event handling end
 
 		Grid.prototype._isCtrlKey = function(evt){

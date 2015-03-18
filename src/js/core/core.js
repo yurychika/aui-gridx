@@ -303,14 +303,15 @@ angular.module('aui.grid')
 			}
 		},
 
-		setData: function(data, skipAutoParseColumn){
+		setData: function(data){
 			var c;
 
 			this.model.setData(data);
-			if(!skipAutoParseColumn){
-				c = this.model._parseStructure(data);
-				this.setColumns(c);
-			}
+			// this.model.when({}, function(){console.log('in model when set data');});
+			// if(!skipAutoParseColumn){
+			// 	c = this.model._parseStructure(data);
+			// 	this.setColumns(c);
+			// }
 		},
 
 		setColumns: function(columns){
@@ -429,6 +430,7 @@ angular.module('aui.grid')
 
 				//Create model before module creation, so that all modules can use the logic grid from very beginning.
 				t.model = new Model(t);
+				t.model.when({}, function() {console.log('data load done')});
 				t.when = hitch(t.model, t.model.when);
 				t._create();
 				t._preload();

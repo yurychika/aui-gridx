@@ -18,10 +18,7 @@
 			// },
 			// controller: 'auiGridController',
 			link: function($scope, $elem, $attrs, controllers) {
-				console.log('in aui-grid');
 				var gridCtrl = controllers[0];
-				console.log('in aui-grid-header link');
-				console.log($elem);
 
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;

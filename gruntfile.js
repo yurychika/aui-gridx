@@ -31,12 +31,17 @@ module.exports = function (grunt) {
 			release: {
 				src: [
 					'src/js/bootstrap.js',
+
 					'src/js/core/directives/aui-grid.js',
 					'src/js/core/directives/aui-grid-header.js',
+					'src/js/core/directives/aui-grid-body.js',
 					'src/js/core/directives/aui-grid-footer.js',
+
 					'src/js/core/factories/Grid.js',
+					'src/js/core/factories/GridBody.js',
 					'src/js/core/factories/model/Model.js',
 					'src/js/core/factories/model/Sync.js',
+
 					'src/js/core/core.js',
 					'src/js/core/services/GridUtil.js',
 					'release/.tmp/template.js'

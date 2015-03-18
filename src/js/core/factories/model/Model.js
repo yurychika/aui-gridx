@@ -209,6 +209,7 @@
 
 	var isArrayLike = GridUtil.isArray,
 		isString = GridUtil.isString;
+		hitch = GridUtil.hitch;
 
 	function isId(it){
 		return it || it === 0;
@@ -292,7 +293,7 @@
 		},
 	
 		destroy: function(){
-			array.forEach(this._cnnts, function(cnnt){
+			this._cnnts.forEach(function(cnnt){
 				cnnt.remove();
 			});
 			for(var n in this._exts){
@@ -307,9 +308,9 @@
 
 		isId: isId,
 
-		setStore: function(store){
-			this.store = store;
-			this._cache.setStore(store);
+		setData: function(data){
+			this.data = data;
+			this._cache.setData(data);
 		},
 
 		//Public-------------------------------------------------------------------
@@ -326,7 +327,7 @@
 		},
 
 		scan: function(args, callback){
-			var d = new Deferred(),
+			var d = new $q.defer(),
 				start = args.start || 0,
 				pageSize = args.pageSize || this._cache.pageSize || 1,
 				count = args.count,
@@ -421,7 +422,7 @@
 
 		_cmdRequest: function(){
 			var t = this;
-			return new DeferredList(array.map(arguments, function(args){
+			return new $q.all([].map.apply(arguments, [function(args){
 				var arg = args[0],
 					finish = function(){
 						t._onSizeChange();
@@ -432,20 +433,20 @@
 						}
 					};
 				if(arg === null || !args.length){
-					var d = new Deferred();
+					var d = new $q.defer();
 					finish();
 					d.callback();
 					return d;
 				}
 				return t._model._call('when', [normArgs(t, arg), finish]);
-			}), 0, 1);
+			}]), 0, 1);
 		},
 
 		_exec: function(){
 			//Execute commands one by one.
 			var t = this,
 				c = t._cache,
-				d = new Deferred(),
+				d = new $q.defer(),
 				cmds = t._cmdQueue,
 				finish = function(d, err){
 					t._busy = 0;
@@ -453,13 +454,13 @@
 						c._checkSize();
 					}
 					if(err){
-						d.errback(err);
+						d.reject(err);
 					}else{
-						d.callback();
+						d.resolve();
 					}
 				},
 				func = function(){
-					if(array.some(cmds, function(cmd){
+					if(cmds.some(function(cmd){
 						return cmd.name == '_cmdRequest';
 					})){
 						try{
@@ -467,7 +468,7 @@
 								var cmd = cmds.shift(),
 									dd = cmd.scope[cmd.name].apply(cmd.scope, cmd.args);
 								if(cmd.async){
-									Deferred.when(dd, func, lang.partial(finish, d));
+									$q.when(dd, func, hitch(t, finish, d));
 									return;
 								}
 							}

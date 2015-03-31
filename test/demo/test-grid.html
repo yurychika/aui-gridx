@@ -50,11 +50,6 @@ app.controller('appController', function($scope) {
 		{name: "Enos", age: 34, id: 12, country: 'US'},
 	];
 
-	// setTimeout(function() {
-	// 	$scope.gridOption.data.pop();
-	// 	$scope.$digest();
-	// 	console.log('pop data');
-	// }, 3000);
 
 	$scope.gridOption.columnStructs = [
 		{id: 'name', field: 'name', name: 'my name', width: '70px'},
@@ -86,7 +81,6 @@ app.controller('appController', function($scope) {
 
 <body ng-controller='appController'>
 	<div aui-grid='gridOption'></div>
-
 	<button ng-click='removeRow()'>remove row</button>
 	<button ng-click='addRow()'>add row</button>
 </body>

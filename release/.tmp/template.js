@@ -29,7 +29,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid',
-    "<div class=\"gridx\" role=\"grid\" tabindex=\"0\" aria-readonly=\"true\" aria-label=\"grid\"><div class=\"gridxLoad\"></div><div aui-grid-header></div><div aui-grid-body></div><div aui-grid-footer></div><span data-dojo-attach-point=\"lastFocusNode\" tabindex=\"0\"></span></div>"
+    "<div class=\"gridx\" role=\"grid\" tabindex=\"0\" aria-readonly=\"true\" aria-label=\"grid\"><div class=\"gridxLoad\"></div><div aui-grid-header></div><div aui-grid-body></div><!-- <div aui-grid-footer></div> --><span data-dojo-attach-point=\"lastFocusNode\" tabindex=\"0\"></span></div>"
   );
 
 }]);

@@ -10,9 +10,8 @@
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
 			console.log(grid.body.emptyMessage);
-
-			console.log('Grid instance:', $scope.grid);
-			console.log($scope.auiGrid.data);
+			// console.log('Grid instance:', $scope.grid);
+			// console.log($scope.auiGrid.data);
 
 			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
 

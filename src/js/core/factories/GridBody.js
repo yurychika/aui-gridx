@@ -348,7 +348,6 @@ angular.module('aui.grid')
 				for(i in cache) {
 					rr.push(cache[i].item);
 				}
-				console.log(rr);
 			},
 
 			compareOnSet: function(v1, v2){

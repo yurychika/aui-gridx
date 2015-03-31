@@ -15,9 +15,8 @@
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
 			console.log(grid.body.emptyMessage);
-
-			console.log('Grid instance:', $scope.grid);
-			console.log($scope.auiGrid.data);
+			// console.log('Grid instance:', $scope.grid);
+			// console.log($scope.auiGrid.data);
 
 			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
 
@@ -297,8 +296,7 @@
 
 	var module = angular.module('aui.grid');
 
-	module.controller('auiGridBodyController',
-		['$scope', '$element', '$attrs', 'Grid', function ($scope, $element, $attrs, Grid) {
+	module.controller('auiGridBodyController', ['$scope', '$element', '$attrs', 'Grid', function ($scope, $element, $attrs, Grid) {
 			var self = this;
 			this.grid = $scope.grid;
 			this.renderedRows = this.grid.body.renderedRows;
@@ -312,10 +310,6 @@
 	module.directive('auiGridBody', function() {
 		return {
 			templateUrl: 'aui-grid/aui-grid-body',
-			// scope: {
-			// 	auiGrid: '=',
-			// 	getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
-			// },
 			require: ['^auiGrid', 'auiGridBody'],
 			replace: true,
 			transclude: true,
@@ -330,15 +324,12 @@
 				$scope.isEmpty = bodyCtrl.isEmpty;
 
 				$scope.$watch(
-				// This function returns the value being watched. It is called for each turn of the $digest loop
+					// This function returns the value being watched. It is called for each turn of the $digest loop
 					function() { return gridCtrl.grid.model.size() === 0; },
-				// This is the change listener, called when the value returned from the above function changes
+					// This is the change listener, called when the value returned from the above function changes
 					function(newValue, oldValue) {
 						if (newValue) {
-							console.log(newValue);
 							$scope.isEmpty = true;
-						// Only increment the counter if the value changed
-							// scope.foodCounter = scope.foodCounter + 1;
 						} else {
 							$scope.isEmpty = false;
 						}
@@ -3633,7 +3624,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid',
-    "<div class=\"gridx\" role=\"grid\" tabindex=\"0\" aria-readonly=\"true\" aria-label=\"grid\"><div class=\"gridxLoad\"></div><div aui-grid-header></div><div aui-grid-body></div><div aui-grid-footer></div><span data-dojo-attach-point=\"lastFocusNode\" tabindex=\"0\"></span></div>"
+    "<div class=\"gridx\" role=\"grid\" tabindex=\"0\" aria-readonly=\"true\" aria-label=\"grid\"><div class=\"gridxLoad\"></div><div aui-grid-header></div><div aui-grid-body></div><!-- <div aui-grid-footer></div> --><span data-dojo-attach-point=\"lastFocusNode\" tabindex=\"0\"></span></div>"
   );
 
 }]);

@@ -12,7 +12,7 @@
 			},
 			replace: true,
 			require: ['^auiGrid'],
-			transclude: true,
+			// transclude: true,
 			// compile: function() {
 			// 	console.log('in aui-grid compile');
 			// },

@@ -12,7 +12,7 @@
 			},
 			require: ['^auiGrid'],
 			replace: true,
-			transclude: true,
+			// transclude: true,
 			// controller: 'auiGridController',
 			link: function($scope, $elem) {
 				console.log($scope.auiGrid);

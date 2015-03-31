@@ -372,6 +372,46 @@
 	});
 })();
 
+(function() {
+	'use strict';
+
+	var module = angular.module('aui.grid');
+
+	module.directive('auiGridRow', ['GridUtil', function(GridUtil) {
+		return {
+			templateUrl: 'aui-grid/aui-grid-row',
+			replace: true,
+			require: ['^auiGrid'],
+			transclude: true,
+			link: function($scope, $elem, $attrs, controllers) {
+				var gridCtrl = controllers[0];
+
+				$scope.grid = gridCtrl.grid;
+				var grid = $scope.grid;
+				$scope.columns = gridCtrl._columns;
+				$scope.domNode = $elem[0];
+				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
+				$scope.headerCells = [];
+				// var $colMenu 
+				var temp;
+
+				// angular.forEach(grid._columns, function(col) {
+				// 	temp = {};
+				// 	temp.id = grid.id + col.id;
+				// 	temp.domClass = (GridUtil.isFunction(col.headerClass) ? col.headerClass(col) : col.headerClass) || '';
+				// 	temp.style = 'width:' +  col.width + ';min-width:' + col.width + ';';
+				// 	temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
+				// 	temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
+				// 	$scope.headerCells.push(temp);
+				// });
+
+				// console.log($scope.headerCells);
+				// return;
+			}
+		};
+	}]);
+})();
+
 (function(){
 angular.module('aui.grid')
 .factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore',
@@ -977,7 +1017,6 @@ angular.module('aui.grid')
 				for(i in cache) {
 					rr.push(cache[i].item);
 				}
-				console.log(rr);
 			},
 
 			compareOnSet: function(v1, v2){
@@ -3597,7 +3636,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('aui-grid/aui-grid-body',
-    "<div class=\"gridxMain\" role=\"presentation\"><div class=\"gridxBodyEmpty\" role=\"alert\" tabindex=\"-1\" ng-show=\"isEmpty\">this is the empty body</div><div class=\"gridxBody\" role=\"presentation\" tabindex=\"0\"><div class=\"gridxRow\" ng-repeat=\"row in renderedRows\" role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\" data-rowheight=\"53\"><table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"(key, value) in row\" class=\"gridxCell\">{{value}}</td></tr></tbody></table></div></div><!-- \t<div class=\"gridxVScroller\"tabindex=\"-1\">\r" +
+    "<div class=\"gridxMain\" role=\"presentation\"><div class=\"gridxBodyEmpty\" role=\"alert\" tabindex=\"-1\" ng-show=\"isEmpty\">this is the empty body</div><div class=\"gridxBody\" role=\"presentation\" tabindex=\"0\"><div aui-grid-row ng-repeat=\"row in renderedRows\" row=\"row\"></div></div><!-- \t<div class=\"gridxVScroller\"tabindex=\"-1\">\r" +
     "\n" +
     "\t\t<div style='width: 1px;'></div>\r" +
     "\n" +
@@ -3620,6 +3659,27 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('aui-grid/aui-grid-header',
     "<div class=\"gridxHeader\" role=\"presentation\"><!-- this is the header for {{grid.name}} --><div class=\"gridxHeaderRow\"><div class=\"gridxHeaderRowInner\" role=\"row\" style><table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"cell in headerCells\" aria-readonly=\"true\" role=\"gridcell\" tabindex=\"-1\" aria-describedby=\"grid-id\" colid=\"{{cell.id}}\" class=\"gridxCell {{cell.domClass}}\" style=\"{{cell.style}}\">{{cell.content}}</td></tr></tbody></table></div></div></div>"
+  );
+
+
+  $templateCache.put('aui-grid/aui-grid-row',
+    "<!-- <div class=\"gridxRow\" ng-repeat='row in renderedRows' role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\" data-rowheight=\"53\">\r" +
+    "\n" +
+    "\t<table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\r" +
+    "\n" +
+    "\t\t<tbody>\r" +
+    "\n" +
+    "\t\t\t<tr>\r" +
+    "\n" +
+    "\t\t\t\t<td ng-repeat='(key, value) in row' class='gridxCell'>{{value}}</td>\r" +
+    "\n" +
+    "\t\t\t</tr>\r" +
+    "\n" +
+    "\t\t</tbody>\r" +
+    "\n" +
+    "\t</table>\r" +
+    "\n" +
+    "</div> --><div>hello world</div>"
   );
 
 

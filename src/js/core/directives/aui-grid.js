@@ -33,7 +33,7 @@
 				getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
 			},
 			replace: true,
-			transclude: true,
+			// transclude: true,
 			controller: 'auiGridController',
 			link: function($scope, $elem) {
 				console.log(arguments);

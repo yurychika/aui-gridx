@@ -2,7 +2,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('aui-grid/aui-grid-body',
-    "<div class=\"gridxMain\" role=\"presentation\"><div class=\"gridxBodyEmpty\" role=\"alert\" tabindex=\"-1\" ng-show=\"isEmpty\">this is the empty body</div><div class=\"gridxBody\" role=\"presentation\" tabindex=\"0\"><div class=\"gridxRow\" ng-repeat=\"row in renderedRows\" role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\" data-rowheight=\"53\"><table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"(key, value) in row\" class=\"gridxCell\">{{value}}</td></tr></tbody></table></div></div><!-- \t<div class=\"gridxVScroller\"tabindex=\"-1\">\r" +
+    "<div class=\"gridxMain\" role=\"presentation\"><div class=\"gridxBodyEmpty\" role=\"alert\" tabindex=\"-1\" ng-show=\"isEmpty\">this is the empty body</div><div class=\"gridxBody\" role=\"presentation\" tabindex=\"0\"><div aui-grid-row ng-repeat=\"row in renderedRows\" row=\"row\"></div></div><!-- \t<div class=\"gridxVScroller\"tabindex=\"-1\">\r" +
     "\n" +
     "\t\t<div style='width: 1px;'></div>\r" +
     "\n" +
@@ -25,6 +25,27 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('aui-grid/aui-grid-header',
     "<div class=\"gridxHeader\" role=\"presentation\"><!-- this is the header for {{grid.name}} --><div class=\"gridxHeaderRow\"><div class=\"gridxHeaderRowInner\" role=\"row\" style><table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"cell in headerCells\" aria-readonly=\"true\" role=\"gridcell\" tabindex=\"-1\" aria-describedby=\"grid-id\" colid=\"{{cell.id}}\" class=\"gridxCell {{cell.domClass}}\" style=\"{{cell.style}}\">{{cell.content}}</td></tr></tbody></table></div></div></div>"
+  );
+
+
+  $templateCache.put('aui-grid/aui-grid-row',
+    "<!-- <div class=\"gridxRow\" ng-repeat='row in renderedRows' role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\" data-rowheight=\"53\">\r" +
+    "\n" +
+    "\t<table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\r" +
+    "\n" +
+    "\t\t<tbody>\r" +
+    "\n" +
+    "\t\t\t<tr>\r" +
+    "\n" +
+    "\t\t\t\t<td ng-repeat='(key, value) in row' class='gridxCell'>{{value}}</td>\r" +
+    "\n" +
+    "\t\t\t</tr>\r" +
+    "\n" +
+    "\t\t</tbody>\r" +
+    "\n" +
+    "\t</table>\r" +
+    "\n" +
+    "</div> --><div>hello world</div>"
   );
 
 

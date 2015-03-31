@@ -19,7 +19,6 @@
 			templateUrl: 'aui-grid/aui-grid-body',
 			require: ['^auiGrid', 'auiGridBody'],
 			replace: true,
-			transclude: true,
 			controller: 'auiGridBodyController as RenderContainer',
 			// controller: 'auiGridController',
 			link: function($scope, $elm, $attrs, controllers) {

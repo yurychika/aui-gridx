@@ -8,18 +8,23 @@
 			templateUrl: 'aui-grid/aui-grid-row',
 			replace: true,
 			require: ['^auiGrid'],
+			scope: {
+				row: '='
+			},
 			// transclude: true,
 			link: function($scope, $elem, $attrs, controllers) {
-				var gridCtrl = controllers[0];
+				var gridCtrl = controllers[0],
+					grid,
+					temp;
 
 				$scope.grid = gridCtrl.grid;
-				var grid = $scope.grid;
-				$scope.columns = gridCtrl._columns;
+				$scope.columns = $scope.grid._columns;
 				$scope.domNode = $elem[0];
 				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
 				$scope.headerCells = [];
 				// var $colMenu 
-				var temp;
+				grid = $scope.grid;
+				console.log('$scope.row in aui-grid-row', $scope.row);
 
 				// angular.forEach(grid._columns, function(col) {
 				// 	temp = {};

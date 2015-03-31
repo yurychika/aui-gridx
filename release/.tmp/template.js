@@ -29,23 +29,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid-row',
-    "<!-- <div class=\"gridxRow\" ng-repeat='row in renderedRows' role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\" data-rowheight=\"53\">\r" +
-    "\n" +
-    "\t<table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\r" +
-    "\n" +
-    "\t\t<tbody>\r" +
-    "\n" +
-    "\t\t\t<tr>\r" +
-    "\n" +
-    "\t\t\t\t<td ng-repeat='(key, value) in row' class='gridxCell'>{{value}}</td>\r" +
-    "\n" +
-    "\t\t\t</tr>\r" +
-    "\n" +
-    "\t\t</tbody>\r" +
-    "\n" +
-    "\t</table>\r" +
-    "\n" +
-    "</div> --><div>hello world</div>"
+    "<div class=\"gridxRow\" role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\"><table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"col in columns\" class=\"gridxCell\">{{col.field}}</td></tr></tbody></table></div>"
   );
 
 

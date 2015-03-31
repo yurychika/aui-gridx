@@ -38,7 +38,7 @@
 				getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
 			},
 			replace: true,
-			transclude: true,
+			// transclude: true,
 			controller: 'auiGridController',
 			link: function($scope, $elem) {
 				console.log(arguments);
@@ -63,7 +63,7 @@
 			},
 			replace: true,
 			require: ['^auiGrid'],
-			transclude: true,
+			// transclude: true,
 			// compile: function() {
 			// 	console.log('in aui-grid compile');
 			// },
@@ -312,7 +312,6 @@
 			templateUrl: 'aui-grid/aui-grid-body',
 			require: ['^auiGrid', 'auiGridBody'],
 			replace: true,
-			transclude: true,
 			controller: 'auiGridBodyController as RenderContainer',
 			// controller: 'auiGridController',
 			link: function($scope, $elm, $attrs, controllers) {
@@ -362,7 +361,7 @@
 			},
 			require: ['^auiGrid'],
 			replace: true,
-			transclude: true,
+			// transclude: true,
 			// controller: 'auiGridController',
 			link: function($scope, $elem) {
 				console.log($scope.auiGrid);
@@ -382,18 +381,23 @@
 			templateUrl: 'aui-grid/aui-grid-row',
 			replace: true,
 			require: ['^auiGrid'],
-			transclude: true,
+			scope: {
+				row: '='
+			},
+			// transclude: true,
 			link: function($scope, $elem, $attrs, controllers) {
-				var gridCtrl = controllers[0];
+				var gridCtrl = controllers[0],
+					grid,
+					temp;
 
 				$scope.grid = gridCtrl.grid;
-				var grid = $scope.grid;
-				$scope.columns = gridCtrl._columns;
+				$scope.columns = $scope.grid._columns;
 				$scope.domNode = $elem[0];
 				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
 				$scope.headerCells = [];
 				// var $colMenu 
-				var temp;
+				grid = $scope.grid;
+				console.log('$scope.row in aui-grid-row', $scope.row);
 
 				// angular.forEach(grid._columns, function(col) {
 				// 	temp = {};
@@ -3663,23 +3667,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid-row',
-    "<!-- <div class=\"gridxRow\" ng-repeat='row in renderedRows' role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\" data-rowheight=\"53\">\r" +
-    "\n" +
-    "\t<table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\r" +
-    "\n" +
-    "\t\t<tbody>\r" +
-    "\n" +
-    "\t\t\t<tr>\r" +
-    "\n" +
-    "\t\t\t\t<td ng-repeat='(key, value) in row' class='gridxCell'>{{value}}</td>\r" +
-    "\n" +
-    "\t\t\t</tr>\r" +
-    "\n" +
-    "\t\t</tbody>\r" +
-    "\n" +
-    "\t</table>\r" +
-    "\n" +
-    "</div> --><div>hello world</div>"
+    "<div class=\"gridxRow\" role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\"><table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"col in columns\" class=\"gridxCell\">{{col.field}}</td></tr></tbody></table></div>"
   );
 
 

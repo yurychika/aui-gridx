@@ -270,16 +270,18 @@
 		}
 		return res;
 	}
-	var Model = function Model(args) {
+	var Model = function Model(grid) {
 		var t = this,
-			g = args,
-			cacheClass = args.cacheClass || Sync;
+			g = grid,
+			cacheClass = grid.cacheClass || Sync;
+
 		cacheClass = typeof cacheClass == 'string' ? require(cacheClass) : cacheClass;
-		t.store = args.store;
+		t.childField = grid.getOption('childField');
+		t.store = grid.store;
 		t._exts = {};
 		t._cmdQueue = [];
-		t._model = t._cache = new cacheClass(t, args);
-		// t._createExts(args.modelExtensions || [], args);
+		t._model = t._cache = new cacheClass(t, grid);
+		// t._createExts(grid.modelExtensions || [], grid);
 		var m = t._model;
 		// t._cnnts = [
 		// 	aspect.after(m, "onDelete", lang.hitch(t, "onDelete"), 1),
@@ -289,9 +291,8 @@
 	};
 
 	Model.prototype = {
-		constructor: function(args){
-		},
-	
+		childField: 'children',
+
 		destroy: function(){
 			this._cnnts.forEach(function(cnnt){
 				cnnt.remove();
@@ -380,6 +381,7 @@
 				childId = this.indexToId(i, parentId, isWhole);
 				count += this._sizeAll(childId, isWhole);
 			}
+
 
 			return count;
 		},

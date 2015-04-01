@@ -1,7 +1,7 @@
 (function(){
 angular.module('aui.grid')
-.factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore',
-	function($q, $compile, $parse, $timeout, GridCore) {
+.factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridOption',
+	function($q, $compile, $parse, $timeout, GridCore, GridOption) {
 		console.log('in side grid constuctor');
 		console.log('Grid core', GridCore);
 		var dummyFunc = function(){};
@@ -30,12 +30,20 @@ angular.module('aui.grid')
 			this.name = 'aui gridx';
 			this.isIE = false;
 			this.options = options;
+			this._options = new GridOption(options);
+			console.log('childField', this.getOption('childField'));
+			console.log('emptyInfo', this.getOption('emptyInfo'));
 			this.postCreate();
 		};
+
 
 		Grid.prototype = GridCore.prototype;
 
 		Grid.prototype.version = version;
+
+		Grid.prototype.getOption = function(name) {
+			return this._options.getOption(name);
+		};
 
 		Grid.prototype._setTextDirAttr = function(textDir){
 			// summary:

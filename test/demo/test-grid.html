@@ -34,13 +34,16 @@ var app = angular.module('app', ['aui.grid']);
 app.controller('appController', function($scope) {
 	$scope.gridOption = {};
 
+	// $scope.gridOption.childField = 'childrend';
+
 	window.data = $scope.gridOption.data = [
-		{name: "Moroni", age: 50, id: 1, country: 'US'},
-		{name: "Tiancum", age: 43, id: 2, country: 'US'},
-		{name: "Jacob", age: 27, id: 3, country: 'US'},
-		{name: "Nephi", age: 29, id: 4, country: 'US'},
-		{name: "Enos", age: 34, id: 5, country: 'US'},
-		{name: "Moroni", age: 50, id: 1, country: 'US'},
+		{name: "Moroni", age: 50, id: 1, country: 'US', children: [
+			{name: "Tiancum", age: 43, id: 2, country: 'US'},
+			{name: "Jacob", age: 27, id: 3, country: 'US'},
+			{name: "Nephi", age: 29, id: 4, country: 'US'},
+			{name: "Enos", age: 34, id: 5, country: 'US'}
+		]},
+		{name: "Moroni", age: 50, id: 13, country: 'US'},
 		{name: "Tiancum", age: 43, id: 6, country: 'US'},
 		{name: "Jacob", age: 27, id: 7, country: 'US'},
 		{name: "Nephi", age: 29, id: 8, country: 'US'},
@@ -52,7 +55,11 @@ app.controller('appController', function($scope) {
 
 
 	$scope.gridOption.columnStructs = [
-		{id: 'name', field: 'name', name: 'my name', width: '70px'},
+		{id: 'name', field: 'name', name: 'my name', width: '70px',
+			formatter: function(celldata, rowData, rowId, columnId) {
+				return 'gee';
+			}
+		},
 		{id: 'age', field: 'age', name: 'my age', width: '70px'},
 		{id: 'id', field: 'id', name: 'my id', width: '70px'},
 		{id: 'country', field: 'country', name: 'my country', width: '70px'},

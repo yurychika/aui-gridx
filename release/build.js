@@ -418,8 +418,8 @@
 
 (function(){
 angular.module('aui.grid')
-.factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore',
-	function($q, $compile, $parse, $timeout, GridCore) {
+.factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridOption',
+	function($q, $compile, $parse, $timeout, GridCore, GridOption) {
 		console.log('in side grid constuctor');
 		console.log('Grid core', GridCore);
 		var dummyFunc = function(){};
@@ -448,12 +448,20 @@ angular.module('aui.grid')
 			this.name = 'aui gridx';
 			this.isIE = false;
 			this.options = options;
+			this._options = new GridOption(options);
+			console.log('childField', this.getOption('childField'));
+			console.log('emptyInfo', this.getOption('emptyInfo'));
 			this.postCreate();
 		};
+
 
 		Grid.prototype = GridCore.prototype;
 
 		Grid.prototype.version = version;
+
+		Grid.prototype.getOption = function(name) {
+			return this._options.getOption(name);
+		};
 
 		Grid.prototype._setTextDirAttr = function(textDir){
 			// summary:
@@ -1913,6 +1921,31 @@ angular.module('aui.grid')
 })();
 
 (function(){
+angular.module('aui.grid')
+.factory('GridOption', ['$q', '$compile', '$parse', '$timeout', 'GridCore',
+	function($q, $compile, $parse, $timeout, GridCore) {
+
+		var GridOption = function(options) {
+			this._options = options;
+		};
+
+		GridOption.prototype.childField = 'children';
+
+		GridOption.prototype.emptyInfo = 'There are no rows.';
+
+		GridOption.prototype.getOption = function(name) {
+			if (this._options.hasOwnProperty(name)) {
+				return this._options[name];
+			}
+
+			return this[name];
+		};
+
+		return GridOption;
+	}]);
+})();
+
+(function(){
 	angular.module('aui.grid')
 	.factory('Model', ['$q', 'GridUtil', 'Sync', '$compile', '$parse', '$timeout', function($q, GridUtil, Sync) {
 /*=====
@@ -2184,16 +2217,18 @@ angular.module('aui.grid')
 		}
 		return res;
 	}
-	var Model = function Model(args) {
+	var Model = function Model(grid) {
 		var t = this,
-			g = args,
-			cacheClass = args.cacheClass || Sync;
+			g = grid,
+			cacheClass = grid.cacheClass || Sync;
+
 		cacheClass = typeof cacheClass == 'string' ? require(cacheClass) : cacheClass;
-		t.store = args.store;
+		t.childField = grid.getOption('childField');
+		t.store = grid.store;
 		t._exts = {};
 		t._cmdQueue = [];
-		t._model = t._cache = new cacheClass(t, args);
-		// t._createExts(args.modelExtensions || [], args);
+		t._model = t._cache = new cacheClass(t, grid);
+		// t._createExts(grid.modelExtensions || [], grid);
 		var m = t._model;
 		// t._cnnts = [
 		// 	aspect.after(m, "onDelete", lang.hitch(t, "onDelete"), 1),
@@ -2203,9 +2238,8 @@ angular.module('aui.grid')
 	};
 
 	Model.prototype = {
-		constructor: function(args){
-		},
-	
+		childField: 'children',
+
 		destroy: function(){
 			this._cnnts.forEach(function(cnnt){
 				cnnt.remove();
@@ -2294,6 +2328,7 @@ angular.module('aui.grid')
 				childId = this.indexToId(i, parentId, isWhole);
 				count += this._sizeAll(childId, isWhole);
 			}
+
 
 			return count;
 		},
@@ -2454,6 +2489,7 @@ angular.module('aui.grid')
 				i = t.inner = model._model;
 			t._cnnts = [];
 			t.model = model;
+			t.childField = t.model.childField;
 			model._model = t;
 			if(i){
 				t.aspect(i, 'onDelete', '_onDelete');
@@ -2725,10 +2761,13 @@ angular.module('aui.grid')
 			hasChildren: function(id){
 				var t = this,
 					s = t.data,
+					cf = t.childField,
 					c;
+
 				t._init();
 				c = t.byId(id);
-				return s.hasChildren && s.hasChildren(id, c && c.item) && s.getChildren;
+				return c && c.rawData && c.rawData[cf] && c.rawData[cf].length;
+				// return s.hasChildren && s.hasChildren(id, c && c.item) && s.getChildren;
 			},
 
 			children: function(parentId){
@@ -2799,7 +2838,7 @@ angular.module('aui.grid')
 					t = this,
 					cellData; 
 
-				cellData = col.formatter ? col.formatter(rawData, rowId) : rawData[col.field || colId];
+				cellData = col.formatter ? col.formatter(rawData[col.field], rawData, rowId, colId) : rawData[col.field || colId];
 				return (t.columns[colId] && t.columns[colId].encode === true && typeof cellData === 'string')? entities.encode(cellData) : cellData;
 			},
 
@@ -3475,6 +3514,7 @@ angular.module('aui.grid')
 				t.model = new Model(t);
 				t.model.when({}, function() {console.log('data load done')});
 				t.when = hitch(t.model, t.model.when);
+				debugger;
 				t._create();
 				t._preload();
 				// t._load(d).then(function(){

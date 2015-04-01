@@ -25,6 +25,7 @@
 				i = t.inner = model._model;
 			t._cnnts = [];
 			t.model = model;
+			t.childField = t.model.childField;
 			model._model = t;
 			if(i){
 				t.aspect(i, 'onDelete', '_onDelete');
@@ -296,10 +297,13 @@
 			hasChildren: function(id){
 				var t = this,
 					s = t.data,
+					cf = t.childField,
 					c;
+
 				t._init();
 				c = t.byId(id);
-				return s.hasChildren && s.hasChildren(id, c && c.item) && s.getChildren;
+				return c && c.rawData && c.rawData[cf] && c.rawData[cf].length;
+				// return s.hasChildren && s.hasChildren(id, c && c.item) && s.getChildren;
 			},
 
 			children: function(parentId){
@@ -370,7 +374,7 @@
 					t = this,
 					cellData; 
 
-				cellData = col.formatter ? col.formatter(rawData, rowId) : rawData[col.field || colId];
+				cellData = col.formatter ? col.formatter(rawData[col.field], rawData, rowId, colId) : rawData[col.field || colId];
 				return (t.columns[colId] && t.columns[colId].encode === true && typeof cellData === 'string')? entities.encode(cellData) : cellData;
 			},
 

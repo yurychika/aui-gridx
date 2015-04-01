@@ -432,6 +432,7 @@ angular.module('aui.grid')
 				t.model = new Model(t);
 				t.model.when({}, function() {console.log('data load done')});
 				t.when = hitch(t.model, t.model.when);
+				debugger;
 				t._create();
 				t._preload();
 				// t._load(d).then(function(){

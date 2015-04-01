@@ -9,9 +9,6 @@
 			$scope.grid = new Grid($scope.auiGrid);
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
-			console.log(grid.body.emptyMessage);
-			// console.log('Grid instance:', $scope.grid);
-			// console.log($scope.auiGrid.data);
 
 			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
 
@@ -36,9 +33,6 @@
 			// transclude: true,
 			controller: 'auiGridController',
 			link: function($scope, $elem) {
-				console.log(arguments);
-				// console.log($scope.auiGrid);
-				// console.log
 			}
 		};
 	});

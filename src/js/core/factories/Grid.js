@@ -1,9 +1,8 @@
 (function(){
+	
 angular.module('aui.grid')
 .factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridOption',
 	function($q, $compile, $parse, $timeout, GridCore, GridOption) {
-		console.log('in side grid constuctor');
-		console.log('Grid core', GridCore);
 		var dummyFunc = function(){};
 		var version = {
 			// summary:

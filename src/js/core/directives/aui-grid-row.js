@@ -2,7 +2,6 @@
 	'use strict';
 
 	var module = angular.module('aui.grid');
-
 	module.directive('auiGridRow', ['GridUtil', function(GridUtil) {
 		return {
 			templateUrl: 'aui-grid/aui-grid-row',

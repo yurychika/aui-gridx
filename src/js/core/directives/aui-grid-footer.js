@@ -15,8 +15,6 @@
 			// transclude: true,
 			// controller: 'auiGridController',
 			link: function($scope, $elem) {
-				console.log($scope.auiGrid);
-				// console.log
 			}
 		};
 	});

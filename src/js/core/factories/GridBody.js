@@ -1,7 +1,8 @@
 (function(){
+
 angular.module('aui.grid')
-.factory('GridBody', ['$q', '$compile', '$parse', '$timeout',
-	function($q, $compile, $parse, $timeout) {
+.factory('GridBody', ['$q', 'GridRow',
+		function($q, GridRow) {
 /*=====
 	Row.node = function(){
 		// summary:
@@ -346,7 +347,7 @@ angular.module('aui.grid')
 
 				rr.splice(0, rr.length);
 				for(i in cache) {
-					rr.push(cache[i].item);
+					rr.push(new GridRow(i, this.grid));
 				}
 			},
 

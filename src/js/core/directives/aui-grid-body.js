@@ -9,7 +9,7 @@
 			this.renderedRows = this.grid.body.renderedRows;
 
 			this.isEmpty = function() {
-				console.log('is empty', grid.model.size());
+				// console.log('is empty', grid.model.size());
 				return self.grid.model.size() !== 0;
 			}
 		}]);

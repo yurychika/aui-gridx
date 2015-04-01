@@ -14,9 +14,6 @@
 			$scope.grid = new Grid($scope.auiGrid);
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
-			console.log(grid.body.emptyMessage);
-			// console.log('Grid instance:', $scope.grid);
-			// console.log($scope.auiGrid.data);
 
 			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
 
@@ -41,9 +38,6 @@
 			// transclude: true,
 			controller: 'auiGridController',
 			link: function($scope, $elem) {
-				console.log(arguments);
-				// console.log($scope.auiGrid);
-				// console.log
 			}
 		};
 	});
@@ -64,9 +58,6 @@
 			replace: true,
 			require: ['^auiGrid'],
 			// transclude: true,
-			// compile: function() {
-			// 	console.log('in aui-grid compile');
-			// },
 			// controller: 'auiGridController',
 			link: function($scope, $elem, $attrs, controllers) {
 				var gridCtrl = controllers[0];
@@ -302,7 +293,7 @@
 			this.renderedRows = this.grid.body.renderedRows;
 
 			this.isEmpty = function() {
-				console.log('is empty', grid.model.size());
+				// console.log('is empty', grid.model.size());
 				return self.grid.model.size() !== 0;
 			}
 		}]);
@@ -364,8 +355,6 @@
 			// transclude: true,
 			// controller: 'auiGridController',
 			link: function($scope, $elem) {
-				console.log($scope.auiGrid);
-				// console.log
 			}
 		};
 	});
@@ -375,7 +364,6 @@
 	'use strict';
 
 	var module = angular.module('aui.grid');
-
 	module.directive('auiGridRow', ['GridUtil', function(GridUtil) {
 		return {
 			templateUrl: 'aui-grid/aui-grid-row',
@@ -417,11 +405,10 @@
 })();
 
 (function(){
+	
 angular.module('aui.grid')
 .factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridOption',
 	function($q, $compile, $parse, $timeout, GridCore, GridOption) {
-		console.log('in side grid constuctor');
-		console.log('Grid core', GridCore);
 		var dummyFunc = function(){};
 		var version = {
 			// summary:
@@ -680,9 +667,10 @@ angular.module('aui.grid')
 })();
 
 (function(){
+
 angular.module('aui.grid')
-.factory('GridBody', ['$q', '$compile', '$parse', '$timeout',
-	function($q, $compile, $parse, $timeout) {
+.factory('GridBody', ['$q', 'GridRow',
+		function($q, GridRow) {
 /*=====
 	Row.node = function(){
 		// summary:
@@ -1027,7 +1015,7 @@ angular.module('aui.grid')
 
 				rr.splice(0, rr.length);
 				for(i in cache) {
-					rr.push(cache[i].item);
+					rr.push(new GridRow(i, this.grid));
 				}
 			},
 
@@ -1921,6 +1909,7 @@ angular.module('aui.grid')
 })();
 
 (function(){
+	
 angular.module('aui.grid')
 .factory('GridOption', ['$q', '$compile', '$parse', '$timeout', 'GridCore',
 	function($q, $compile, $parse, $timeout, GridCore) {
@@ -1942,6 +1931,83 @@ angular.module('aui.grid')
 		};
 
 		return GridOption;
+	}]);
+})();
+
+(function(){
+
+angular.module('aui.grid')
+.factory('GridRow', ['$q', '$compile', '$parse', '$timeout', 'GridCore',
+	function($q, $compile, $parse, $timeout, GridCore) {
+		var GridRow = function(id, grid) {
+			this.grid = grid;
+			this.model = grid.model;
+			this.id = id;
+		};
+
+		GridRow.prototype.index = function() {
+			return this.model.idToIndex(this.id);
+		};
+
+		GridRow.prototype.parent = function() {
+			return this.grid.row(this.model.parentId(this.id), 1);
+		};
+
+		GridRow.prototype.cell = function(column, isId) {
+			return this.grid.cell(this, column, isId);
+		};
+
+		GridRow.prototype.cells = function(start, count) {
+			var t = this,
+				g = t.grid,
+				cells = [],
+				cols = g._columns,
+				total = cols.length,
+				i = start || 0,
+				end = count >= 0 ? start + count : total;
+
+			for (; i < end && i < total; ++i) {
+				cells.push(g.cell(t.id, cols[i].id, 1));
+			}
+			return cells;
+		};
+
+		GridRow.prototype.data = function() {
+			return this.model.byId(this.id).data;
+		};
+
+		GridRow.prototype.rawData = function() {
+			return this.model.byId(this.id).rawData;
+		};
+
+		GridRow.prototype.item = function() {
+			return this.model.byId(this.id).item;
+		};
+
+		GridRow.prototype.setRawData = function(rawData) {
+			var t = this, 
+				s = t.grid.store,
+				item = t.item(),
+				field, d;
+				
+			if(s.setValue){
+				d = new Deferred();
+				try{
+					for(field in rawData){
+						s.setValue(item, field, rawData[field]);
+					}
+					s.save({
+						onComplete: lang.hitch(d, d.callback),
+						onError: lang.hitch(d, d.errback)
+					});
+				}catch(e){
+					d.errback(e);
+				}
+			}
+			return d || Deferred.when(s.put(lang.mixin(lang.clone(item), rawData)));
+		};
+
+		return GridRow;
 	}]);
 })();
 
@@ -3386,14 +3452,7 @@ angular.module('aui.grid')
 		},
 
 		setData: function(data){
-			var c;
-
 			this.model.setData(data);
-			// this.model.when({}, function(){console.log('in model when set data');});
-			// if(!skipAutoParseColumn){
-			// 	c = this.model._parseStructure(data);
-			// 	this.setColumns(c);
-			// }
 		},
 
 		setColumns: function(columns){
@@ -3514,7 +3573,6 @@ angular.module('aui.grid')
 				t.model = new Model(t);
 				t.model.when({}, function() {console.log('data load done')});
 				t.when = hitch(t.model, t.model.when);
-				debugger;
 				t._create();
 				t._preload();
 				// t._load(d).then(function(){
@@ -3707,7 +3765,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid-row',
-    "<div class=\"gridxRow\" role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\"><table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"col in columns\" class=\"gridxCell\">{{row[col.field]}}</td></tr></tbody></table></div>"
+    "<div class=\"gridxRow\" role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\"><table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"col in columns\" class=\"gridxCell\">{{row.data()[col.field]}}</td></tr></tbody></table></div>"
   );
 
 

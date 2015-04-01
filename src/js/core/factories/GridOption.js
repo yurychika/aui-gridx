@@ -1,4 +1,5 @@
 (function(){
+	
 angular.module('aui.grid')
 .factory('GridOption', ['$q', '$compile', '$parse', '$timeout', 'GridCore',
 	function($q, $compile, $parse, $timeout, GridCore) {

@@ -304,14 +304,7 @@ angular.module('aui.grid')
 		},
 
 		setData: function(data){
-			var c;
-
 			this.model.setData(data);
-			// this.model.when({}, function(){console.log('in model when set data');});
-			// if(!skipAutoParseColumn){
-			// 	c = this.model._parseStructure(data);
-			// 	this.setColumns(c);
-			// }
 		},
 
 		setColumns: function(columns){
@@ -432,7 +425,6 @@ angular.module('aui.grid')
 				t.model = new Model(t);
 				t.model.when({}, function() {console.log('data load done')});
 				t.when = hitch(t.model, t.model.when);
-				debugger;
 				t._create();
 				t._preload();
 				// t._load(d).then(function(){

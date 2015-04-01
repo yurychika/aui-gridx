@@ -13,9 +13,6 @@
 			replace: true,
 			require: ['^auiGrid'],
 			// transclude: true,
-			// compile: function() {
-			// 	console.log('in aui-grid compile');
-			// },
 			// controller: 'auiGridController',
 			link: function($scope, $elem, $attrs, controllers) {
 				var gridCtrl = controllers[0];

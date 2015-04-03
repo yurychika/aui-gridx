@@ -21,7 +21,7 @@
 				method = angular.isString(method) ? scope[method] : method;
 
 				if (arguments.length > 2) {
-					var args = [].slice(arguments, [2]);
+					var args = [].slice.apply(arguments, [2]);
 					// args = args.splice(0, 2);
 					return function() {return method.apply(scope, args.concat(arguments));}
 				}

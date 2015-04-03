@@ -57,7 +57,8 @@ app.controller('appController', function($scope) {
 	$scope.gridOption.columnStructs = [
 		{id: 'name', field: 'name', name: 'my name', width: '70px',
 			formatter: function(celldata, rowData, rowId, columnId) {
-				return 'gee';
+				// console.log(arguments);
+				return 'geek';
 			}
 		},
 		{id: 'age', field: 'age', name: 'my age', width: '70px'},

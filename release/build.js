@@ -2626,14 +2626,18 @@ angular.module('aui.grid')
 			var s = self._struct,
 				pids = s[''].slice(1),
 				pid,
+				df,
 				appendChildren = function(pid){
 					[].push.apply(pids, s[pid].slice(1));
 				};
-			while(pids.length){
+
+			while (pids.length) {
 				pid = pids.shift();
-				self._storeFetch({
+				df = self._storeFetch({
 					parentId: pid
-				}).then(lang.partial(appendChildren, pid));
+				});
+
+				df.promise && df.promise.then(hitch(null, appendChildren, pid));
 			}
 		}
 
@@ -2836,6 +2840,15 @@ angular.module('aui.grid')
 				// return s.hasChildren && s.hasChildren(id, c && c.item) && s.getChildren;
 			},
 
+			getChildren: function(id) {
+				if (!this.hasChildren(id)) return [];
+
+				var cache = this.byId(id),
+					cf = this.childField;
+
+				return cache.rawData[cf];
+			},
+
 			children: function(parentId){
 				this._init();
 				parentId = this.model.isId(parentId) ? parentId : '';
@@ -2876,13 +2889,11 @@ angular.module('aui.grid')
 			},
 
 			//Protected-----------------------------------------
-			_init: function(){
+			_init: function() {
 				var t = this;
-				if(!t._filled){
+				if (!t._filled) {
 					t._storeFetch({ start: 0 });
-					if(t.data.getChildren){
-						fetchChildren(t);
-					}
+					fetchChildren(t);
 					t.model._onSizeChange();
 				}
 			},
@@ -2904,7 +2915,7 @@ angular.module('aui.grid')
 					t = this,
 					cellData; 
 
-				cellData = col.formatter ? col.formatter(rawData[col.field], rawData, rowId, colId) : rawData[col.field || colId];
+				cellData = col.formatter ? col.formatter(rawData[col.field], rawData, rowId, colId, t.model) : rawData[col.field || colId];
 				return (t.columns[colId] && t.columns[colId].encode === true && typeof cellData === 'string')? entities.encode(cellData) : cellData;
 			},
 
@@ -2949,12 +2960,6 @@ angular.module('aui.grid')
 			},
 
 			_storeFetch: function(options, onFetched){
-	//            console.debug("\tFETCH parent: ",
-	//                    options.parentId, ", start: ",
-	//                    options.start || 0, ", count: ",
-	//                    options.count, ", end: ",
-	//                    options.count && (options.start || 0) + options.count - 1, ", options:",
-	//                    this.options);
 				var t = this,
 					s = t.data,
 					d = new $q.defer(),
@@ -2962,62 +2967,51 @@ angular.module('aui.grid')
 					req = mixin({}, t.options || {}, options),
 					onError = hitch(d, d.errback),
 					results;
-				function onBegin(size){
+
+				var onBegin = function(size) {
 					t._size[parentId] = parseInt(size, 10);
-				}
-				function onComplete(items){
+				};
+				var onComplete = function(items) {
 					//FIXME: store does not support getting total size after filter/query, so we must change the protocal a little.
-					if(items.ioArgs && items.ioArgs.xhr){
-						var range = results.ioArgs.xhr.getResponseHeader("Content-Range");
-						if(range && (range = range.match(/(.+)\//))){
-							t.totalSize = +range[1];
-						}else{
-							t.totalSize = undefined;
-						}
-					}
-					try{
+					try {
 						var start = options.start || 0,
 							i = 0,
 							item;
-						for(; item = items[i]; ++i){
+
+						for (; item = items[i]; ++i) {
 							t._addRow(item.id, start + i, t._itemToObject(item), item, parentId);
 						}
 						// d.callback();
 						d.resolve();
-					}catch(e){
+					} catch(e) {
 						// d.errback(e);
 						d.reject(e);
 					}
-				}
+				};
+
 				t._filled = 1;
 				t.onBeforeFetch(req);
-				if(parentId === ''){
-					// if(s.fetch){
-					// 	s.fetch(mixin(req, {
-					// 		onBegin: onBegin,
-					// 		onComplete: onComplete,
-					// 		onError: onError
-					// 	}));
-					// }else{
-					// results = s.query(req.query || {}, req);
-					// Deferred.when(results.total, onBegin);
-					// Deferred.when(results, onComplete, onError);
+
+				if (parentId === '') {
 					onBegin(s.length);
 					onComplete(s);
-					// }
-				}else if(t.hasChildren(parentId)){
-					results = s.getChildren(t.byId(parentId).item, req);
-					if('total' in results){
-						Deferred.when(results.total, onBegin);
-					}else{
-						Deferred.when(results, function(results){
-							onBegin(results.length);
-						});
+				} else if (t.hasChildren(parentId)) {
+					results = t.getChildren(parentId);
+
+					if (results.length){
+						onBegin(results.length);
 					}
-					Deferred.when(results, onComplete, onError);
-				}else{
-					d.callback();
+					//  else {
+					// 	Deferred.when(results, function(results){
+					// 		onBegin(results.length);
+					// 	});
+					// }
+					// Deferred.when(results, onComplete, onError);
+					onComplete(results);
 				}
+				// else{
+				// 	d.callback();
+				// }
 				d.promise.then(function(){
 					t.onAfterFetch();
 				});

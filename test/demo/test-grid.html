@@ -25,6 +25,10 @@
 	width: initial !important;
 }
 
+.error {
+	color: azure;
+}
+
 </style>
 <script type='text/javascript' src='../../lib/angular/angular.js'></script>
 <script type='text/javascript' src='../../release/build.js'></script>
@@ -34,7 +38,7 @@ var app = angular.module('app', ['aui.grid']);
 app.controller('appController', function($scope) {
 	$scope.gridOption = {};
 
-	// $scope.gridOption.childField = 'childrend';
+	$scope.gridOption.childField = 'geek';
 
 	window.data = $scope.gridOption.data = [
 		{name: "Moroni", age: 50, id: 1, country: 'US', children: [
@@ -56,12 +60,17 @@ app.controller('appController', function($scope) {
 
 	$scope.gridOption.columnStructs = [
 		{id: 'name', field: 'name', name: 'my name', width: '70px',
-			formatter: function(celldata, rowData, rowId, columnId) {
+			formatter: function(celldata, rowData, rowId, columnId, model) {
 				// console.log(arguments);
-				return 'geek';
+				return model.size();
+				return "<p class>" + celldata + ' ' + rowData['age'] + "</p>";
 			}
 		},
-		{id: 'age', field: 'age', name: 'my age', width: '70px'},
+		{id: 'age', field: 'age', name: 'my age', width: '70px',
+			formatter: function(celldata, rowData, rowId, columnId, model) {
+				return parseInt(celldata) + Math.floor(Math.random() * 100) % 20;
+			}
+		},
 		{id: 'id', field: 'id', name: 'my id', width: '70px'},
 		{id: 'country', field: 'country', name: 'my country', width: '70px'},
 		// {id: 'name', field: 'name', name: 'my name', width: '70px'},

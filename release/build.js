@@ -9,11 +9,12 @@
 	var module = angular.module('aui.grid');
 
 	module.controller('auiGridController',
-		['$scope', '$element', '$attrs', 'Grid', 'GridBody', function ($scope, $element, $attrs, Grid, GridBody) {
+		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', function ($scope, $element, $attrs, Grid, GridBody, GridView) {
 			var grid;
 			$scope.grid = new Grid($scope.auiGrid);
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
+			grid.view = new GridView(grid);
 
 			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
 
@@ -2008,6 +2009,34 @@ angular.module('aui.grid')
 		};
 
 		return GridRow;
+	}]);
+})();
+
+(function(){
+
+angular.module('aui.grid')
+.factory('GridView', ['$q', '$compile', '$parse', '$timeout', 'GridCore',
+	function($q, $compile, $parse, $timeout, GridCore) {
+		var GridView = function(grid) {
+			this.grid = grid;
+		};
+
+		GridView.prototype.getRowInfo = function(row) {
+			var vi = row.visualIndex,
+				index = row.index,
+				id = row.id;
+
+			if (vi) {				//by visual index
+
+			} else if (index) {		//by index
+
+			} else {				//by id
+
+			}
+			// return this.model.idToIndex(this.id);
+		};
+
+		return GridView;
 	}]);
 })();
 

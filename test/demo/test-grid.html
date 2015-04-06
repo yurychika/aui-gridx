@@ -38,16 +38,23 @@ var app = angular.module('app', ['aui.grid']);
 app.controller('appController', function($scope) {
 	$scope.gridOption = {};
 
-	$scope.gridOption.childField = 'geek';
+	$scope.gridOption.childField = 'children';
 
 	window.data = $scope.gridOption.data = [
-		{name: "Moroni", age: 50, id: 1, country: 'US', children: [
-			{name: "Tiancum", age: 43, id: 2, country: 'US'},
-			{name: "Jacob", age: 27, id: 3, country: 'US'},
-			{name: "Nephi", age: 29, id: 4, country: 'US'},
-			{name: "Enos", age: 34, id: 5, country: 'US'}
+		{name: "Moroni", age: 50, id: 'item-1', country: 'US', children: [
+			{name: "Moroni-child1", age: 43, id: 29, country: 'US'},
+			{name: "Moroni-child2", age: 27, id: 3, country: 'US'},
+			{name: "Moroni-child3", age: 29, id: 4, country: 'US'},
+			{name: "Moroni-child4", age: 34, id: 5, country: 'US'}
 		]},
-		{name: "Moroni", age: 50, id: 13, country: 'US'},
+		{name: "gee", age: 50, id: 13, country: 'CN', children: [
+			{name: "gee-child1", age: 43, id: 22, country: 'CN', children: [
+				{name: "gee-cc", age: 27, id: 100, country: 'US'}
+			]},
+			{name: "gee-child2", age: 27, id: 33, country: 'CN'},
+			{name: "gee-child3", age: 29, id: 44, country: 'CN'},
+			{name: "gee-child4", age: 34, id: 55, country: 'CN'}
+		]},
 		{name: "Tiancum", age: 43, id: 6, country: 'US'},
 		{name: "Jacob", age: 27, id: 7, country: 'US'},
 		{name: "Nephi", age: 29, id: 8, country: 'US'},
@@ -60,15 +67,18 @@ app.controller('appController', function($scope) {
 
 	$scope.gridOption.columnStructs = [
 		{id: 'name', field: 'name', name: 'my name', width: '70px',
-			formatter: function(celldata, rowData, rowId, columnId, model) {
+			formatter: function(cellData, rowData, rowId, columnId, model) {
 				// console.log(arguments);
+				// model._cache._cache.hasChildren(rowId);
+				return cellData;
+				// return cellData + model.hasChildren(rowId)? '+' :;
 				return model.size();
-				return "<p class>" + celldata + ' ' + rowData['age'] + "</p>";
+				return "<p class>" + cellData + ' ' + rowData['age'] + "</p>";
 			}
 		},
 		{id: 'age', field: 'age', name: 'my age', width: '70px',
-			formatter: function(celldata, rowData, rowId, columnId, model) {
-				return parseInt(celldata) + Math.floor(Math.random() * 100) % 20;
+			formatter: function(cellData, rowData, rowId, columnId, model) {
+				return parseInt(cellData) + Math.floor(Math.random() * 100) % 20;
 			}
 		},
 		{id: 'id', field: 'id', name: 'my id', width: '70px'},

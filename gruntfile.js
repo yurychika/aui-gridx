@@ -42,6 +42,7 @@ module.exports = function (grunt) {
 					'src/js/core/factories/GridBody.js',
 					'src/js/core/factories/GridOption.js',
 					'src/js/core/factories/GridRow.js',
+					'src/js/core/factories/GridView.js',
 					'src/js/core/factories/model/Model.js',
 					'src/js/core/factories/model/Sync.js',
 

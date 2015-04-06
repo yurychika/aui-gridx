@@ -4,11 +4,12 @@
 	var module = angular.module('aui.grid');
 
 	module.controller('auiGridController',
-		['$scope', '$element', '$attrs', 'Grid', 'GridBody', function ($scope, $element, $attrs, Grid, GridBody) {
+		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', function ($scope, $element, $attrs, Grid, GridBody, GridView) {
 			var grid;
 			$scope.grid = new Grid($scope.auiGrid);
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
+			grid.view = new GridView(grid);
 
 			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
 

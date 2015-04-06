@@ -340,14 +340,18 @@ angular.module('aui.grid')
 			renderedIds: {},
 
 			render: function() {
-				var g = this.grid;
-				var size = g.model.size(), i = 0,
+				var g = this.grid,
+					size = g.model.size(), i = 0,
 					rr = this.renderedRows,
-					cache = g.model._cache._cache;
+					cache = g.model._cache._cache, rowInfo;
 
 				rr.splice(0, rr.length);
-				for(i in cache) {
-					rr.push(new GridRow(i, this.grid));
+				for (i = 0; i < size; i++) {
+					rowInfo = g.view.getRowInfo({visualIndex: i});
+
+					if (rowInfo) {
+						rr.push(new GridRow(rowInfo.id, this.grid));
+					}
 				}
 			},
 

@@ -23,21 +23,8 @@
 				$scope.headerCells = [];
 				// var $colMenu 
 				grid = $scope.grid;
-				console.log('$scope.row in aui-grid-row', $scope.row);
-
-				// angular.forEach(grid._columns, function(col) {
-				// 	temp = {};
-				// 	temp.id = grid.id + col.id;
-				// 	temp.domClass = (GridUtil.isFunction(col.headerClass) ? col.headerClass(col) : col.headerClass) || '';
-				// 	temp.style = 'width:' +  col.width + ';min-width:' + col.width + ';';
-				// 	temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
-				// 	temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
-				// 	$scope.headerCells.push(temp);
-				// });
-
-				// console.log($scope.headerCells);
-				// return;
-			}
+				// console.log('$scope.row in aui-grid-row', $scope.row);
+			// }
 		};
 	}]);
 })();

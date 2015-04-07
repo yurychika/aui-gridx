@@ -67,7 +67,6 @@ app.controller('appController', function($scope) {
 		{name: "Enos", age: 34, id: 12, country: 'US'},
 	];
 
-
 	$scope.gridOption.columnStructs = [
 		{id: 'name', field: 'name', name: 'my name', width: '70px',
 			formatter: function(cellData, rowData, rowId, columnId, model) {
@@ -94,6 +93,7 @@ app.controller('appController', function($scope) {
 
 	$scope.removeRow = function() {
 		$scope.gridOption.data.splice(0, 1);
+		// window.data.splice(0, 1);
 		console.log('remove row');
 	};
 
@@ -104,6 +104,12 @@ app.controller('appController', function($scope) {
 			id: new Date().getTime(),
 			country: 'US'
 		});
+		// window.data.push({
+		// 	name: "",
+		// 	age: new Date().getTime() % 50,
+		// 	id: new Date().getTime(),
+		// 	country: 'US'
+		// });
 		console.log('add row');
 	};
 });

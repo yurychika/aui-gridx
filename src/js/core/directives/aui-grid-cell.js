@@ -44,9 +44,9 @@
 						console.log('in expando');
 						grid.view.logicExpand($scope.row.id);
 						setTimeout(function() {
-							console.log(grid.body.renderedRows)
 							grid.body.render();
-							console.log(grid.body.renderedRows)
+							// $scope.$parent.$parent.$digest();
+							$scope.$apply();
 						}, 200);
 					}
 				});

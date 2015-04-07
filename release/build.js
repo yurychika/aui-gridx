@@ -386,20 +386,7 @@
 				$scope.headerCells = [];
 				// var $colMenu 
 				grid = $scope.grid;
-				console.log('$scope.row in aui-grid-row', $scope.row);
-
-				// angular.forEach(grid._columns, function(col) {
-				// 	temp = {};
-				// 	temp.id = grid.id + col.id;
-				// 	temp.domClass = (GridUtil.isFunction(col.headerClass) ? col.headerClass(col) : col.headerClass) || '';
-				// 	temp.style = 'width:' +  col.width + ';min-width:' + col.width + ';';
-				// 	temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
-				// 	temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
-				// 	$scope.headerCells.push(temp);
-				// });
-
-				// console.log($scope.headerCells);
-				// return;
+				// console.log('$scope.row in aui-grid-row', $scope.row);
 			}
 		};
 	}]);
@@ -451,9 +438,9 @@
 						console.log('in expando');
 						grid.view.logicExpand($scope.row.id);
 						setTimeout(function() {
-							console.log(grid.body.renderedRows)
 							grid.body.render();
-							console.log(grid.body.renderedRows)
+							// $scope.$parent.$parent.$digest();
+							$scope.$apply();
 						}, 200);
 					}
 				});
@@ -2074,20 +2061,15 @@ angular.module('aui.grid')
 })();
 
 (function(){
+'use strict';
 
 angular.module('aui.grid')
-.factory('GridView', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridUtil',
-	function($q, $compile, $parse, $timeout, GridCore, GridUtil) {
+.factory('GridView', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridUtil', 'GridRow',
+	function($q, $compile, $parse, $timeout, GridCore, GridUtil, GridRow) {
 		var mixin = GridUtil.mixin;
 
 		var GridView = function(grid) {
 			this.grid = grid;
-			// this._openInfo = {
-			// 	'': {
-			// 		opened: [],
-			// 		count: 0
-			// 	}
-			// }
 			this.model = grid.model;
 			this._clear();
 			this.rootStart = 0;
@@ -2132,12 +2114,10 @@ angular.module('aui.grid')
 			});
 		};
 
-		GridView.prototype.rowMixin = {
-			visualIndex: function(){
-				return this.grid.view.getRowInfo({
-					rowId: this.id
-				}).visualIndex;
-			}
+		GridRow.prototype.visualIndex = function() {
+			return this.grid.view.getRowInfo({
+				rowId: this.id
+			}).visualIndex;
 		};
 
 		// clearOnSetStore: true,
@@ -2572,8 +2552,9 @@ angular.module('aui.grid')
 
 		// GridView.prototype.getRowInfo = function(row) {
 		// 	var vi = row.visualIndex,
+		// 		pi = row.parentId || '',
 		// 		index = row.index,
-		// 		id = row.id;
+		// 		id = row.rowId;
 
 		// 	if (vi !== undefined) {			//by visual index
 		// 		var info = {parentId: '', count: 0, found: false};
@@ -2581,9 +2562,14 @@ angular.module('aui.grid')
 		// 	} else if (index !== undefined) {		//by index
 
 		// 	} else {		//by id
-
+		// 		index = this.model.idToIndex(id);
+		// 		vi = this._getVisualIndex(index, pi);
 		// 	}
 		// 	// return this.model.idToIndex(this.id);
+		// };
+
+		// GridView.prototype._getVisualIndex = function(index, parentId) {
+
 		// };
 
 		return GridView;

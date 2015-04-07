@@ -24,7 +24,7 @@
 				// var $colMenu 
 				grid = $scope.grid;
 				// console.log('$scope.row in aui-grid-row', $scope.row);
-			// }
+			}
 		};
 	}]);
 })();

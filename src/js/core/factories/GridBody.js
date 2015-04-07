@@ -350,7 +350,7 @@ angular.module('aui.grid')
 					rowInfo = g.view.getRowInfo({visualIndex: i});
 
 					if (rowInfo) {
-						rr.push(new GridRow(rowInfo.id, this.grid));
+						rr.push(new GridRow(rowInfo.rowId, this.grid));
 					}
 				}
 			},

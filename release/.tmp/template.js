@@ -10,6 +10,11 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('aui-grid/aui-grid-cell',
+    "aui-grid-cell.html"
+  );
+
+
   $templateCache.put('aui-grid/aui-grid-footer',
     "<div class=\"gridxFooter\" data-dojo-attach-point=\"footerNode\"><!-- \t<div class=\"gridxHScroller\">\r" +
     "\n" +
@@ -29,7 +34,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid-row',
-    "<div class=\"gridxRow\" role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\"><table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"col in columns\" class=\"gridxCell\">{{row.data()[col.field]}}</td></tr></tbody></table></div>"
+    "<div class=\"gridxRow\" role=\"row\" visualindex=\"0\" rowid=\"0\" rowindex=\"0\" parentid=\"\"><table class=\"gridxRowTable\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"col in columns\" class=\"gridxCell\" aui-grid-cell field=\"col.field\" row=\"row\" col-id=\"col.id\" col=\"col\"></td></tr></tbody></table></div>"
   );
 
 

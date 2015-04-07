@@ -6,7 +6,7 @@
 	module.controller('auiGridController',
 		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', function ($scope, $element, $attrs, Grid, GridBody, GridView) {
 			var grid;
-			$scope.grid = new Grid($scope.auiGrid);
+			window.grid = $scope.grid = new Grid($scope.auiGrid);
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
 			grid.view = new GridView(grid);

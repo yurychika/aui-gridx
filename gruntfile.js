@@ -37,6 +37,7 @@ module.exports = function (grunt) {
 					'src/js/core/directives/aui-grid-body.js',
 					'src/js/core/directives/aui-grid-footer.js',
 					'src/js/core/directives/aui-grid-row.js',
+					'src/js/core/directives/aui-grid-cell.js',
 
 					'src/js/core/factories/Grid.js',
 					'src/js/core/factories/GridBody.js',

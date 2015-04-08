@@ -63,6 +63,9 @@ angular.module('aui.grid')
 		// rootCount: 0,
 
 		// visualCount: 0,
+		GridView.prototype.isExpanded = function(rowId) {
+			return !!this._openInfo[rowId]
+		};
 
 		GridView.prototype.getRowInfo = function(args){
 			var t = this,
@@ -138,13 +141,15 @@ angular.module('aui.grid')
 			var t = this,
 				openInfo = t._openInfo,
 				info = openInfo[id];
-			if(info){
+
+			if (info) {
 				var parentId = t.model.parentId(id),
 					parentOpenInfo = t._parentOpenInfo[parentId],
 					childCount = info.count;
-				parentOpenInfo.splice(array.indexOf(parentOpenInfo, id), 1);
+
+				parentOpenInfo.splice(parentOpenInfo.indexOf(id), 1);
 				info = openInfo[parentId];
-				while(info){
+				while (info) {
 					info.count -= childCount;
 					info = openInfo[info.parentId];
 				}

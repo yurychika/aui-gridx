@@ -13,8 +13,6 @@ angular.module('aui.grid')
 			this.rootStart = 0;
 		};
 
-		// name: 'view',
-
 		GridView.prototype.load = function(args){
 			var t = this,
 				m = t.model,

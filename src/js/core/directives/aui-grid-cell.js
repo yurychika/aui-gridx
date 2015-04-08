@@ -3,6 +3,18 @@
 
 	var module = angular.module('aui.grid');
 	module.directive('auiGridCell', ['GridUtil', function(GridUtil) {
+		function cellWrapper(rowId, colIndex, data, grid) {
+			if (colIndex === 0 && grid.model.hasChildren(rowId)) {
+				var treepath = grid.model.treePath(rowId);
+				var wrapper = document.createElement('div');
+				wrapper.style.paddingLeft = ((treepath.length - 1) * 10) + 'px';
+				wrapper.innerHTML = data;
+				return wrapper;
+			}
+
+			return data;
+		}
+
 		return {
 			// templateUrl: 'aui-grid/aui-grid-cell',
 			replace: true,
@@ -33,13 +45,15 @@
 				var col = grid._columnsById[colId];
 				var colIndex = $scope.col.index;
 
-				if (colIndex === 0 && grid.model.hasChildren($scope.row.id)) {
-					data = '<a href="' + '#" class="expando">+</a>' + data;
+				// 	data = '<a href="' + '#" class="expando">+</a>' + data;
+				// }
+				var cellContent = cellWrapper(row.id, colIndex, data, grid);
+				if (typeof cellContent === 'object') {
+					$elem[0].appendChild(cellContent);
+				} else {
+					$elem[0].innerHTML = data;
 				}
-
-				$elem[0].innerHTML = data;
 				$elem[0].addEventListener('click', function(e) {
-					console.log(this);
 					if (e.target.classList.contains('expando')) {
 						console.log('in expando');
 						grid.view.logicExpand($scope.row.id);

@@ -3225,9 +3225,9 @@ angular.module('aui.grid')
 
 		function fetchChildren(self){
 			var s = self._struct,
-				pids = s[''].slice(1),
 				pid,
 				df,
+				pids = s[''].slice(1),
 				appendChildren = function(pid){
 					[].push.apply(pids, s[pid].slice(1));
 				};
@@ -3238,7 +3238,8 @@ angular.module('aui.grid')
 					parentId: pid
 				});
 
-				df.promise && df.promise.then(hitch(null, appendChildren, pid));
+				appendChildren(pid);
+				// df.promise && df.promise.then(hitch(null, appendChildren, pid));
 			}
 		}
 

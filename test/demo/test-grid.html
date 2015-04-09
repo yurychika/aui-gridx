@@ -38,7 +38,7 @@ body {
 <script type='text/javascript'>
 var app = angular.module('app', ['aui.grid']);
 
-app.controller('appController', function($scope) {
+app.controller('appController', function($scope, $q) {
 	$scope.gridOption = {};
 
 	$scope.gridOption.childField = 'children';
@@ -52,7 +52,7 @@ app.controller('appController', function($scope) {
 		]},
 		{name: "gee", age: 50, id: 'item-2', country: 'CN', children: [
 			{name: "gee-child1", age: 43, id: 'item-2-1', country: 'CN', children: [
-				{name: "gee-cc", age: 27, id: 'item-2-1-2', country: 'US'}
+				{name: "gee-cc", age: 27, id: 'item-2-1-1', country: 'US'}
 			]},
 			{name: "gee-child2", age: 27, id: 'item-2-2', country: 'CN'},
 			{name: "gee-child3", age: 29, id: 'item-2-3', country: 'CN'},

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html ng-app='app'>
-<title>test grid basic</title>
+<title>test aui-grid basic</title>
 <link rel='stylesheet' href='../../src/less/Gridx.css'>
 <style type='text/css'>
 body {
@@ -45,26 +45,26 @@ app.controller('appController', function($scope) {
 
 	window.data = $scope.gridOption.data = [
 		{name: "Moroni", age: 50, id: 'item-1', country: 'US', children: [
-			{name: "Moroni-child1", age: 43, id: 29, country: 'US'},
-			{name: "Moroni-child2", age: 27, id: 3, country: 'US'},
-			{name: "Moroni-child3", age: 29, id: 4, country: 'US'},
-			{name: "Moroni-child4", age: 34, id: 5, country: 'US'}
+			{name: "Moroni-child1", age: 43, id: 'item-1-1', country: 'US'},
+			{name: "Moroni-child2", age: 27, id: 'item-1-2', country: 'US'},
+			{name: "Moroni-child3", age: 29, id: 'item-1-3', country: 'US'},
+			{name: "Moroni-child4", age: 34, id: 'item-1-4', country: 'US'}
 		]},
-		{name: "gee", age: 50, id: 13, country: 'CN', children: [
-			{name: "gee-child1", age: 43, id: 22, country: 'CN', children: [
-				{name: "gee-cc", age: 27, id: 100, country: 'US'}
+		{name: "gee", age: 50, id: 'item-2', country: 'CN', children: [
+			{name: "gee-child1", age: 43, id: 'item-2-1', country: 'CN', children: [
+				{name: "gee-cc", age: 27, id: 'item-2-1-2', country: 'US'}
 			]},
-			{name: "gee-child2", age: 27, id: 33, country: 'CN'},
-			{name: "gee-child3", age: 29, id: 44, country: 'CN'},
-			{name: "gee-child4", age: 34, id: 55, country: 'CN'}
+			{name: "gee-child2", age: 27, id: 'item-2-2', country: 'CN'},
+			{name: "gee-child3", age: 29, id: 'item-2-3', country: 'CN'},
+			{name: "gee-child4", age: 34, id: 'item-2-4', country: 'CN'}
 		]},
-		{name: "Tiancum", age: 43, id: 6, country: 'US'},
-		{name: "Jacob", age: 27, id: 7, country: 'US'},
-		{name: "Nephi", age: 29, id: 8, country: 'US'},
-		{name: "Enos", age: 34, id: 9, country: 'US'},
-		{name: "Jacob", age: 27, id: 10, country: 'US'},
-		{name: "Nephi", age: 29, id: 11, country: 'US'},
-		{name: "Enos", age: 34, id: 12, country: 'US'},
+		{name: "Tiancum", age: 43, id: 'item-3', country: 'US'},
+		{name: "Jacob", age: 27, id: 'item-4', country: 'US'},
+		{name: "Nephi", age: 29, id: 'item-5', country: 'US'},
+		{name: "Enos", age: 34, id: 'item-6', country: 'US'},
+		{name: "Jacob", age: 27, id: 'item-7', country: 'US'},
+		{name: "Nephi", age: 29, id: 'item-8', country: 'US'},
+		{name: "Enos", age: 34, id: 'item-9', country: 'US'},
 	];
 
 	$scope.gridOption.columnStructs = [
@@ -105,12 +105,6 @@ app.controller('appController', function($scope) {
 			id: new Date().getTime(),
 			country: 'US'
 		});
-		// window.data.push({
-		// 	name: "",
-		// 	age: new Date().getTime() % 50,
-		// 	id: new Date().getTime(),
-		// 	country: 'US'
-		// });
 		console.log('add row');
 	};
 });

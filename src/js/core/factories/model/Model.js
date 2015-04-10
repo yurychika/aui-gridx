@@ -448,7 +448,7 @@
 			//Execute commands one by one.
 			var t = this,
 				c = t._cache,
-				d = new $q.defer(),
+				d = $q.defer(),
 				cmds = t._cmdQueue,
 				finish = function(d, err){
 					t._busy = 0;
@@ -482,11 +482,11 @@
 					finish(d);
 				};
 			if(t._busy){
-				return t._busy;
+				return t._busy && t._busy.promise;
 			}
 			t._busy = d;
 			func();
-			return d;
+			return d && d.promise;
 		},
 
 		_createExts: function(exts, args){

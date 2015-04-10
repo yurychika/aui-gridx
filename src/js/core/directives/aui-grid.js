@@ -17,6 +17,12 @@
 				newData = newData || [];
 				grid.setData(newData);
 				grid.model.when({}, function() {
+					var size = grid.model.size();
+					try {
+						grid.view.updateRootRange(0, size);
+					} catch (e) {
+						console.log(e);
+					}
 					grid.redraw();
 				});
 				console.log('in data watch function;');

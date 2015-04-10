@@ -345,12 +345,14 @@ angular.module('aui.grid')
 					rr = this.renderedRows,
 					cache = g.model._cache._cache, rowInfo;
 
-				rr.splice(0, rr.length);
-				for (i = 0; i < size; i++) {
-					rowInfo = g.view.getRowInfo({visualIndex: i});
+				g.view.updateVisualCount().then(function(){
+					rr.splice(0, rr.length);
+					for (i = 0; i < size; i++) {
+						rowInfo = g.view.getRowInfo({visualIndex: i});
 
-					if (rowInfo) {
-						rr.push(new GridRow(rowInfo.rowId, this.grid));
+						if (rowInfo) {
+							rr.push(new GridRow(rowInfo.rowId, this.grid));
+						}
 					}
 				}
 			},

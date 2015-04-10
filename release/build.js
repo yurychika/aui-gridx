@@ -22,6 +22,12 @@
 				newData = newData || [];
 				grid.setData(newData);
 				grid.model.when({}, function() {
+					var size = grid.model.size();
+					try {
+						grid.view.updateRootRange(0, size);
+					} catch (e) {
+						console.log(e);
+					}
 					grid.redraw();
 				});
 				console.log('in data watch function;');
@@ -2225,7 +2231,7 @@ angular.module('aui.grid')
 				if(t._expand(id)){
 					t._updateVC();
 				}
-			}).promise.then(function(){
+			}).then(function(){
 				d.resolve();
 			}, function(e){
 				d.reject(e);
@@ -2408,7 +2414,7 @@ angular.module('aui.grid')
 		GridView.prototype._loadLevels = function(openInfo){
 			openInfo = openInfo || this._openInfo;
 			var m = this.model,
-				d = new Deferred(),
+				d = $q.defer(),
 				id, levels = [];
 			for(id in openInfo){
 				if(m.isId(id)){
@@ -2431,18 +2437,18 @@ angular.module('aui.grid')
 						});
 						fetchLevel(level + 1);
 					}).then(null, function(e){
-						d.errback(e);
+						d.reject(e);
 					});
 				}else{
 					m.when({}).then(function(){
-						d.callback();
+						d.resolve();
 					}, function(e){
-						d.errback(e);
+						d.reject(e);
 					});
 				}
 			};
 			fetchLevel(0);
-			return d;
+			return d && d.promise;
 		};
 
 		GridView.prototype._updateVC = function(){
@@ -3063,7 +3069,7 @@ angular.module('aui.grid')
 			//Execute commands one by one.
 			var t = this,
 				c = t._cache,
-				d = new $q.defer(),
+				d = $q.defer(),
 				cmds = t._cmdQueue,
 				finish = function(d, err){
 					t._busy = 0;
@@ -3097,11 +3103,11 @@ angular.module('aui.grid')
 					finish(d);
 				};
 			if(t._busy){
-				return t._busy;
+				return t._busy && t._busy.promise;
 			}
 			t._busy = d;
 			func();
-			return d;
+			return d && d.promise;
 		},
 
 		_createExts: function(exts, args){

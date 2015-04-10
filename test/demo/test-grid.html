@@ -17,8 +17,8 @@ body {
 
 .gridxCell {
 	/*border: 1px solid red;*/
-	width: 70px;
-	max-width: 70px;
+/*	width: 70px;
+	max-width: 70px;*/
 }
 
 .gridxBody {
@@ -68,7 +68,7 @@ app.controller('appController', function($scope, $q) {
 	];
 
 	$scope.gridOption.columnStructs = [
-		{id: 'name', field: 'name', name: 'my name', width: '70px',
+		{id: 'name', field: 'name', name: 'my name', width: '100px',
 			formatter: function(cellData, rowData, rowId, columnId, model) {
 				// console.log(arguments);
 				// model._cache._cache.hasChildren(rowId);
@@ -78,13 +78,13 @@ app.controller('appController', function($scope, $q) {
 				return "<p class>" + cellData + ' ' + rowData['age'] + "</p>";
 			}
 		},
-		{id: 'age', field: 'age', name: 'my age', width: '70px',
+		{id: 'age', field: 'age', name: 'my age', width: '100px',
 			formatter: function(cellData, rowData, rowId, columnId, model) {
 				return parseInt(cellData) + Math.floor(Math.random() * 100) % 20;
 			}
 		},
-		{id: 'id', field: 'id', name: 'my id', width: '70px'},
-		{id: 'country', field: 'country', name: 'my country', width: '70px'},
+		{id: 'id', field: 'id', name: 'my id', width: '100px'},
+		{id: 'country', field: 'country', name: 'my country', width: '110px'},
 		// {id: 'name', field: 'name', name: 'my name', width: '70px'},
 		// {id: 'age', field: 'age', name: 'my age', width: '70px'},
 		// {id: 'id', field: 'name', name: 'my id', width: '70px'},

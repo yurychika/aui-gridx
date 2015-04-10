@@ -347,14 +347,14 @@ angular.module('aui.grid')
 
 				g.view.updateVisualCount().then(function(){
 					rr.splice(0, rr.length);
-					for (i = 0; i < size; i++) {
+					for (i = 0; i < grid.view.visualCount; i++) {
 						rowInfo = g.view.getRowInfo({visualIndex: i});
 
 						if (rowInfo) {
 							rr.push(new GridRow(rowInfo.rowId, this.grid));
 						}
 					}
-				}
+				});
 			},
 
 			compareOnSet: function(v1, v2){

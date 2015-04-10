@@ -330,7 +330,7 @@ angular.module('aui.grid')
 			var fetchLevel = function(level){
 				if(level < levels.length){
 					m.when(levels[level], function(){
-						array.forEach(levels[level], function(arg){
+						levels[level].forEach(function(arg){
 							m.keep(arg.parentId, 1);
 						});
 						fetchLevel(level + 1);

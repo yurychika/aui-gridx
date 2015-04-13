@@ -175,17 +175,16 @@
 	module.directive('auiGridPagination', ['GridPaginationService', function(GridPaginationService) {
 		return {
 			strict: 'A',
-			templateUrl: 'aui-grid/aui-grid-pagination',
-			scope: {
-				auiGrid: '=',
-				getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
-			},
+			// scope: {
+			// 	auiGrid: '=',
+			// 	getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
+			// },
 			require: ['^auiGrid'],
 			// replace: true,
 			// transclude: true,
 			// controller: 'auiGridController',
 			link: function($scope, $elem, $attrs, $controller) {
-				gridCtrl = $controller;
+				var gridCtrl = $controller[0];
 				$scope.grid = gridCtrl.grid;
 				GridPaginationService.init($scope.grid);
 			}

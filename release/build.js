@@ -474,6 +474,7 @@
 				var col = grid._columnsById[colId];
 				var colIndex = $scope.col.index;
 				$elem[0].style.width = col.width;
+				$elem[0].style.maxWidth = col.width;
 
 				// 	data = '<a href="' + '#" class="expando">+</a>' + data;
 				// }

@@ -493,9 +493,14 @@
 	'use strict';
 
 	var module = angular.module('aui.grid');
-	
-	module.service('GridPaginationService', ['$q', '$compile', '$parse', '$timeout', function() {
-		var s = {
+	module.factory('GridPagination', ['GridUtil', '$q', '$compile', '$parse', '$timeout', function(GridUtil) {
+		var GridPagination = function(grid) {
+			this.grid = grid;
+			this.model = grid.model;
+			this.init();
+		};
+
+		var proto = {
 			rowMixin: {
 				getPage: function(){
 					// summary:
@@ -514,21 +519,20 @@
 				this.grid.view.paging = true;
 			},
 
-			init: function(grid){
+			init: function(){
 				var t = this,
 					finish = function(){
 						t._updateBody(1);
-						t.connect(t.model, 'onSizeChange', '_onSizeChange');
-						t.loaded.callback();
+						// t.connect(t.model, 'onSizeChange', '_onSizeChange');
+						// t.loaded.callback();
 					};
-				grid.pageSize = grid.getOption('pageSize');
-				grid.currentPage = t.arg('initialPage', t._page, function(arg){
-					return arg >= 0;
-				});
 
-				grid.gotoPage = this.gotoPage;
-				grid.currentPage = this.currentPage;
-				grid.model.when({}).then(finish, finish);
+				this._pageSize = this.grid.getOption('pageSize');
+				this._page = this.grid.getOption('initialPage');
+
+				// grid.currentPage = this.currentPage;
+				this.grid.model.when({}).then(finish, finish);
+
 			},
 
 			// [Public API] --------------------------------------------------------
@@ -639,7 +643,7 @@
 				t.grid.view.updateRootRange(start, count, 1);
 				if(!noRefresh){
 					// t.grid.body.lazyRefresh();
-					t.grid.body.lazyRefresh();
+					t.grid.body.render();
 				}
 			},
 
@@ -660,10 +664,12 @@
 			}
 		};
 
-		return s;
+		GridUtil.mixin(GridPagination.prototype, proto);
+
+		return GridPagination;
 	}]);
 
-	module.directive('auiGridPagination', ['GridPaginationService', function(GridPaginationService) {
+	module.directive('auiGridPagination', ['GridPagination', function(GridPagination) {
 		return {
 			strict: 'A',
 			// scope: {
@@ -675,9 +681,10 @@
 			// transclude: true,
 			// controller: 'auiGridController',
 			link: function($scope, $elem, $attrs, $controller) {
-				gridCtrl = $controller[0];
-				$scope.grid = gridCtrl.grid;
-				GridPaginationService.init($scope.grid);
+				var gridCtrl = $controller[0];
+				var grid = $scope.grid = gridCtrl.grid;
+				grid.pagination = new GridPagination(grid);
+				// GridPaginationService.init($scope.grid);
 			}
 		};
 	}]);
@@ -2207,7 +2214,9 @@ angular.module('aui.grid')
 
 		GridOption.prototype.emptyInfo = 'There are no rows.';
 
-		GridOption.prototype.pageSize = 10;
+		GridOption.prototype.pageSize = 5;
+
+		GridOption.prototype.initialPage = 10;
 
 		GridOption.prototype.getOption = function(name) {
 			if (this._options.hasOwnProperty(name)) {

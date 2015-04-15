@@ -36,7 +36,7 @@
 						// t.loaded.callback();
 					};
 
-				this._pageSize = this.grid.getOption('pageSize');
+				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
 				this._page = this.grid.getOption('initialPage');
 
 				// grid.currentPage = this.currentPage;
@@ -193,6 +193,7 @@
 				var gridCtrl = $controller[0];
 				var grid = $scope.grid = gridCtrl.grid;
 				grid.pagination = new GridPagination(grid);
+				grid.paging = true;
 				// GridPaginationService.init($scope.grid);
 			}
 		};

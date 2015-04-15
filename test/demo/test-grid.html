@@ -43,6 +43,8 @@ app.controller('appController', function($scope, $q) {
 
 	$scope.gridOption.childField = 'children';
 
+	$scope.gridOption.pageSize = 3;
+
 	window.data = $scope.gridOption.data = [
 		{name: "Moroni", age: 50, id: 'item-1', country: 'US', children: [
 			{name: "Moroni-child1", age: 43, id: 'item-1-1', country: 'US'},

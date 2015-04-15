@@ -17,9 +17,15 @@
 				newData = newData || [];
 				grid.setData(newData);
 				grid.model.when({}, function() {
-					var size = grid.model.size();
+					var size = grid.model.size(),
+						pageSize = grid.getOption('pageSize'),
+						startPage = grid.getOption('startPage'),
+						firstIndex = 0;
+
+					pageSize = pageSize > 0 ? pageSize : size;
+					firstIndex = pageSize * startPage;
 					try {
-						grid.view.updateRootRange(0, size);
+						grid.view.updateRootRange(firstIndex, pageSize);
 					} catch (e) {
 						console.log(e);
 					}

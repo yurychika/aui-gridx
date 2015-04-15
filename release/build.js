@@ -15,6 +15,7 @@
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
 			grid.view = new GridView(grid);
+			console.log('init grid controller');
 
 			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
 
@@ -22,9 +23,15 @@
 				newData = newData || [];
 				grid.setData(newData);
 				grid.model.when({}, function() {
-					var size = grid.model.size();
+					var size = grid.model.size(),
+						pageSize = grid.getOption('pageSize'),
+						startPage = grid.getOption('startPage'),
+						firstIndex = 0;
+
+					pageSize = pageSize > 0 ? pageSize : size;
+					firstIndex = pageSize * startPage;
 					try {
-						grid.view.updateRootRange(0, size);
+						grid.view.updateRootRange(firstIndex, pageSize);
 					} catch (e) {
 						console.log(e);
 					}
@@ -528,7 +535,7 @@
 						// t.loaded.callback();
 					};
 
-				this._pageSize = this.grid.getOption('pageSize');
+				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
 				this._page = this.grid.getOption('initialPage');
 
 				// grid.currentPage = this.currentPage;
@@ -685,6 +692,7 @@
 				var gridCtrl = $controller[0];
 				var grid = $scope.grid = gridCtrl.grid;
 				grid.pagination = new GridPagination(grid);
+				grid.paging = true;
 				// GridPaginationService.init($scope.grid);
 			}
 		};
@@ -2215,9 +2223,9 @@ angular.module('aui.grid')
 
 		GridOption.prototype.emptyInfo = 'There are no rows.';
 
-		GridOption.prototype.pageSize = 5;
+		GridOption.prototype.pageSize = -1;		//no pagination by default
 
-		GridOption.prototype.initialPage = 10;
+		GridOption.prototype.startPage = 0;
 
 		GridOption.prototype.getOption = function(name) {
 			if (this._options.hasOwnProperty(name)) {

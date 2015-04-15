@@ -86,7 +86,7 @@ app.controller('appController', function($scope, $q) {
 			}
 		},
 		{id: 'id', field: 'id', name: 'my id', width: '100px'},
-		{id: 'country', field: 'country', name: 'my country', width: '110px'},
+		{id: 'country', field: 'country', name: 'my  country', width: '110px'},
 		// {id: 'name', field: 'name', name: 'my name', width: '70px'},
 		// {id: 'age', field: 'age', name: 'my age', width: '70px'},
 		// {id: 'id', field: 'name', name: 'my id', width: '70px'},
@@ -94,10 +94,13 @@ app.controller('appController', function($scope, $q) {
 	];
 
 	$scope.removeRow = function() {
-		return;
 		$scope.gridOption.data.splice(0, 1);
 		// window.data.splice(0, 1);
 		console.log('remove row');
+	};
+
+	$scope.gridOption.onRegisterApi = function(api) {
+		$scope.api = api;
 	};
 
 	$scope.addRow = function() {
@@ -109,6 +112,10 @@ app.controller('appController', function($scope, $q) {
 		});
 		console.log('add row');
 	};
+
+	$scope.nextpage = function() {
+		// $scope.
+	};
 });
 </script>
 
@@ -116,5 +123,7 @@ app.controller('appController', function($scope, $q) {
 	<div aui-grid='gridOption' aui-grid-pagination></div>
 	<button ng-click='removeRow()'>remove row</button>
 	<button ng-click='addRow()'>add row</button>
+	<button ng-click='nextPage()'>next page</button>
+	<button ng-click='previousPage()'>previous page</button>
 </body>
 </html>

@@ -29,6 +29,7 @@ angular.module('aui.grid')
 			this.name = 'aui gridx';
 			this.isIE = false;
 			this.options = options;
+			this.api = {};		//GridApi
 			this._options = new GridOption(options);
 			console.log('childField', this.getOption('childField'));
 			console.log('emptyInfo', this.getOption('emptyInfo'));

@@ -4,7 +4,8 @@
 	var module = angular.module('aui.grid');
 
 	module.controller('auiGridController',
-		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', function ($scope, $element, $attrs, Grid, GridBody, GridView) {
+		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', 'GridUtil',
+		function ($scope, $element, $attrs, Grid, GridBody, GridView, GridUtil) {
 			var grid;
 			window.grid = $scope.grid = new Grid($scope.auiGrid);
 			grid = this.grid = $scope.grid;
@@ -35,7 +36,7 @@
 			}
 		}]);
 
-	module.directive('auiGrid', function() {
+	module.directive('auiGrid', ['GridUtil', function(GridUtil) {
 		return {
 			templateUrl: 'aui-grid/aui-grid',
 			scope: {
@@ -46,7 +47,13 @@
 			// transclude: true,
 			controller: 'auiGridController',
 			link: function($scope, $elem) {
+				// debugger;
+				var grid = $scope.grid;
+
+				if (GridUtil.isFunction($scope.auiGrid.onRegisterApi)) {
+					$scope.auiGrid.onRegisterApi(grid.api);
+				}
 			}
 		};
-	});
+	}]);
 })();

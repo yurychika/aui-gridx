@@ -9,13 +9,13 @@
 	var module = angular.module('aui.grid');
 
 	module.controller('auiGridController',
-		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', function ($scope, $element, $attrs, Grid, GridBody, GridView) {
+		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', 'GridUtil',
+		function ($scope, $element, $attrs, Grid, GridBody, GridView, GridUtil) {
 			var grid;
 			window.grid = $scope.grid = new Grid($scope.auiGrid);
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
 			grid.view = new GridView(grid);
-			console.log('init grid controller');
 
 			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
 
@@ -41,7 +41,7 @@
 			}
 		}]);
 
-	module.directive('auiGrid', function() {
+	module.directive('auiGrid', ['GridUtil', function(GridUtil) {
 		return {
 			templateUrl: 'aui-grid/aui-grid',
 			scope: {
@@ -52,9 +52,15 @@
 			// transclude: true,
 			controller: 'auiGridController',
 			link: function($scope, $elem) {
+				// debugger;
+				var grid = $scope.grid;
+
+				if (GridUtil.isFunction($scope.auiGrid.onRegisterApi)) {
+					$scope.auiGrid.onRegisterApi(grid.api);
+				}
 			}
 		};
-	});
+	}]);
 })();
 
 (function() {
@@ -730,6 +736,7 @@ angular.module('aui.grid')
 			this.name = 'aui gridx';
 			this.isIE = false;
 			this.options = options;
+			this.api = {};		//GridApi
 			this._options = new GridOption(options);
 			console.log('childField', this.getOption('childField'));
 			console.log('emptyInfo', this.getOption('emptyInfo'));

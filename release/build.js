@@ -513,7 +513,7 @@
 			this.model = grid.model;
 			this.init();
 		};
-
+		var hitch = GridUtil.hitch;
 		var proto = {
 			rowMixin: {
 				getPage: function(){
@@ -543,6 +543,8 @@
 
 				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
 				this._page = this.grid.getOption('initialPage');
+				this.grid.registerApi('pagination', 'gotoPage', hitch(this, this.gotoPage));
+				this.grid.registerApi('pagination', 'gotoPage', hitch(this, this.gotoPage));
 
 				// grid.currentPage = this.currentPage;
 				this.grid.model.when({}).then(finish, finish);
@@ -4090,6 +4092,7 @@ angular.module('aui.grid')
 	var delegate = GridUtil.delegate,
 		isFunc = GridUtil.isFunction,
 		isString = GridUtil.isString,
+		mixin = GridUtil.mixin,
 		hitch = GridUtil.hitch;
 
 	function getDepends(mod){
@@ -4365,6 +4368,13 @@ angular.module('aui.grid')
 
 		onModulesLoaded: function(){},
 
+		registerApi: function(moduleName, apiName, func) {
+			if (!this.api) return;
+
+			if (!this.api[moduleName]) this.api[moduleName] = {};
+
+			this.api[moduleName][apiName] = func;
+		},
 		//Private-------------------------------------------------------------------------------------
 		_init: function(){
 			var t = this, s,
@@ -4518,8 +4528,8 @@ angular.module('aui.grid')
 		var s = {
 			delegate: function() {},
 
-			isFunction: function() {
-				return angular.isFunction();
+			isFunction: function(func) {
+				return angular.isFunction(func);
 			},
 
 			isString: function(s) {

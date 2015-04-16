@@ -8,7 +8,7 @@
 			this.model = grid.model;
 			this.init();
 		};
-
+		var hitch = GridUtil.hitch;
 		var proto = {
 			rowMixin: {
 				getPage: function(){
@@ -38,6 +38,8 @@
 
 				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
 				this._page = this.grid.getOption('initialPage');
+				this.grid.registerApi('pagination', 'gotoPage', hitch(this, this.gotoPage));
+				this.grid.registerApi('pagination', 'gotoPage', hitch(this, this.gotoPage));
 
 				// grid.currentPage = this.currentPage;
 				this.grid.model.when({}).then(finish, finish);

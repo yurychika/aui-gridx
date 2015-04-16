@@ -116,6 +116,7 @@ angular.module('aui.grid')
 	var delegate = GridUtil.delegate,
 		isFunc = GridUtil.isFunction,
 		isString = GridUtil.isString,
+		mixin = GridUtil.mixin,
 		hitch = GridUtil.hitch;
 
 	function getDepends(mod){
@@ -391,6 +392,13 @@ angular.module('aui.grid')
 
 		onModulesLoaded: function(){},
 
+		registerApi: function(moduleName, apiName, func) {
+			if (!this.api) return;
+
+			if (!this.api[moduleName]) this.api[moduleName] = {};
+
+			this.api[moduleName][apiName] = func;
+		},
 		//Private-------------------------------------------------------------------------------------
 		_init: function(){
 			var t = this, s,

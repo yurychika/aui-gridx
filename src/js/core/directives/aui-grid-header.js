@@ -6,23 +6,18 @@
 	module.directive('auiGridHeader', ['GridUtil', function(GridUtil) {
 		return {
 			templateUrl: 'aui-grid/aui-grid-header',
-			scope: {
-				auiGrid: '=',
-				getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
-			},
 			replace: true,
 			require: ['^auiGrid'],
-			// transclude: true,
-			// controller: 'auiGridController',
 			link: function($scope, $elem, $attrs, controllers) {
 				var gridCtrl = controllers[0];
 
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
 				grid.headerNode = $elem[0];
+				grid.headerInner = $elem[0].querySelectorAll('.gridxHeaderRowInner')[0];;
 				$scope.columns = gridCtrl._columns;
 				$scope.domNode = $elem[0];
-				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
+				$scope.innerNode = grid.headerInner;
 				$scope.headerCells = [];
 				// var $colMenu 
 				var temp;

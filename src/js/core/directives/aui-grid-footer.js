@@ -2,7 +2,6 @@
 	'use strict';
 
 	var module = angular.module('aui.grid');
-
 	module.directive('auiGridFooter', function() {
 		return {
 			templateUrl: 'aui-grid/aui-grid-footer',

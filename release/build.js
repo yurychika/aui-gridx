@@ -71,23 +71,18 @@
 	module.directive('auiGridHeader', ['GridUtil', function(GridUtil) {
 		return {
 			templateUrl: 'aui-grid/aui-grid-header',
-			scope: {
-				auiGrid: '=',
-				getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
-			},
 			replace: true,
 			require: ['^auiGrid'],
-			// transclude: true,
-			// controller: 'auiGridController',
 			link: function($scope, $elem, $attrs, controllers) {
 				var gridCtrl = controllers[0];
 
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
 				grid.headerNode = $elem[0];
+				grid.headerInner = $elem[0].querySelectorAll('.gridxHeaderRowInner')[0];;
 				$scope.columns = gridCtrl._columns;
 				$scope.domNode = $elem[0];
-				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
+				$scope.innerNode = grid.headerInner;
 				$scope.headerCells = [];
 				// var $colMenu 
 				var temp;
@@ -330,10 +325,12 @@
 			// link: function($scope, $elem) {
 				var gridCtrl = controllers[0];
 				var bodyCtrl = controllers[1];
+				var bodyNode = $elem.find('div')[1];
 
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
-				$scope.grid.bodyNode = $elem[0];
+
+				$scope.grid.bodyNode = $elem.find('div')[1];
 
 				$scope.$watch(
 					// This function returns the value being watched. It is called for each turn of the $digest loop
@@ -347,6 +344,12 @@
 						}
 					}
 				);
+
+				angular.element(bodyNode).on('scroll', function() {
+					console.log('in on scroll event');
+					console.log(bodyNode.scrollLeft);
+					$scope.grid.headerInner.scrollLeft = bodyNode.scrollLeft;
+				});
 			}
 		};
 	});
@@ -356,7 +359,6 @@
 	'use strict';
 
 	var module = angular.module('aui.grid');
-
 	module.directive('auiGridFooter', function() {
 		return {
 			templateUrl: 'aui-grid/aui-grid-footer',
@@ -4596,7 +4598,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid-header',
-    "<div class=\"gridxHeader\" role=\"presentation\"><!-- this is the header for {{grid.name}} --><div class=\"gridxHeaderRow\"><div class=\"gridxHeaderRowInner\" role=\"row\" style><table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"cell in headerCells\" aria-readonly=\"true\" role=\"gridcell\" tabindex=\"-1\" aria-describedby=\"grid-id\" colid=\"{{cell.id}}\" class=\"gridxCell {{cell.domClass}}\" style=\"{{cell.style}}\">{{cell.content}}</td></tr></tbody></table></div></div></div>"
+    "<div class=\"gridxHeader\" role=\"presentation\"><div class=\"gridxHeaderRow\"><div class=\"gridxHeaderRowInner\" role=\"row\" style><table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"cell in headerCells\" aria-readonly=\"true\" role=\"gridcell\" tabindex=\"-1\" aria-describedby=\"grid-id\" colid=\"{{cell.id}}\" class=\"gridxCell {{cell.domClass}}\" style=\"{{cell.style}}\">{{cell.content}}</td></tr></tbody></table></div></div></div>"
   );
 
 

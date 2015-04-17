@@ -25,10 +25,12 @@
 			// link: function($scope, $elem) {
 				var gridCtrl = controllers[0];
 				var bodyCtrl = controllers[1];
+				var bodyNode = $elem.find('div')[1];
 
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
-				$scope.grid.bodyNode = $elem[0];
+
+				$scope.grid.bodyNode = $elem.find('div')[1];
 
 				$scope.$watch(
 					// This function returns the value being watched. It is called for each turn of the $digest loop
@@ -42,6 +44,12 @@
 						}
 					}
 				);
+
+				angular.element(bodyNode).on('scroll', function() {
+					console.log('in on scroll event');
+					console.log(bodyNode.scrollLeft);
+					$scope.grid.headerInner.scrollLeft = bodyNode.scrollLeft;
+				});
 			}
 		};
 	});

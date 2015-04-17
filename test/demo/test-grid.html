@@ -80,12 +80,12 @@ app.controller('appController', function($scope, $q) {
 				return "<p class>" + cellData + ' ' + rowData['age'] + "</p>";
 			}
 		},
-		{id: 'age', field: 'age', name: 'my age', width: '100px',
+		{id: 'age', field: 'age', name: 'my age', width: '200px',
 			formatter: function(cellData, rowData, rowId, columnId, model) {
 				return parseInt(cellData) + Math.floor(Math.random() * 100) % 20;
 			}
 		},
-		{id: 'id', field: 'id', name: 'my id', width: '100px'},
+		{id: 'id', field: 'id', name: 'my id', width: '200px'},
 		{id: 'country', field: 'country', name: 'my  country', width: '110px'},
 		// {id: 'name', field: 'name', name: 'my name', width: '70px'},
 		// {id: 'age', field: 'age', name: 'my age', width: '70px'},
@@ -101,7 +101,6 @@ app.controller('appController', function($scope, $q) {
 
 	$scope.gridOption.onRegisterApi = function(api) {
 		$scope.api = api;
-		console.log($scope.api);
 	};
 
 	$scope.addRow = function() {
@@ -114,17 +113,23 @@ app.controller('appController', function($scope, $q) {
 		console.log('add row');
 	};
 
-	$scope.nextpage = function() {
-		// $scope.
+	$scope.nextPage = function() {
+		$scope.api.pagination.next();
+	};
+
+	$scope.previousPage = function() {
+		$scope.api.pagination.previous();
 	};
 });
 </script>
 
 <body ng-controller='appController'>
 	<div aui-grid='gridOption' aui-grid-pagination></div>
+	<br>
+	<button onclick=''>empty button</button>
 	<button ng-click='removeRow()'>remove row</button>
 	<button ng-click='addRow()'>add row</button>
-	<button ng-click='nextPage()'>next page</button>
 	<button ng-click='previousPage()'>previous page</button>
+	<button ng-click='nextPage()'>next page</button>
 </body>
 </html>

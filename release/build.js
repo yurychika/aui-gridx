@@ -84,6 +84,7 @@
 
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
+				grid.headerNode = $elem[0];
 				$scope.columns = gridCtrl._columns;
 				$scope.domNode = $elem[0];
 				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
@@ -325,13 +326,14 @@
 			replace: true,
 			controller: 'auiGridBodyController as RenderContainer',
 			// controller: 'auiGridController',
-			link: function($scope, $elm, $attrs, controllers) {
+			link: function($scope, $elem, $attrs, controllers) {
 			// link: function($scope, $elem) {
 				var gridCtrl = controllers[0];
 				var bodyCtrl = controllers[1];
 
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
+				$scope.grid.bodyNode = $elem[0];
 
 				$scope.$watch(
 					// This function returns the value being watched. It is called for each turn of the $digest loop
@@ -345,14 +347,6 @@
 						}
 					}
 				);
-				// $scope.renderredRows = [1,2,3];
-				// console.log('body controller', gridCtrl.grid.body.renderedRows);
-				// console.log('body controller', gridCtrl.grid);
-				// console.log('body controller', gridCtrl.grid.body);
-				// // $scope.renderredRows =
-				// console.log('in aui body link');
-				// console.log($scope.auiGrid);
-				// console.log
 			}
 		};
 	});
@@ -366,15 +360,10 @@
 	module.directive('auiGridFooter', function() {
 		return {
 			templateUrl: 'aui-grid/aui-grid-footer',
-			scope: {
-				auiGrid: '=',
-				getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
-			},
-			require: ['^auiGrid'],
+			// require: ['^auiGrid'],
 			replace: true,
-			// transclude: true,
-			// controller: 'auiGridController',
 			link: function($scope, $elem) {
+				$scope.grid.footerNode = $elem[0];
 			}
 		};
 	});
@@ -488,6 +477,7 @@
 				var colIndex = $scope.col.index;
 				$elem[0].style.width = col.width;
 				$elem[0].style.maxWidth = col.width;
+				$elem[0].style.minWidth= col.width;
 
 				// 	data = '<a href="' + '#" class="expando">+</a>' + data;
 				// }
@@ -542,9 +532,10 @@
 					};
 
 				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
-				this._page = this.grid.getOption('initialPage');
+				this._page = this.grid.getOption('startPage');
 				this.grid.registerApi('pagination', 'gotoPage', hitch(this, this.gotoPage));
-				this.grid.registerApi('pagination', 'gotoPage', hitch(this, this.gotoPage));
+				this.grid.registerApi('pagination', 'previous', hitch(this, this.previous));
+				this.grid.registerApi('pagination', 'next', hitch(this, this.next));
 
 				// grid.currentPage = this.currentPage;
 				this.grid.model.when({}).then(finish, finish);
@@ -608,13 +599,21 @@
 			},
 
 			//SET functions
-			gotoPage: function(page){
+			goto: function(page){
 				var t = this, oldPage = t._page;
 				if(page != oldPage && t.firstIndexInPage(page) >= 0){
 					t._page = page;
 					t._updateBody();
 					t.onSwitchPage(page, oldPage);
 				}
+			},
+
+			previous: function() {
+				this.goto(this._page - 1);
+			},
+
+			next: function() {
+				this.goto(this._page + 1);
 			},
 
 			setPageSize: function(size){
@@ -688,10 +687,6 @@
 	module.directive('auiGridPagination', ['GridPagination', function(GridPagination) {
 		return {
 			strict: 'A',
-			// scope: {
-			// 	auiGrid: '=',
-			// 	getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
-			// },
 			require: ['^auiGrid'],
 			// replace: true,
 			// transclude: true,
@@ -4611,7 +4606,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid',
-    "<div class=\"gridx\" role=\"grid\" tabindex=\"0\" aria-readonly=\"true\" aria-label=\"grid\"><div class=\"gridxLoad\"></div><div aui-grid-header></div><div aui-grid-body></div><!-- <div aui-grid-footer></div> --><span data-dojo-attach-point=\"lastFocusNode\" tabindex=\"0\"></span></div>"
+    "<div class=\"gridx\" role=\"grid\" tabindex=\"0\" aria-readonly=\"true\" aria-label=\"grid\"><div class=\"gridxLoad\"></div><div aui-grid-header></div><div aui-grid-body></div><div aui-grid-footer></div><span data-dojo-attach-point=\"lastFocusNode\" tabindex=\"0\"></span></div>"
   );
 
 }]);

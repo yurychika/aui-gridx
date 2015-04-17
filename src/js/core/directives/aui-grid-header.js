@@ -19,6 +19,7 @@
 
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
+				grid.headerNode = $elem[0];
 				$scope.columns = gridCtrl._columns;
 				$scope.domNode = $elem[0];
 				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];

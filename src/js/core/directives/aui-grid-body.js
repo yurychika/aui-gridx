@@ -21,13 +21,14 @@
 			replace: true,
 			controller: 'auiGridBodyController as RenderContainer',
 			// controller: 'auiGridController',
-			link: function($scope, $elm, $attrs, controllers) {
+			link: function($scope, $elem, $attrs, controllers) {
 			// link: function($scope, $elem) {
 				var gridCtrl = controllers[0];
 				var bodyCtrl = controllers[1];
 
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
+				$scope.grid.bodyNode = $elem[0];
 
 				$scope.$watch(
 					// This function returns the value being watched. It is called for each turn of the $digest loop
@@ -41,14 +42,6 @@
 						}
 					}
 				);
-				// $scope.renderredRows = [1,2,3];
-				// console.log('body controller', gridCtrl.grid.body.renderedRows);
-				// console.log('body controller', gridCtrl.grid);
-				// console.log('body controller', gridCtrl.grid.body);
-				// // $scope.renderredRows =
-				// console.log('in aui body link');
-				// console.log($scope.auiGrid);
-				// console.log
 			}
 		};
 	});

@@ -37,9 +37,10 @@
 					};
 
 				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
-				this._page = this.grid.getOption('initialPage');
+				this._page = this.grid.getOption('startPage');
 				this.grid.registerApi('pagination', 'gotoPage', hitch(this, this.gotoPage));
-				this.grid.registerApi('pagination', 'gotoPage', hitch(this, this.gotoPage));
+				this.grid.registerApi('pagination', 'previous', hitch(this, this.previous));
+				this.grid.registerApi('pagination', 'next', hitch(this, this.next));
 
 				// grid.currentPage = this.currentPage;
 				this.grid.model.when({}).then(finish, finish);
@@ -103,13 +104,21 @@
 			},
 
 			//SET functions
-			gotoPage: function(page){
+			goto: function(page){
 				var t = this, oldPage = t._page;
 				if(page != oldPage && t.firstIndexInPage(page) >= 0){
 					t._page = page;
 					t._updateBody();
 					t.onSwitchPage(page, oldPage);
 				}
+			},
+
+			previous: function() {
+				this.goto(this._page - 1);
+			},
+
+			next: function() {
+				this.goto(this._page + 1);
 			},
 
 			setPageSize: function(size){
@@ -183,10 +192,6 @@
 	module.directive('auiGridPagination', ['GridPagination', function(GridPagination) {
 		return {
 			strict: 'A',
-			// scope: {
-			// 	auiGrid: '=',
-			// 	getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
-			// },
 			require: ['^auiGrid'],
 			// replace: true,
 			// transclude: true,

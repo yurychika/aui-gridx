@@ -36,12 +36,14 @@
 						// t.loaded.callback();
 					};
 
-				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
+				this._pageSize = grid.paginationPageSize = this.grid.getOption('paginationPageSize') > 0 ? this.grid.getOption('paginationPageSize') : 5;
 				this._page = grid.currentPage = this.grid.getOption('startPage');
+
 				this.grid.registerApi('pagination', 'goto', hitch(this, this.goto));
 				this.grid.registerApi('pagination', 'previous', hitch(this, this.previous));
 				this.grid.registerApi('pagination', 'next', hitch(this, this.next));
 				this.grid.registerApi('pagination', 'pageCount', hitch(this, this.pageCount));
+				this.grid.registerApi('pagination', 'setPageSize', hitch(this, this.setPageSize));
 
 				// grid.currentPage = this.currentPage;
 				this.grid.model.when({}).then(finish, finish);
@@ -122,19 +124,19 @@
 				this.goto(this._page + 1);
 			},
 
-			setPageSize: function(size){
+			setPageSize: function(size) {
 				var t = this, oldSize = t._pageSize;
-				if(size != oldSize && size >= 0){
+				if (size != oldSize && size >= 0) {
 					var index = t.firstIndexInPage(),
 						oldPage = -1;
 					t._pageSize = size;
-					if(t._page >= t.pageCount()){
+					if (t._page >= t.pageCount()) {
 						oldPage = t._page;
 						t._page = t.pageOfIndex(index);
 					}
 					t._updateBody();
 					t.onChangePageSize(size, oldSize);
-					if(oldPage >= 0){
+					if (oldPage >= 0) {
 						t.onSwitchPage(t._page, oldPage);
 					}
 				}

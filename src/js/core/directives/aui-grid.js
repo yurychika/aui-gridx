@@ -19,7 +19,7 @@
 				grid.setData(newData);
 				grid.model.when({}, function() {
 					var size = grid.model.size(),
-						pageSize = grid.getOption('pageSize'),
+						pageSize = grid.getOption('paginationPageSize'),
 						startPage = grid.getOption('startPage'),
 						firstIndex = 0;
 

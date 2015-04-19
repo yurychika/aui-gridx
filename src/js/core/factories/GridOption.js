@@ -12,9 +12,11 @@ angular.module('aui.grid')
 
 		GridOption.prototype.emptyInfo = 'There are no rows.';
 
-		GridOption.prototype.pageSize = -1;		//no pagination by default
+		GridOption.prototype.paginationPageSize = -1;		//no pagination by default
 
 		GridOption.prototype.startPage = 0;
+
+		GridOption.prototype.paginationPageSizes = [5, 10, 25, 50];
 
 		GridOption.prototype.getOption = function(name) {
 			if (this._options.hasOwnProperty(name)) {

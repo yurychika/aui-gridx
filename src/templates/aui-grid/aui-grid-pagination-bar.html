@@ -22,8 +22,8 @@
 				last
 			</button>
 		</div>
-		<div class="ui-grid-pager-row-count-picker">
-			<select ng-model="grid.options.paginationPageSize" ng-options="o as o for o in grid.options.paginationPageSizes"></select>
+		<div class="gridx-pagination-bar-sizes">
+			<select ng-model="grid.paginationPageSize" ng-options="o as o for o in paginationPageSizes"></select>
 			<span class="ui-grid-pager-row-count-label">&nbsp;{{sizesLabel}}</span>
 		</div>
 	</div>

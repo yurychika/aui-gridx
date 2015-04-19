@@ -532,7 +532,7 @@
 					};
 
 				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
-				this._page = this.grid.getOption('startPage');
+				this._page = grid.currentPage = this.grid.getOption('startPage');
 				this.grid.registerApi('pagination', 'goto', hitch(this, this.goto));
 				this.grid.registerApi('pagination', 'previous', hitch(this, this.previous));
 				this.grid.registerApi('pagination', 'next', hitch(this, this.next));
@@ -603,7 +603,7 @@
 			goto: function(page){
 				var t = this, oldPage = t._page;
 				if(page != oldPage && t.firstIndexInPage(page) >= 0){
-					t._page = page;
+					t.grid.currentPage = t._page = page;
 					t._updateBody();
 					t.onSwitchPage(page, oldPage);
 				}
@@ -4627,7 +4627,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid-pagination-bar',
-    "<div class=\"gridx-pagination-bar\"><div class=\"gridx-pagination-bar-container\"><div class=\"gridx-pagination-bar-control\"><button type=\"button\" ng-click=\"paginationApi.goto(0)\" class=\"firstPage\" ng-disabled=\"cantPageBackward()\"><!-- <div class=\"first-triangle\"><div class=\"first-bar\"></div></div> -->first</button> <button type=\"button\" ng-click=\"paginationApi.previous()\" class=\"previous\" ng-disabled=\"cantPageBackward()\"><!-- <div class=\"first-triangle prev-triangle\"></div> -->prev</button> <input type=\"number\" ng-model=\"grid.options.paginationCurrentPage\" min=\"1\" max=\"{{ paginationApi.getTotalPages() }}\" required> <span class=\"ui-grid-pager-max-pages-number\" ng-show=\"paginationApi.getTotalPages() > 0\">/ {{ paginationApi.getTotalPages() }}</span> <button type=\"button\" ng-click=\"paginationApi.next()\" class=\"next\" ng-disabled=\"cantPageForward()\"><!-- <div class=\"last-triangle next-triangle\"></div> -->next</button> <button type=\"button\" ng-click=\"paginationApi.goto(paginationApi.pageCount() - 1)\" class=\"last\" ng-disabled=\"cantPageToLast()\"><!-- <div class=\"last-triangle\"><div class=\"last-bar\"></div></div> -->last</button></div><div class=\"ui-grid-pager-row-count-picker\"><select ng-model=\"grid.options.paginationPageSize\" ng-options=\"o as o for o in grid.options.paginationPageSizes\"></select><span class=\"ui-grid-pager-row-count-label\">&nbsp;{{sizesLabel}}</span></div></div><div class=\"ui-grid-pager-count-container\"><div class=\"ui-grid-pager-count\"><span ng-show=\"grid.options.totalItems > 0\">{{showingLow}} - {{showingHigh}} of {{grid.options.totalItems}} {{totalItemsLabel}}</span></div></div></div>"
+    "<div class=\"gridx-pagination-bar\"><div class=\"gridx-pagination-bar-container\"><div class=\"gridx-pagination-bar-control\"><button type=\"button\" ng-click=\"paginationApi.goto(0)\" class=\"firstPage\" ng-disabled=\"cantPageBackward()\"><!-- <div class=\"first-triangle\"><div class=\"first-bar\"></div></div> -->first</button> <button type=\"button\" ng-click=\"paginationApi.previous()\" class=\"previous\" ng-disabled=\"cantPageBackward()\"><!-- <div class=\"first-triangle prev-triangle\"></div> -->prev</button> <input type=\"number\" ng-model=\"grid.currentPage\" class=\"currentPage\" min=\"1\" max=\"{{ paginationApi.getTotalPages() }}\" required> <span class=\"ui-grid-pager-max-pages-number\" ng-show=\"paginationApi.pageCount() > 0\">/ {{ paginationApi.pageCount() }}</span> <button type=\"button\" ng-click=\"paginationApi.next()\" class=\"next\" ng-disabled=\"cantPageForward()\"><!-- <div class=\"last-triangle next-triangle\"></div> -->next</button> <button type=\"button\" ng-click=\"paginationApi.goto(paginationApi.pageCount() - 1)\" class=\"last\" ng-disabled=\"cantPageToLast()\"><!-- <div class=\"last-triangle\"><div class=\"last-bar\"></div></div> -->last</button></div><div class=\"ui-grid-pager-row-count-picker\"><select ng-model=\"grid.options.paginationPageSize\" ng-options=\"o as o for o in grid.options.paginationPageSizes\"></select><span class=\"ui-grid-pager-row-count-label\">&nbsp;{{sizesLabel}}</span></div></div><div class=\"ui-grid-pager-count-container\"><div class=\"ui-grid-pager-count\"><span ng-show=\"grid.options.totalItems > 0\">{{showingLow}} - {{showingHigh}} of {{grid.options.totalItems}} {{totalItemsLabel}}</span></div></div></div>"
   );
 
 

@@ -37,7 +37,7 @@
 					};
 
 				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
-				this._page = this.grid.getOption('startPage');
+				this._page = grid.currentPage = this.grid.getOption('startPage');
 				this.grid.registerApi('pagination', 'goto', hitch(this, this.goto));
 				this.grid.registerApi('pagination', 'previous', hitch(this, this.previous));
 				this.grid.registerApi('pagination', 'next', hitch(this, this.next));
@@ -108,7 +108,7 @@
 			goto: function(page){
 				var t = this, oldPage = t._page;
 				if(page != oldPage && t.firstIndexInPage(page) >= 0){
-					t._page = page;
+					t.grid.currentPage = t._page = page;
 					t._updateBody();
 					t.onSwitchPage(page, oldPage);
 				}

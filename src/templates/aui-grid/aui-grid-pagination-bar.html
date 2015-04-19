@@ -10,8 +10,8 @@
 				prev
 			</button>
 
-			<input type="number" ng-model="grid.options.paginationCurrentPage" min="1" max="{{ paginationApi.getTotalPages() }}" required />
-			<span class="ui-grid-pager-max-pages-number" ng-show="paginationApi.getTotalPages() > 0">/ {{ paginationApi.getTotalPages() }}</span>
+			<input type="number" ng-model="grid.currentPage" class='currentPage' min="1" max="{{ paginationApi.getTotalPages() }}" required/>
+			<span class="ui-grid-pager-max-pages-number" ng-show="paginationApi.pageCount() > 0">/ {{ paginationApi.pageCount() }}</span>
 
 			<button type="button" ng-click="paginationApi.next()" class='next' ng-disabled="cantPageForward()">
 				<!-- <div class="last-triangle next-triangle"></div> -->

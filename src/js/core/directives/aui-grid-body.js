@@ -46,8 +46,6 @@
 				);
 
 				angular.element(bodyNode).on('scroll', function() {
-					console.log('in on scroll event');
-					console.log(bodyNode.scrollLeft);
 					$scope.grid.headerInner.scrollLeft = bodyNode.scrollLeft;
 				});
 			}

@@ -38,9 +38,10 @@
 
 				this._pageSize = this.grid.getOption('pageSize') > 0 ? this.grid.getOption('pageSize') : 5;
 				this._page = this.grid.getOption('startPage');
-				this.grid.registerApi('pagination', 'gotoPage', hitch(this, this.gotoPage));
+				this.grid.registerApi('pagination', 'goto', hitch(this, this.goto));
 				this.grid.registerApi('pagination', 'previous', hitch(this, this.previous));
 				this.grid.registerApi('pagination', 'next', hitch(this, this.next));
+				this.grid.registerApi('pagination', 'pageCount', hitch(this, this.pageCount));
 
 				// grid.currentPage = this.currentPage;
 				this.grid.model.when({}).then(finish, finish);
@@ -189,7 +190,7 @@
 		return GridPagination;
 	}]);
 
-	module.directive('auiGridPagination', ['GridPagination', function(GridPagination) {
+	module.directive('auiGridPagination', ['GridPagination', '$compile', function(GridPagination, $compile) {
 		return {
 			strict: 'A',
 			require: ['^auiGrid'],
@@ -201,6 +202,10 @@
 				var grid = $scope.grid = gridCtrl.grid;
 				grid.pagination = new GridPagination(grid);
 				grid.paging = true;
+
+				var pager = angular.element("<div aui-grid-pagination-bar></div>");
+				$elem.append(pager);
+				$compile(pager)($scope);
 				// GridPaginationService.init($scope.grid);
 			}
 		};

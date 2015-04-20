@@ -40,6 +40,7 @@ module.exports = function (grunt) {
 					'src/js/core/directives/aui-grid-cell.js',
 					'src/js/core/directives/aui-grid-pagination.js',
 					'src/js/core/directives/aui-grid-pagination-bar.js',
+					'src/js/core/directives/aui-grid-sort.js',
 
 					'src/js/core/factories/Grid.js',
 					'src/js/core/factories/GridBody.js',

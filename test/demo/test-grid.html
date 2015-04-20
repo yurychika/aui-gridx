@@ -141,12 +141,10 @@ app.controller('appController', function($scope, $q) {
 </script>
 
 <body ng-controller='appController'>
-	<div aui-grid='gridOption' aui-grid-pagination></div>
-	<br>
+	<div aui-grid='gridOption' aui-grid-pagination aui-grid-sort></div>
+	<div style='margin-bottom: 10px;'></div>
 	<button onclick=''>empty button</button>
 	<button ng-click='removeRow()'>remove row</button>
 	<button ng-click='addRow()'>add row</button>
-	<button ng-click='previousPage()'>previous page</button>
-	<button ng-click='nextPage()'>next page</button>
 </body>
 </html>

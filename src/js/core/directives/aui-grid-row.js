@@ -23,7 +23,13 @@
 				$scope.headerCells = [];
 				// var $colMenu 
 				grid = $scope.grid;
-				// console.log('$scope.row in aui-grid-row', $scope.row);
+
+
+				$scope.$on('onRowRender', function() {
+					if ($scope.$parent.$last) {
+						$scope.$emit('onBodyRender');
+					}
+				})
 			}
 		};
 	}]);

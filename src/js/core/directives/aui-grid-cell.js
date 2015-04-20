@@ -90,6 +90,9 @@
 					$elem[0].innerHTML = data;
 				}
 
+				if ($scope.$parent.$last) {
+					$scope.$emit('onRowRender');
+				}
 			}
 		};
 	}]);

@@ -406,7 +406,8 @@
 	var module = angular.module('aui.grid');
 	module.directive('auiGridCell', ['GridUtil', function(GridUtil) {
 		function cellWrapper(rowId, colIndex, data, grid, $scope) {
-			if (colIndex === 0 && grid.model.hasChildren(rowId)) {
+			// if (colIndex === 0 && grid.model.hasChildren(rowId)) {
+			if (colIndex === 0) {
 				var treepath = grid.model.treePath(rowId);
 
 				var wrapper = document.createElement('div');
@@ -415,30 +416,34 @@
 					angular.element(wrapper).addClass('gridxTreeExpandoCellOpen');
 				}
 				wrapper.style.paddingLeft = ((treepath.length) * 16) + 'px';
-
-				var icon = document.createElement('div');
-				angular.element(icon).addClass('gridxTreeExpandoIcon');
-				var expando = document.createElement('div');
-				angular.element(expando).addClass('gridxTreeExpandoInner').html('+');
-
-				icon.addEventListener('click', function(e) {
-					if (grid.view.isExpanded(rowId)) {
-						grid.view.logicCollapse(rowId);
-					} else {
-						grid.view.logicExpand(rowId);
-					}
-					grid.body.render();
-					// $scope.$parent.$parent.$digest();
-					// $scope.$apply();
-					$scope.$apply();
-				});
 				var content = document.createElement('div');
 				angular.element(content).addClass('gridxTreeExpandoContent gridxCellContent').html(data);
 
-				wrapper.appendChild(icon);
-				wrapper.appendChild(content);
+				if (grid.model.hasChildren(rowId)) {
+					var icon = document.createElement('div');
+					angular.element(icon).addClass('gridxTreeExpandoIcon');
+					var expando = document.createElement('div');
+					angular.element(expando).addClass('gridxTreeExpandoInner').html('+');
 
-				icon.appendChild(expando);
+					icon.addEventListener('click', function(e) {
+						if (grid.view.isExpanded(rowId)) {
+							grid.view.logicCollapse(rowId);
+						} else {
+							grid.view.logicExpand(rowId);
+						}
+						grid.body.render();
+						// $scope.$parent.$parent.$digest();
+						// $scope.$apply();
+						$scope.$apply();
+					});
+
+					wrapper.appendChild(icon);
+					wrapper.appendChild(content);
+
+					icon.appendChild(expando);
+				} else {
+					wrapper.appendChild(content);
+				}
 				// wrapper.innerHTML = data;
 				return wrapper;
 			}
@@ -752,7 +757,17 @@
 			}, 
 
 			sort: function(grid, option) {
+				var field = option.field;
 				console.log(arguments);
+				console.log(grid.options.data);
+				grid.options.data.sort(function(a, b) {
+					console.log('sort field is', field);
+					a = a[field];
+					b = b[field];
+					if (a > b) return 1;
+					if (a == b) return 0;
+					if (a < b) return -1;
+				});
 			}
 		};
 
@@ -4617,7 +4632,13 @@ angular.module('aui.grid')
 				if (arguments.length > 2) {
 					var args = [].slice.apply(arguments, [2]);
 					// args = args.splice(0, 2);
-					return function() {return method.apply(scope, args.concat(arguments));}
+					return function() {
+						var _args = [].concat(args);
+						for (var i = 0; i < arguments.length; i++) {
+							_args.push(arguments[i]);
+						}
+						return method.apply(scope, _args);
+					}
 				}
 
 				return function() {return method.apply(scope, arguments || []);}

@@ -11,8 +11,17 @@
 			}, 
 
 			sort: function(grid, option) {
+				var field = option.field;
 				console.log(arguments);
 				console.log(grid.options.data);
+				grid.options.data.sort(function(a, b) {
+					console.log('sort field is', field);
+					a = a[field];
+					b = b[field];
+					if (a > b) return 1;
+					if (a == b) return 0;
+					if (a < b) return -1;
+				});
 			}
 		};
 

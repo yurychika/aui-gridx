@@ -22,6 +22,7 @@
 					angular.element(icon).addClass('gridxTreeExpandoIcon');
 					var expando = document.createElement('div');
 					angular.element(expando).addClass('gridxTreeExpandoInner').html('+');
+					icon.style.left = ((treepath.length - 1) * 16) + 'px';
 
 					icon.addEventListener('click', function(e) {
 						if (grid.view.isExpanded(rowId)) {
@@ -30,8 +31,6 @@
 							grid.view.logicExpand(rowId);
 						}
 						grid.body.render();
-						// $scope.$parent.$parent.$digest();
-						// $scope.$apply();
 						$scope.$apply();
 					});
 

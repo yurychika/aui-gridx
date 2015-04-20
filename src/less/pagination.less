@@ -133,3 +133,53 @@
 	padding-bottom: 3px;
 }
 
+.gridx-pagination-bar-control {
+	float: left;
+
+	input.currentPage {
+		width: 50px;
+	}
+	.next-triangle,
+	.last-triangle {
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 5px 0 5px 8.7px;
+		border-color: transparent transparent transparent #4d4d4d;
+		margin-left: -1px;
+	}
+	
+	.prev-triangle,
+	.first-triangle {
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 5px 8.7px 5px 0;
+		border-color: transparent #4d4d4d transparent transparent;
+	}
+
+	.first-bar {
+		width: 10px;
+		border-left: 2px solid #4d4d4d;
+		margin-top: -6px;
+		height: 12px;
+		margin-left: -3px;
+	}
+
+	.last-bar {
+		width: 10px;
+		border-left: 2px solid #4d4d4d;
+		margin-top: -6px;
+		height: 12px;
+		margin-left: 1px;
+	}
+}
+
+.gridx-pagination-bar-sizes {
+	float: right;
+}
+
+.gridx-pagination-count-label {
+	color: #2c3e50;
+	font-size: 13px;
+}

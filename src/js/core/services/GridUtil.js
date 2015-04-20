@@ -23,7 +23,13 @@
 				if (arguments.length > 2) {
 					var args = [].slice.apply(arguments, [2]);
 					// args = args.splice(0, 2);
-					return function() {return method.apply(scope, args.concat(arguments));}
+					return function() {
+						var _args = [].concat(args);
+						for (var i = 0; i < arguments.length; i++) {
+							_args.push(arguments[i]);
+						}
+						return method.apply(scope, _args);
+					}
 				}
 
 				return function() {return method.apply(scope, arguments || []);}

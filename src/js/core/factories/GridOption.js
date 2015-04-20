@@ -14,7 +14,7 @@ angular.module('aui.grid')
 
 		GridOption.prototype.paginationPageSize = -1;		//no pagination by default
 
-		GridOption.prototype.startPage = 0;
+		GridOption.prototype.startPage = 1;
 
 		GridOption.prototype.paginationPageSizes = [5, 10, 25, 50];
 

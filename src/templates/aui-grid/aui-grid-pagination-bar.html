@@ -1,7 +1,7 @@
 <div class="gridx-pagination-bar">
 	<div class="gridx-pagination-bar-container">
 		<div class="gridx-pagination-bar-control">
-			<button type="button" ng-click="paginationApi.goto(0)" class='firstPage'ng-disabled="cantPageBackward()">
+			<button type="button" ng-click="paginationApi.goto(1)" class='firstPage'ng-disabled="cantPageBackward()">
 				<div class="first-triangle">
 					<div class="first-bar"></div>
 				</div>
@@ -17,7 +17,7 @@
 				<div class="last-triangle next-triangle"></div>
 				
 			</button>
-			<button type="button" ng-click="paginationApi.goto(paginationApi.pageCount() - 1)" class='last' ng-disabled="cantPageToLast()">
+			<button type="button" ng-click="paginationApi.goto(paginationApi.pageCount())" class='last' ng-disabled="cantPageToLast()">
 				<div class="last-triangle">
 					<div class="last-bar"></div>
 				</div>

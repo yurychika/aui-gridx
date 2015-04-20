@@ -75,7 +75,7 @@
 				}else if(!(page >= 0)){
 					return -1;	//Integer
 				}
-				var index = page * this.pageSize();
+				var index = (page - 1) * this.pageSize();
 				return index < this.model.size() ? index : -1;
 			},
 
@@ -91,7 +91,7 @@
 			},
 
 			pageOfIndex: function(index){
-				return this.isAll() ? 0 : Math.floor(index / this.pageSize());
+				return this.isAll() ? 0 : (Math.floor(index / this.pageSize()) + 1);
 			},
 
 			indexInPage: function(index){
@@ -130,7 +130,7 @@
 					var index = t.firstIndexInPage(),
 						oldPage = -1;
 					t._pageSize = size;
-					if (t._page >= t.pageCount()) {
+					if (t._page > t.pageCount()) {
 						oldPage = t._page;
 						t._page = t.pageOfIndex(index);
 					}

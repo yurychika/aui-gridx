@@ -24,7 +24,7 @@
 						firstIndex = 0;
 
 					pageSize = pageSize > 0 ? pageSize : size;
-					firstIndex = pageSize * startPage;
+					firstIndex = pageSize * (startPage - 1);
 					try {
 						grid.view.updateRootRange(firstIndex, pageSize);
 					} catch (e) {

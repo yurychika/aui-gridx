@@ -39,6 +39,10 @@ body {
 .gridx-pagination-bar-control button {
 	height: 20px;
 }
+
+.buttonGroup {
+	margin: 0 10px;
+}
 </style>
 <script type='text/javascript' src='../../lib/angular/angular.js'></script>
 <script type='text/javascript' src='../../release/build.js'></script>
@@ -136,12 +140,8 @@ app.controller('appController', function($scope, $q) {
 		$scope.api.pagination.previous();
 	};
 
-	$scope.sortName = function() {
-		$scope.api.sort.sort({field: 'name'});
-	};
-
-	$scope.sortAge = function() {
-		$scope.api.sort.sort({field: 'age'});
+	$scope.sort = function(field) {
+		$scope.api.sort.sort({field: field});
 	};
 
 	$scope.empty = function() {
@@ -152,12 +152,20 @@ app.controller('appController', function($scope, $q) {
 </script>
 
 <body ng-controller='appController'>
-	<div aui-grid='gridOption'></div>
+	<div aui-grid='gridOption' aui-grid-sort></div>
 	<div style='margin-bottom: 10px;'></div>
-	<button ng-click='dummy()'>dummy</button>
-	<button ng-click='removeRow()'>remove row</button>
-	<button ng-click='addRow()'>add row</button>
-	<button ng-click='sortName()'>sort name</button>
-	<button ng-click='sortAge()'>sort age</button>
+	<span class='buttonGroup'>
+		<button ng-click='dummy()'>dummy</button>
+	</span>
+	<span class='buttonGroup'>
+		<button ng-click='removeRow()'>remove row</button>
+		<button ng-click='addRow()'>add row</button>
+	</span>
+	<span class='buttonGroup'>
+		<button ng-click='sort("name")'>sort name</button>
+		<button ng-click='sort("age")'>sort age</button>
+		<button ng-click='sort("id")'>sort id</button>
+		<button ng-click='sort("country")'>sort country</button>
+	</span>
 </body>
 </html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html ng-app='app'>
+<title>test aui-grid basic</title>
+<link rel='stylesheet' href='../../src/less/Gridx.css'>
+<style type='text/css'>
+body {
+	font-family: arial;
+}
+.gridx {
+	width: 600px;
+	height: auto;
+}
+
+.gridxMain {
+	height: 450px;
+}
+
+.gridxCell {
+	font-size: 13px;
+	font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.gridxHeader .gridxCell {
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.gridxBody {
+	overflow: auto;
+}
+.gridxRowTable {
+	width: initial !important;
+}
+
+.error {
+	color: azure;
+}
+
+.gridx-pagination-bar-control button {
+	height: 20px;
+}
+</style>
+<script type='text/javascript' src='../../lib/angular/angular.js'></script>
+<script type='text/javascript' src='../../release/build.js'></script>
+<script type='text/javascript' src='../js/musicData.js'></script>
+<script type='text/javascript'>
+var app = angular.module('app', ['aui.grid']);
+
+app.controller('appController', function($scope, $q) {
+	$scope.gridOption = {};
+
+	$scope.gridOption.childField = 'children';
+
+	$scope.gridOption.paginationPageSize = 5;
+
+	window.data = $scope.gridOption.data = [
+		{name: "Moroni", age: 50, id: 'item-1', country: 'US', children: [
+			{name: "Moroni-child1", age: 43, id: 'item-1-1', country: 'US'},
+			{name: "Moroni-child2", age: 27, id: 'item-1-2', country: 'US'},
+			{name: "Moroni-child3", age: 29, id: 'item-1-3', country: 'US'},
+			{name: "Moroni-child4", age: 34, id: 'item-1-4', country: 'US'}
+		]},
+		{name: "gee", age: 50, id: 'item-2', country: 'CN', children: [
+			{name: "gee-child1", age: 43, id: 'item-2-1', country: 'CN', children: [
+				{name: "gee-cc", age: 27, id: 'item-2-1-1', country: 'US'}
+			]},
+			{name: "gee-child2", age: 27, id: 'item-2-2', country: 'CN'},
+			{name: "gee-child3", age: 29, id: 'item-2-3', country: 'CN'},
+			{name: "gee-child4", age: 34, id: 'item-2-4', country: 'CN'}
+		]},
+		{name: "Tiancum", age: 43, id: 'item-3', country: 'US'},
+		{name: "Jacob", age: 27, id: 'item-4', country: 'US'},
+		{name: "Nephi", age: 29, id: 'item-5', country: 'US'},
+		{name: "Enos", age: 34, id: 'item-6', country: 'US'},
+		{name: "Jacob", age: 27, id: 'item-7', country: 'US'},
+		{name: "Nephi", age: 29, id: 'item-8', country: 'US'},
+		{name: "Enos", age: 34, id: 'item-9', country: 'US'},
+		{name: "Enos", age: 34, id: 'item-10', country: 'US'},
+		{name: "Enos", age: 34, id: 'item-11', country: 'US'},
+		{name: "Enos", age: 34, id: 'item-12', country: 'US'},
+		{name: "Enos", age: 34, id: 'item-13', country: 'US'},
+		{name: "Enos", age: 34, id: 'item-14', country: 'US'},
+	];
+
+	$scope.gridOption.columnStructs = [
+		{id: 'name', field: 'name', name: 'my name', width: '200px',
+			formatter: function(cellData, rowData, rowId, columnId, model) {
+				// console.log(arguments);
+				// model._cache._cache.hasChildren(rowId);
+				return cellData;
+				// return cellData + model.hasChildren(rowId)? '+' :;
+				return model.size();
+				return "<p class>" + cellData + ' ' + rowData['age'] + "</p>";
+			}
+		},
+		{id: 'age', field: 'age', name: 'my age', width: '100px',
+			formatter: function(cellData, rowData, rowId, columnId, model) {
+				return cellData;
+				return parseInt(cellData) + Math.floor(Math.random() * 100) % 20;
+			}
+		},
+		{id: 'id', field: 'id', name: 'my id', width: '200px'},
+		{id: 'country', field: 'country', name: 'my  country', width: '110px'},
+		// {id: 'name', field: 'name', name: 'my name', width: '70px'},
+		// {id: 'age', field: 'age', name: 'my age', width: '70px'},
+		// {id: 'id', field: 'name', name: 'my id', width: '70px'},
+		// {id: 'country', field: 'age', name: 'my country', width: '70px'}
+	];
+
+	//music data
+	$scope.gridOption.data = window.musicData;
+	$scope.gridOption.columnStructs = [
+		{id: 'id', field: 'id', name: 'Identity', width: '80px'},
+		{id: 'Genre', field: 'Genre', name: 'Genre', width: '100px', alwaysEditing: true},
+		{id: 'Artist', field: 'Artist', name: 'Artist', width: '120px'},
+		{id: 'Year', field: 'Year', name: 'Year', width: '80px'},
+		{id: 'Album', field: 'Album', name: 'Album', width: '160px'},
+		{id: 'Name', field: 'Name', name: 'Name', width: '80px'},
+		{id: 'Length', field: 'Length', name: 'Length', width: '80px'},
+		{id: 'Track', field: 'Track', name: 'Track', width: '80px'},
+		{id: 'Composer', field: 'Composer', name: 'Composer', width: '160px'},
+		{id: 'Download Date', field: 'Download Date', name: 'Download Date', width: '160px'},
+		{id: 'Last Played', field: 'Last Played', name: 'Last Played', width: '120px'},
+		{id: 'Heard', field: 'Heard', name: 'Heard', width: '80px'}
+	],
+
+	$scope.removeRow = function() {
+		$scope.gridOption.data.splice(0, 1);
+		// window.data.splice(0, 1);
+		console.log('remove row');
+	};
+
+	$scope.gridOption.onRegisterApi = function(api) {
+		$scope.api = api;
+	};
+
+	$scope.addRow = function() {
+		$scope.gridOption.data.push({
+			name: "",
+			age: new Date().getTime() % 50,
+			id: new Date().getTime(),
+			country: 'US'
+		});
+		console.log('add row');
+	};
+
+	$scope.nextPage = function() {
+		$scope.api.pagination.next();
+	};
+
+	$scope.previousPage = function() {
+		$scope.api.pagination.previous();
+	};
+
+	$scope.sortName = function() {
+		$scope.api.sort.sort({field: 'name'});
+	};
+
+	$scope.sortAge = function() {
+		$scope.api.sort.sort({field: 'age'});
+	};
+
+	$scope.empty = function() {
+		return;
+	};
+
+});
+</script>
+
+<body ng-controller='appController'>
+	<div aui-grid='gridOption' aui-grid-pagination aui-grid-sort></div>
+	<div style='margin-bottom: 10px;'></div>
+	<button ng-click='dummy()'>dummy</button>
+	<button ng-click='removeRow()'>remove row</button>
+	<button ng-click='addRow()'>add row</button>
+	<button ng-click='sortName()'>sort name</button>
+	<button ng-click='sortAge()'>sort age</button>
+	<!-- <button ng-click='sortAge()'>sort item</button> -->
+</body>
+</html>

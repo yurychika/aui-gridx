@@ -24,11 +24,17 @@
 				// var $colMenu 
 				grid = $scope.grid;
 
-
 				$scope.$on('onRowRender', function() {
 					if ($scope.$parent.$last) {
 						$scope.$emit('onBodyRender');
 					}
+				});
+
+				$elem.on('mouseenter', function() {
+					$elem.addClass('gridxRowOver');
+				});
+				$elem.on('mouseleave', function() {
+					$elem.removeClass('gridxRowOver');
 				})
 			}
 		};

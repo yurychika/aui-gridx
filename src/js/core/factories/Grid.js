@@ -43,6 +43,12 @@ angular.module('aui.grid')
 
 		Grid.prototype.version = version;
 
+		Grid.prototype.hasVScroller = false;
+
+		Grid.prototype.hasHScroller = false;
+
+		Grid.prototype.enableRowHoverEffect = true;
+
 		Grid.prototype.getOption = function(name) {
 			return this._options.getOption(name);
 		};

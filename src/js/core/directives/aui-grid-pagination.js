@@ -36,8 +36,8 @@
 						// t.loaded.callback();
 					};
 
-				this._pageSize = grid.paginationPageSize = this.grid.getOption('paginationPageSize') > 0 ? this.grid.getOption('paginationPageSize') : 5;
-				this._page = grid.currentPage = this.grid.getOption('startPage');
+				this._pageSize = this.grid.paginationPageSize = this.grid.getOption('paginationPageSize') > 0 ? this.grid.getOption('paginationPageSize') : 5;
+				this._page = this.grid.currentPage = this.grid.getOption('startPage');
 
 				this.grid.registerApi('pagination', 'goto', hitch(this, this.goto));
 				this.grid.registerApi('pagination', 'previous', hitch(this, this.previous));
@@ -132,7 +132,7 @@
 					t._pageSize = size;
 					if (t._page > t.pageCount()) {
 						oldPage = t._page;
-						t._page = t.pageOfIndex(index);
+						t._page = t.grid.currentPage = t.pageOfIndex(index);
 					}
 					t._updateBody();
 					t.onChangePageSize(size, oldSize);

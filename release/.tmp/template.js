@@ -2,7 +2,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('aui-grid/aui-grid-body',
-    "<div class=\"gridxMain\" role=\"presentation\"><div class=\"gridxBodyEmpty\" role=\"alert\" tabindex=\"-1\" ng-show=\"isEmpty\">this is the empty body</div><div class=\"gridxBody\" role=\"presentation\" tabindex=\"0\" ng-class=\"{gridxBodyRowHoverEffect: grid.enableRowHoverEffect}\"><div aui-grid-row ng-repeat=\"row in renderedRows\" row=\"row\"></div></div><!-- \t<div class=\"gridxVScroller\"tabindex=\"-1\">\r" +
+    "<div class=\"gridxMain\" role=\"presentation\"><div class=\"gridxBodyEmpty\" role=\"alert\" tabindex=\"-1\" ng-show=\"renderedRows.length === 0\">this is the empty body</div><div class=\"gridxBody\" role=\"presentation\" tabindex=\"0\" ng-class=\"{gridxBodyRowHoverEffect: grid.enableRowHoverEffect}\"><div aui-grid-row ng-repeat=\"row in renderedRows\" row=\"row\"></div></div><!-- \t<div class=\"gridxVScroller\"tabindex=\"-1\">\r" +
     "\n" +
     "\t\t<div style='width: 1px;'></div>\r" +
     "\n" +

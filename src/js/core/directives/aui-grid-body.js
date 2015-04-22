@@ -23,9 +23,9 @@
 			// controller: 'auiGridController',
 			link: function($scope, $elem, $attrs, controllers) {
 			// link: function($scope, $elem) {
-				var gridCtrl = controllers[0];
-				var bodyCtrl = controllers[1];
-				var bodyNode = $elem.find('div')[1];
+				var gridCtrl = controllers[0],
+					bodyCtrl = controllers[1],
+					bodyNode = $elem.find('div')[1];
 
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;

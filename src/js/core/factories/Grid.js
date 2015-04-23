@@ -150,6 +150,9 @@ angular.module('aui.grid')
 			// this.inherited(arguments);
 		},
 
+		Grid.prototype.sort = function(options) {
+			this.model.sort(options);
+		},
 	/*=====
 		// autoHeight: Boolean
 		//		If true, the grid's height is determined by the total height of the rows in current body view,

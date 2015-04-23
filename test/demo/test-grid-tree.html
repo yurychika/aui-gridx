@@ -142,7 +142,7 @@ app.controller('appController', function($scope, $q) {
 	};
 
 	$scope.sort = function(field) {
-		$scope.api.sort.sort({field: field});
+		$scope.api.core.sort({field: field});
 	};
 
 	$scope.empty = function() {
@@ -154,7 +154,7 @@ app.controller('appController', function($scope, $q) {
 
 <body ng-controller='appController'>
 	<!-- <div aui-grid='gridOption' aui-grid-sort></div> -->
-	<div aui-grid='gridOption' aui-grid-sort></div>
+	<div aui-grid='gridOption'></div>
 	<div style='margin-bottom: 10px;'></div>
 	<span class='buttonGroup'>
 		<button ng-click='dummy()'>dummy</button>

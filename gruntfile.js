@@ -52,6 +52,7 @@ module.exports = function (grunt) {
 
 					'src/js/core/core.js',
 					'src/js/core/services/GridUtil.js',
+					'src/js/core/services/GridSortService.js',
 					'release/.tmp/template.js'
 					// 'src/outro.js'
 				],

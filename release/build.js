@@ -995,6 +995,9 @@ angular.module('aui.grid')
 			// this.inherited(arguments);
 		},
 
+		Grid.prototype.sort = function(options) {
+			this.model.sort(options);
+		},
 	/*=====
 		// autoHeight: Boolean
 		//		If true, the grid's height is determined by the total height of the rows in current body view,
@@ -3191,6 +3194,7 @@ angular.module('aui.grid')
 =====*/
 
 	var hitch = GridUtil.hitch;
+
 	function isId(it){
 
 		return it || it === 0;
@@ -3288,8 +3292,12 @@ angular.module('aui.grid')
 			this._cache.setData(data);
 		},
 
-		sort: function(option) {
+		sort: function(options, grid) {
 			// option.length
+			var rootIndex = this._cache._struct[''],
+				t = this;
+
+			GridSortService.sort(rootIndex, options, grid);
 		},
 
 		//Public-------------------------------------------------------------------
@@ -4728,6 +4736,64 @@ angular.module('aui.grid')
 	}]);
 
 })();
+(function() {
+	'use strict';
+	
+	var module = angular.module('aui.grid');
+	module.factory('GridSortService', ['GridUtil', function(GridUtil) {
+		var hitch = GridUtil.hitch;
+
+		var service = {
+			init: function(grid) {
+				// grid.registerApi('sort', 'sort', hitch(this, this.sort, grid))
+			},
+
+			basicSort: function(list, options) {
+
+			},
+
+			sort: function(list, options, grid) {
+				var field, isDesc, option,
+					cols = grid._columnsById,
+					cache = grid.model._cache._cache,
+					da, db, optionsLen = options.length;
+
+				if (list[0] === undefined) list.shift();
+				list.sort(function(a, b) {
+					if (a === undefined) return 1;
+					if (b === undefined) return -1;
+
+					for (var i = 0; i < optionsLen; i++) {
+						option = options[i];
+						field = cols[option.field].field;
+						da = cache[a].rawData[field];
+						db = cache[b].rawData[field];
+						if (da > db) {
+							return 1;
+						}
+						if (da < db) {
+							return -1;
+						}
+					}
+					return 0;
+				});
+				list.unshift(undefined);
+				// console.log(arguments);
+				// console.log(grid.options.data);
+				// grid.options.data.sort(function(a, b) {
+				// 	a = a[field];
+				// 	b = b[field];
+				// 	if (a > b) return 1;
+				// 	if (a == b) return 0;
+				// 	if (a < b) return -1;
+				// });
+			}
+		};
+
+		return service;
+	}]);
+})();
+
 angular.module('aui.grid').run(['$templateCache', function($templateCache) {
   'use strict';
 

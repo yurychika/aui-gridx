@@ -212,6 +212,7 @@
 =====*/
 
 	var hitch = GridUtil.hitch;
+
 	function isId(it){
 
 		return it || it === 0;
@@ -309,8 +310,12 @@
 			this._cache.setData(data);
 		},
 
-		sort: function(option) {
+		sort: function(options, grid) {
 			// option.length
+			var rootIndex = this._cache._struct[''],
+				t = this;
+
+			GridSortService.sort(rootIndex, options, grid);
 		},
 
 		//Public-------------------------------------------------------------------

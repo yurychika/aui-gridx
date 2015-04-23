@@ -14,7 +14,7 @@
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
 				grid.subscribe(['columnChange', 'refresh'], function() {
-					console.log('in column change callback');
+					console.log('%cin column change callback', 'color:red');
 					buildHeader();
 				});
 				grid.headerNode = $elem[0];
@@ -27,6 +27,7 @@
 
 				function buildHeader() {
 					$scope.headerCells = [];
+					console.log('%cin build header', 'color:blue');
 					angular.forEach(grid._columns, function(col) {
 						temp = {};
 						temp.id = grid.id + col.id;

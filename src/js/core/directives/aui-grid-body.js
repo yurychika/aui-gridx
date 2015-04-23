@@ -30,7 +30,7 @@
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
 				$scope.grid.bodyNode = $elem.find('div')[1];
-				
+
 				$scope.grid.subscribe('columnChange', function() {
 					grid.body.render();
 				});
@@ -51,7 +51,7 @@
 				);
 
 				$scope.$on('onBodyRender', function() {
-					console.log('in on body render event');
+					console.log('%cin on body render event', 'color:red');
 					if ($scope.grid.bodyNode.scrollHeight > $scope.grid.bodyNode.clientHeight) {
 						$scope.grid.hasVScroller = true;
 					} else {

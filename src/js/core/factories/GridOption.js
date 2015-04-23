@@ -18,6 +18,8 @@ angular.module('aui.grid')
 
 		GridOption.prototype.paginationPageSizes = [5, 10, 25, 50];
 
+		GridOption.prototype.enableRowHoverEffect = true;
+
 		GridOption.prototype.getOption = function(name) {
 			if (this._options.hasOwnProperty(name)) {
 				return this._options[name];

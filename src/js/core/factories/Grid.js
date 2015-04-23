@@ -32,6 +32,7 @@ angular.module('aui.grid')
 			this.hasHScroller = false;
 			this.api = {};		//GridApi
 			this._options = new GridOption(options);
+			this.enableRowHoverEffect = this.getOption('enableRowHoverEffect');
 			// console.log('childField', this.getOption('childField'));
 			// console.log('emptyInfo', this.getOption('emptyInfo'));
 			this.postCreate();

@@ -86,7 +86,7 @@
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
 				grid.subscribe(['columnChange', 'refresh'], function() {
-					console.log('in column change callback');
+					console.log('%cin column change callback', 'color:red');
 					buildHeader();
 				});
 				grid.headerNode = $elem[0];
@@ -99,6 +99,7 @@
 
 				function buildHeader() {
 					$scope.headerCells = [];
+					console.log('%cin build header', 'color:blue');
 					angular.forEach(grid._columns, function(col) {
 						temp = {};
 						temp.id = grid.id + col.id;
@@ -342,7 +343,7 @@
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
 				$scope.grid.bodyNode = $elem.find('div')[1];
-				
+
 				$scope.grid.subscribe('columnChange', function() {
 					grid.body.render();
 				});
@@ -363,7 +364,7 @@
 				);
 
 				$scope.$on('onBodyRender', function() {
-					console.log('in on body render event');
+					console.log('%cin on body render event', 'color:red');
 					if ($scope.grid.bodyNode.scrollHeight > $scope.grid.bodyNode.clientHeight) {
 						$scope.grid.hasVScroller = true;
 					} else {
@@ -876,6 +877,7 @@ angular.module('aui.grid')
 			this.hasHScroller = false;
 			this.api = {};		//GridApi
 			this._options = new GridOption(options);
+			this.enableRowHoverEffect = this.getOption('enableRowHoverEffect');
 			// console.log('childField', this.getOption('childField'));
 			// console.log('emptyInfo', this.getOption('emptyInfo'));
 			this.postCreate();
@@ -2364,6 +2366,8 @@ angular.module('aui.grid')
 		GridOption.prototype.startPage = 1;
 
 		GridOption.prototype.paginationPageSizes = [5, 10, 25, 50];
+
+		GridOption.prototype.enableRowHoverEffect = true;
 
 		GridOption.prototype.getOption = function(name) {
 			if (this._options.hasOwnProperty(name)) {

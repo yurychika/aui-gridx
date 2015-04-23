@@ -13,7 +13,7 @@
 
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
-				grid.subscribe('columnChange', function() {
+				grid.subscribe(['columnChange', 'refresh'], function() {
 					console.log('in column change callback');
 					buildHeader();
 				});
@@ -38,7 +38,6 @@
 					});
 				}
 
-				console.log($scope.headerCells);
 				return;
 
 				// t._build();

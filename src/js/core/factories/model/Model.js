@@ -1,6 +1,6 @@
 (function(){
 	angular.module('aui.grid')
-	.factory('Model', ['$q', 'GridUtil', 'Sync', '$compile', '$parse', '$timeout', function($q, GridUtil, Sync) {
+	.factory('Model', ['$q', 'GridUtil', 'Sync', 'GridSortService', function($q, GridUtil, Sync, GridSortService) {
 /*=====
 	return declare([], {
 		// summary:
@@ -125,6 +125,10 @@
 			//		Unlock a row cache in memory, so that it could be cleared out when cache size is reached.
 			// id: String?
 			//		The row ID. If omitted, all kept rows will be freed.
+		},
+
+		sort: function(id) {
+
 		},
 
 		when: function(args, callback, scope){
@@ -306,7 +310,7 @@
 		},
 
 		sort: function(option) {
-
+			// option.length
 		},
 
 		//Public-------------------------------------------------------------------

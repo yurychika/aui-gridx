@@ -36,16 +36,14 @@
 					} catch (e) {
 						console.log(e);
 					}
-					grid.redraw();
+					grid.refresh();
 				});
 				console.log('in data watch function;');
 			}
 
 			function columnWatchFunction(nv, ov) {
-				// if (nv && nv !== ov) {
-					grid.setColumns(nv);
-					grid.publish('columnChange');
-				// }
+				grid.setColumns(nv);
+				grid.publish('columnChange');
 				console.log('in column watch function');
 			}
 		}]);
@@ -87,7 +85,7 @@
 
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
-				grid.subscribe('columnChange', function() {
+				grid.subscribe(['columnChange', 'refresh'], function() {
 					console.log('in column change callback');
 					buildHeader();
 				});
@@ -112,7 +110,6 @@
 					});
 				}
 
-				console.log($scope.headerCells);
 				return;
 
 				// t._build();
@@ -345,21 +342,17 @@
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
 				$scope.grid.bodyNode = $elem.find('div')[1];
+				
 				$scope.grid.subscribe('columnChange', function() {
-					console.log('in column change callback');
 					grid.body.render();
 				});
 				$scope.$watchCollection(function() {
 					return $scope.renderedRows;
 				}, function(newData) {
-					// debugger;
-					// console.log('renderedRows changed');
 				});
 
 				$scope.$watch(
-					// This function returns the value being watched. It is called for each turn of the $digest loop
 					function() { return gridCtrl.grid.model.size() === 0; },
-					// This is the change listener, called when the value returned from the above function changes
 					function(newValue, oldValue) {
 						if (newValue) {
 							$scope.isEmpty = true;
@@ -857,7 +850,7 @@ angular.module('aui.grid')
 		var dummyFunc = function(){};
 		var version = {
 			// summary:
-			//		Version number of the Dojo Toolkit
+			//		Version number
 			// description:
 			//		Hash about the version, including
 			//
@@ -870,13 +863,12 @@ angular.module('aui.grid')
 			minor: 0,
 			patch: 1,
 			flag: "",
-			toString: function(){
+			toString: function() {
 				return this.major + "." + this.minor + "." + this.patch + this.flag;
 			}
 		};
 		var Grid = function Grid(options){
 			var self = this;
-
 			this.name = 'aui gridx';
 			this.isIE = false;
 			this.options = options;
@@ -884,8 +876,8 @@ angular.module('aui.grid')
 			this.hasHScroller = false;
 			this.api = {};		//GridApi
 			this._options = new GridOption(options);
-			console.log('childField', this.getOption('childField'));
-			console.log('emptyInfo', this.getOption('emptyInfo'));
+			// console.log('childField', this.getOption('childField'));
+			// console.log('emptyInfo', this.getOption('emptyInfo'));
 			this.postCreate();
 		};
 
@@ -919,9 +911,10 @@ angular.module('aui.grid')
 			}
 		},
 
-		Grid.prototype.redraw = function() {
+		Grid.prototype.refresh = function() {
 			// debugger;
 			this.body.render();
+			this.publish('refresh');
 		};
 
 		Grid.prototype.getTextDir = function(colId, text){
@@ -955,10 +948,6 @@ angular.module('aui.grid')
 			// tags:
 			//		protected extension
 			var t = this;
-			// t.inherited(arguments);
-			// if(t.touch === undefined){
-			// 	t.touch = has('ios') || has('android');
-			// }
 			// if(t.touch){
 			// 	domClass.add(t.domNode, 'gridxTouch');
 			// }else{
@@ -2986,7 +2975,7 @@ angular.module('aui.grid')
 
 (function(){
 	angular.module('aui.grid')
-	.factory('Model', ['$q', 'GridUtil', 'Sync', '$compile', '$parse', '$timeout', function($q, GridUtil, Sync) {
+	.factory('Model', ['$q', 'GridUtil', 'Sync', 'GridSortService', function($q, GridUtil, Sync, GridSortService) {
 /*=====
 	return declare([], {
 		// summary:
@@ -3111,6 +3100,10 @@ angular.module('aui.grid')
 			//		Unlock a row cache in memory, so that it could be cleared out when cache size is reached.
 			// id: String?
 			//		The row ID. If omitted, all kept rows will be freed.
+		},
+
+		sort: function(id) {
+
 		},
 
 		when: function(args, callback, scope){
@@ -3292,7 +3285,7 @@ angular.module('aui.grid')
 		},
 
 		sort: function(option) {
-
+			// option.length
 		},
 
 		//Public-------------------------------------------------------------------
@@ -4408,11 +4401,16 @@ angular.module('aui.grid')
 	function GridCore() {}
 
 	GridCore.prototype = {
-		subscribe: function(name, func, context) {
-			if (!this.topics.hasOwnProperty(name)) {
-				this.topics[name] = [];
-			}
-			this.topics[name].push([func, context]);
+		subscribe: function(names/** string| array **/, func, context) {
+			if (angular.isString(names)) names = [names];
+			var t = this;
+
+			names.forEach(function(name) {
+				if (!t.topics.hasOwnProperty(name)) {
+					t.topics[name] = [];
+				}
+				t.topics[name].push([func, context]);
+			})
 		},
 
 		publish: function(name) {
@@ -4534,6 +4532,9 @@ angular.module('aui.grid')
 			t.modelExtensions = t.modelExtensions || [];
 			t.topics = t.topics || {};
 
+			t.registerApi('core', 'sort', t.sort);
+			t.registerApi('core', 'refresh', t.refresh);
+
 			if(t.touch){
 				if(t.touchModules){
 					t.modules = t.modules.concat(t.touchModules);
@@ -4542,11 +4543,7 @@ angular.module('aui.grid')
 				t.modules = t.modules.concat(t.desktopModules);
 			}
 
-			// if(!t.store){
-			// 	s = t._parseData(t.data);
-			// }else{
-				s = t.store;
-			// }
+			s = t.store;
 
 			// Deferred.when(s, function(){
 				t.setColumns(t.options.columnStructs);

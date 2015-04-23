@@ -31,16 +31,14 @@
 					} catch (e) {
 						console.log(e);
 					}
-					grid.redraw();
+					grid.refresh();
 				});
 				console.log('in data watch function;');
 			}
 
 			function columnWatchFunction(nv, ov) {
-				// if (nv && nv !== ov) {
-					grid.setColumns(nv);
-					grid.publish('columnChange');
-				// }
+				grid.setColumns(nv);
+				grid.publish('columnChange');
 				console.log('in column watch function');
 			}
 		}]);

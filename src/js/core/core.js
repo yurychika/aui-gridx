@@ -297,11 +297,16 @@ angular.module('aui.grid')
 	function GridCore() {}
 
 	GridCore.prototype = {
-		subscribe: function(name, func, context) {
-			if (!this.topics.hasOwnProperty(name)) {
-				this.topics[name] = [];
-			}
-			this.topics[name].push([func, context]);
+		subscribe: function(names/** string| array **/, func, context) {
+			if (angular.isString(names)) names = [names];
+			var t = this;
+
+			names.forEach(function(name) {
+				if (!t.topics.hasOwnProperty(name)) {
+					t.topics[name] = [];
+				}
+				t.topics[name].push([func, context]);
+			})
 		},
 
 		publish: function(name) {
@@ -423,6 +428,9 @@ angular.module('aui.grid')
 			t.modelExtensions = t.modelExtensions || [];
 			t.topics = t.topics || {};
 
+			t.registerApi('core', 'sort', t.sort);
+			t.registerApi('core', 'refresh', t.refresh);
+
 			if(t.touch){
 				if(t.touchModules){
 					t.modules = t.modules.concat(t.touchModules);
@@ -431,11 +439,7 @@ angular.module('aui.grid')
 				t.modules = t.modules.concat(t.desktopModules);
 			}
 
-			// if(!t.store){
-			// 	s = t._parseData(t.data);
-			// }else{
-				s = t.store;
-			// }
+			s = t.store;
 
 			// Deferred.when(s, function(){
 				t.setColumns(t.options.columnStructs);

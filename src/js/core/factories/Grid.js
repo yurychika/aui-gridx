@@ -6,7 +6,7 @@ angular.module('aui.grid')
 		var dummyFunc = function(){};
 		var version = {
 			// summary:
-			//		Version number of the Dojo Toolkit
+			//		Version number
 			// description:
 			//		Hash about the version, including
 			//
@@ -19,13 +19,12 @@ angular.module('aui.grid')
 			minor: 0,
 			patch: 1,
 			flag: "",
-			toString: function(){
+			toString: function() {
 				return this.major + "." + this.minor + "." + this.patch + this.flag;
 			}
 		};
 		var Grid = function Grid(options){
 			var self = this;
-
 			this.name = 'aui gridx';
 			this.isIE = false;
 			this.options = options;
@@ -33,8 +32,8 @@ angular.module('aui.grid')
 			this.hasHScroller = false;
 			this.api = {};		//GridApi
 			this._options = new GridOption(options);
-			console.log('childField', this.getOption('childField'));
-			console.log('emptyInfo', this.getOption('emptyInfo'));
+			// console.log('childField', this.getOption('childField'));
+			// console.log('emptyInfo', this.getOption('emptyInfo'));
 			this.postCreate();
 		};
 
@@ -68,9 +67,10 @@ angular.module('aui.grid')
 			}
 		},
 
-		Grid.prototype.redraw = function() {
+		Grid.prototype.refresh = function() {
 			// debugger;
 			this.body.render();
+			this.publish('refresh');
 		};
 
 		Grid.prototype.getTextDir = function(colId, text){
@@ -104,10 +104,6 @@ angular.module('aui.grid')
 			// tags:
 			//		protected extension
 			var t = this;
-			// t.inherited(arguments);
-			// if(t.touch === undefined){
-			// 	t.touch = has('ios') || has('android');
-			// }
 			// if(t.touch){
 			// 	domClass.add(t.domNode, 'gridxTouch');
 			// }else{

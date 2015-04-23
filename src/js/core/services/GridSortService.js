@@ -26,19 +26,4 @@
 
 		return service;
 	}]);
-	// module.directive('auiGridSort', ['GridSortService', function(GridSortService) {
-	// 	return {
-	// 		strict: 'A',
-	// 		require: ['^auiGrid'],
-	// 		// replace: true,
-	// 		// transclude: true,
-	// 		// controller: 'auiGridController',
-	// 		link: function($scope, $elem, $attrs, $controller) {
-	// 			var gridCtrl = $controller[0];
-	// 			var grid = $scope.grid = gridCtrl.grid;
-
-	// 			GridSortService.init(grid);
-	// 		}
-	// 	};
-	// }]);
 })();

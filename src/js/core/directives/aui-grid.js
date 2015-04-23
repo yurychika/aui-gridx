@@ -12,7 +12,8 @@
 			grid.body = new GridBody('basic', grid);
 			grid.view = new GridView(grid);
 
-			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
+			var dataWatchDestroy= $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
+			var columnWatchDestroy = $scope.$parent.$watchCollection(function(){ return $scope.auiGrid.columnStructs; }, columnWatchFunction);
 
 			function dataWatchFunction(newData) {
 				newData = newData || [];
@@ -33,6 +34,14 @@
 					grid.redraw();
 				});
 				console.log('in data watch function;');
+			}
+
+			function columnWatchFunction(nv, ov) {
+				// if (nv && nv !== ov) {
+					grid.setColumns(nv);
+					grid.publish('columnChange');
+				// }
+				console.log('in column watch function');
 			}
 		}]);
 

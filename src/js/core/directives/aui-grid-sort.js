@@ -1,21 +1,18 @@
 (function() {
 	'use strict';
-
+	
 	var module = angular.module('aui.grid');
 	module.factory('GridSortService', ['GridUtil', function(GridUtil) {
 		var hitch = GridUtil.hitch;
 
 		var service = {
 			init: function(grid) {
-				grid.registerApi('sort', 'sort', hitch(this, this.sort, grid))
-			}, 
+				grid.registerApi('sort', 'sort', hitch(this, this.sort, grid));
+			},
 
 			sort: function(grid, option) {
 				var field = option.field;
-				console.log(arguments);
-				console.log(grid.options.data);
 				grid.options.data.sort(function(a, b) {
-					console.log('sort field is', field);
 					a = a[field];
 					b = b[field];
 					if (a > b) return 1;

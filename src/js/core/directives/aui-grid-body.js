@@ -30,17 +30,17 @@
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
 				$scope.grid.bodyNode = $elem.find('div')[1];
+				
+				$scope.grid.subscribe('columnChange', function() {
+					grid.body.render();
+				});
 				$scope.$watchCollection(function() {
 					return $scope.renderedRows;
 				}, function(newData) {
-					// debugger;
-					// console.log('renderedRows changed');
 				});
 
 				$scope.$watch(
-					// This function returns the value being watched. It is called for each turn of the $digest loop
 					function() { return gridCtrl.grid.model.size() === 0; },
-					// This is the change listener, called when the value returned from the above function changes
 					function(newValue, oldValue) {
 						if (newValue) {
 							$scope.isEmpty = true;

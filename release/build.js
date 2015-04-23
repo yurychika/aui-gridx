@@ -17,7 +17,8 @@
 			grid.body = new GridBody('basic', grid);
 			grid.view = new GridView(grid);
 
-			var dataWatchCollectionDereg = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
+			var dataWatchDestroy= $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
+			var columnWatchDestroy = $scope.$parent.$watchCollection(function(){ return $scope.auiGrid.columnStructs; }, columnWatchFunction);
 
 			function dataWatchFunction(newData) {
 				newData = newData || [];
@@ -38,6 +39,14 @@
 					grid.redraw();
 				});
 				console.log('in data watch function;');
+			}
+
+			function columnWatchFunction(nv, ov) {
+				// if (nv && nv !== ov) {
+					grid.setColumns(nv);
+					grid.publish('columnChange');
+				// }
+				console.log('in column watch function');
 			}
 		}]);
 
@@ -78,24 +87,30 @@
 
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
+				grid.subscribe('columnChange', function() {
+					console.log('in column change callback');
+					buildHeader();
+				});
 				grid.headerNode = $elem[0];
 				grid.headerInner = $elem[0].querySelectorAll('.gridxHeaderRowInner')[0];;
 				$scope.columns = gridCtrl._columns;
 				$scope.domNode = $elem[0];
 				$scope.innerNode = grid.headerInner;
-				$scope.headerCells = [];
 				// var $colMenu 
 				var temp;
 
-				angular.forEach(grid._columns, function(col) {
-					temp = {};
-					temp.id = grid.id + col.id;
-					temp.domClass = (GridUtil.isFunction(col.headerClass) ? col.headerClass(col) : col.headerClass) || '';
-					temp.style = 'width:' +  col.width + ';min-width:' + col.width + ';';
-					temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
-					temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
-					$scope.headerCells.push(temp);
-				});
+				function buildHeader() {
+					$scope.headerCells = [];
+					angular.forEach(grid._columns, function(col) {
+						temp = {};
+						temp.id = grid.id + col.id;
+						temp.domClass = (GridUtil.isFunction(col.headerClass) ? col.headerClass(col) : col.headerClass) || '';
+						temp.style = 'width:' +  col.width + ';min-width:' + col.width + ';';
+						temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
+						temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
+						$scope.headerCells.push(temp);
+					});
+				}
 
 				console.log($scope.headerCells);
 				return;
@@ -330,6 +345,10 @@
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
 				$scope.grid.bodyNode = $elem.find('div')[1];
+				$scope.grid.subscribe('columnChange', function() {
+					console.log('in column change callback');
+					grid.body.render();
+				});
 				$scope.$watchCollection(function() {
 					return $scope.renderedRows;
 				}, function(newData) {
@@ -789,22 +808,19 @@
 
 (function() {
 	'use strict';
-
+	
 	var module = angular.module('aui.grid');
 	module.factory('GridSortService', ['GridUtil', function(GridUtil) {
 		var hitch = GridUtil.hitch;
 
 		var service = {
 			init: function(grid) {
-				grid.registerApi('sort', 'sort', hitch(this, this.sort, grid))
-			}, 
+				grid.registerApi('sort', 'sort', hitch(this, this.sort, grid));
+			},
 
 			sort: function(grid, option) {
 				var field = option.field;
-				console.log(arguments);
-				console.log(grid.options.data);
 				grid.options.data.sort(function(a, b) {
-					console.log('sort field is', field);
 					a = a[field];
 					b = b[field];
 					if (a > b) return 1;
@@ -3177,11 +3193,9 @@ angular.module('aui.grid')
 	});
 =====*/
 
-	var isArrayLike = GridUtil.isArray,
-		isString = GridUtil.isString;
-		hitch = GridUtil.hitch;
-
+	var hitch = GridUtil.hitch;
 	function isId(it){
+
 		return it || it === 0;
 	}
 
@@ -3204,7 +3218,7 @@ angular.module('aui.grid')
 				rgs.push(a);
 			}else if(isIndex(a)){
 				rgs.push({start: a, count: 1});
-			}else if(isArrayLike(a)){
+			}else if(angular.isArray(a)){
 				for(i = a.length - 1; i >= 0; --i){
 					if(isIndex(a[i])){
 						rgs.push({
@@ -3213,18 +3227,18 @@ angular.module('aui.grid')
 						});
 					}else if(isRange(a[i])){
 						rgs.push(a[i]);
-					}else if(isString(a)){
+					}else if(angular.isString(a)){
 						ids.push(a[i]);
 					}
 				}
-			}else if(isString(a)){
+			}else if(angular.isString(a)){
 				ids.push(a);
 			}
 		};
 		if(args && (args.index || args.range || args.id)){
 			f(args.index);
 			f(args.range);
-			if(isArrayLike(args.id)){
+			if(angular.isArray(args.id)){
 				for(i = args.id.length - 1; i >= 0; --i){
 					ids.push(args.id[i]);
 				}
@@ -3251,13 +3265,6 @@ angular.module('aui.grid')
 		t._exts = {};
 		t._cmdQueue = [];
 		t._model = t._cache = new cacheClass(t, grid);
-		// t._createExts(grid.modelExtensions || [], grid);
-		var m = t._model;
-		// t._cnnts = [
-		// 	aspect.after(m, "onDelete", lang.hitch(t, "onDelete"), 1),
-		// 	aspect.after(m, "onNew", lang.hitch(t, "onNew"), 1),
-		// 	aspect.after(m, "onSet", lang.hitch(t, "onSet"), 1)
-		// ];
 	};
 
 	Model.prototype = {
@@ -3282,6 +3289,10 @@ angular.module('aui.grid')
 		setData: function(data){
 			this.data = data;
 			this._cache.setData(data);
+		},
+
+		sort: function(option) {
+
 		},
 
 		//Public-------------------------------------------------------------------
@@ -4397,6 +4408,21 @@ angular.module('aui.grid')
 	function GridCore() {}
 
 	GridCore.prototype = {
+		subscribe: function(name, func, context) {
+			if (!this.topics.hasOwnProperty(name)) {
+				this.topics[name] = [];
+			}
+			this.topics[name].push([func, context]);
+		},
+
+		publish: function(name) {
+			if (this.topics.hasOwnProperty(name) && this.topics[name].length) {
+				this.topics[name].forEach(function(func) {
+					func[0].apply(func[1], []);
+				});
+			}
+		},
+
 		setStore: function(store){
 			if(this.store !== store){
 				this.store = store;
@@ -4506,6 +4532,7 @@ angular.module('aui.grid')
 				d = t._deferStartup = $q.defer();
 			t.modules = t.modules || [];
 			t.modelExtensions = t.modelExtensions || [];
+			t.topics = t.topics || {};
 
 			if(t.touch){
 				if(t.touchModules){

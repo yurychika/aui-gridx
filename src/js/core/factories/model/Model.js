@@ -207,11 +207,9 @@
 	});
 =====*/
 
-	var isArrayLike = GridUtil.isArray,
-		isString = GridUtil.isString;
-		hitch = GridUtil.hitch;
-
+	var hitch = GridUtil.hitch;
 	function isId(it){
+
 		return it || it === 0;
 	}
 
@@ -234,7 +232,7 @@
 				rgs.push(a);
 			}else if(isIndex(a)){
 				rgs.push({start: a, count: 1});
-			}else if(isArrayLike(a)){
+			}else if(angular.isArray(a)){
 				for(i = a.length - 1; i >= 0; --i){
 					if(isIndex(a[i])){
 						rgs.push({
@@ -243,18 +241,18 @@
 						});
 					}else if(isRange(a[i])){
 						rgs.push(a[i]);
-					}else if(isString(a)){
+					}else if(angular.isString(a)){
 						ids.push(a[i]);
 					}
 				}
-			}else if(isString(a)){
+			}else if(angular.isString(a)){
 				ids.push(a);
 			}
 		};
 		if(args && (args.index || args.range || args.id)){
 			f(args.index);
 			f(args.range);
-			if(isArrayLike(args.id)){
+			if(angular.isArray(args.id)){
 				for(i = args.id.length - 1; i >= 0; --i){
 					ids.push(args.id[i]);
 				}
@@ -281,13 +279,6 @@
 		t._exts = {};
 		t._cmdQueue = [];
 		t._model = t._cache = new cacheClass(t, grid);
-		// t._createExts(grid.modelExtensions || [], grid);
-		var m = t._model;
-		// t._cnnts = [
-		// 	aspect.after(m, "onDelete", lang.hitch(t, "onDelete"), 1),
-		// 	aspect.after(m, "onNew", lang.hitch(t, "onNew"), 1),
-		// 	aspect.after(m, "onSet", lang.hitch(t, "onSet"), 1)
-		// ];
 	};
 
 	Model.prototype = {
@@ -312,6 +303,10 @@
 		setData: function(data){
 			this.data = data;
 			this._cache.setData(data);
+		},
+
+		sort: function(option) {
+
 		},
 
 		//Public-------------------------------------------------------------------

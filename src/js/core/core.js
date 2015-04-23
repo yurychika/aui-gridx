@@ -297,6 +297,21 @@ angular.module('aui.grid')
 	function GridCore() {}
 
 	GridCore.prototype = {
+		subscribe: function(name, func, context) {
+			if (!this.topics.hasOwnProperty(name)) {
+				this.topics[name] = [];
+			}
+			this.topics[name].push([func, context]);
+		},
+
+		publish: function(name) {
+			if (this.topics.hasOwnProperty(name) && this.topics[name].length) {
+				this.topics[name].forEach(function(func) {
+					func[0].apply(func[1], []);
+				});
+			}
+		},
+
 		setStore: function(store){
 			if(this.store !== store){
 				this.store = store;
@@ -406,6 +421,7 @@ angular.module('aui.grid')
 				d = t._deferStartup = $q.defer();
 			t.modules = t.modules || [];
 			t.modelExtensions = t.modelExtensions || [];
+			t.topics = t.topics || {};
 
 			if(t.touch){
 				if(t.touchModules){

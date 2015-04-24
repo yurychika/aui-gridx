@@ -315,7 +315,7 @@
 			var rootIndex = this._cache._struct[''],
 				t = this;
 
-			GridSortService.sort(rootIndex, options, grid);
+			return GridSortService.sort(rootIndex, options, grid);
 		},
 
 		//Public-------------------------------------------------------------------

@@ -114,8 +114,6 @@
 angular.module('aui.grid')
 .factory('GridCore', ['GridUtil', '$q', 'Model', '$compile', '$parse', '$timeout', function(GridUtil, $q, Model){
 	var delegate = GridUtil.delegate,
-		isFunc = GridUtil.isFunction,
-		isString = GridUtil.isString,
 		mixin = GridUtil.mixin,
 		hitch = GridUtil.hitch;
 
@@ -142,7 +140,7 @@ angular.module('aui.grid')
 			for(var path in apiPath){
 				var bp = base[path],
 					ap = apiPath[path];
-				if(bp && lang.isObject(bp) && !isFunc(bp)){
+				if(bp && lang.isObject(bp) && !angular.isFunction(bp)){
 					mixinAPI(bp, ap);
 				}else{
 					base[path] = ap;
@@ -158,7 +156,7 @@ angular.module('aui.grid')
 			i, m;
 		for(i = 0; i < len; ++i){
 			m = mods[i];
-			if(isString(m)){
+			if(angular.isString(m)){
 				try{
 					m = require(m);
 				}catch(e){
@@ -175,21 +173,21 @@ angular.module('aui.grid')
 		len = modules.length;
 		for(i = 0; i < len; ++i){
 			m = modules[i];
-			if(isFunc(m)){
+			if(angular.isFunction(m)){
 				m = {
 					moduleClass: m
 				};
 			}
 			if(m){
 				var mc = m.moduleClass;
-				if(isString(mc)){
+				if(angular.isString(mc)){
 					try{
 						mc = m.moduleClass = require(mc);
 					}catch(e){
 						console.error(e);
 					}
 				}
-				if(isFunc(mc)){
+				if(angular.isFunction(mc)){
 					mods.push(m);
 					continue;
 				}
@@ -266,7 +264,7 @@ angular.module('aui.grid')
 		for(m in mods){
 			m = mods[m].mod;
 			a = m[name + 'Mixin'];
-			if(isFunc(a)){
+			if(angular.isFunction(a)){
 				a = a.apply(m);
 			}
 			lang.mixin(component, a || {});
@@ -428,8 +426,8 @@ angular.module('aui.grid')
 			t.modelExtensions = t.modelExtensions || [];
 			t.topics = t.topics || {};
 
-			t.registerApi('core', 'sort', t.sort);
-			t.registerApi('core', 'refresh', t.refresh);
+			t.registerApi('core', 'sort', hitch(t, t.sort));
+			t.registerApi('core', 'refresh', hitch(t, t.refresh));
 
 			if(t.touch){
 				if(t.touchModules){

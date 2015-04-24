@@ -151,7 +151,13 @@ angular.module('aui.grid')
 		},
 
 		Grid.prototype.sort = function(options) {
-			this.model.sort(options);
+			var t = this;
+
+			this.model.sort(options, t).then(function() {
+				console.log('%csort finished', 'color:green');
+				t.refresh();
+				t.publish('sort');
+			});
 		},
 	/*=====
 		// autoHeight: Boolean

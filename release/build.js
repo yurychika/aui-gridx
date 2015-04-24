@@ -996,7 +996,13 @@ angular.module('aui.grid')
 		},
 
 		Grid.prototype.sort = function(options) {
-			this.model.sort(options);
+			var t = this;
+
+			this.model.sort(options, t).then(function() {
+				console.log('%csort finished', 'color:green');
+				t.refresh();
+				t.publish('sort');
+			});
 		},
 	/*=====
 		// autoHeight: Boolean
@@ -3297,7 +3303,7 @@ angular.module('aui.grid')
 			var rootIndex = this._cache._struct[''],
 				t = this;
 
-			GridSortService.sort(rootIndex, options, grid);
+			return GridSortService.sort(rootIndex, options, grid);
 		},
 
 		//Public-------------------------------------------------------------------
@@ -4230,8 +4236,6 @@ angular.module('aui.grid')
 angular.module('aui.grid')
 .factory('GridCore', ['GridUtil', '$q', 'Model', '$compile', '$parse', '$timeout', function(GridUtil, $q, Model){
 	var delegate = GridUtil.delegate,
-		isFunc = GridUtil.isFunction,
-		isString = GridUtil.isString,
 		mixin = GridUtil.mixin,
 		hitch = GridUtil.hitch;
 
@@ -4258,7 +4262,7 @@ angular.module('aui.grid')
 			for(var path in apiPath){
 				var bp = base[path],
 					ap = apiPath[path];
-				if(bp && lang.isObject(bp) && !isFunc(bp)){
+				if(bp && lang.isObject(bp) && !angular.isFunction(bp)){
 					mixinAPI(bp, ap);
 				}else{
 					base[path] = ap;
@@ -4274,7 +4278,7 @@ angular.module('aui.grid')
 			i, m;
 		for(i = 0; i < len; ++i){
 			m = mods[i];
-			if(isString(m)){
+			if(angular.isString(m)){
 				try{
 					m = require(m);
 				}catch(e){
@@ -4291,21 +4295,21 @@ angular.module('aui.grid')
 		len = modules.length;
 		for(i = 0; i < len; ++i){
 			m = modules[i];
-			if(isFunc(m)){
+			if(angular.isFunction(m)){
 				m = {
 					moduleClass: m
 				};
 			}
 			if(m){
 				var mc = m.moduleClass;
-				if(isString(mc)){
+				if(angular.isString(mc)){
 					try{
 						mc = m.moduleClass = require(mc);
 					}catch(e){
 						console.error(e);
 					}
 				}
-				if(isFunc(mc)){
+				if(angular.isFunction(mc)){
 					mods.push(m);
 					continue;
 				}
@@ -4382,7 +4386,7 @@ angular.module('aui.grid')
 		for(m in mods){
 			m = mods[m].mod;
 			a = m[name + 'Mixin'];
-			if(isFunc(a)){
+			if(angular.isFunction(a)){
 				a = a.apply(m);
 			}
 			lang.mixin(component, a || {});
@@ -4544,8 +4548,8 @@ angular.module('aui.grid')
 			t.modelExtensions = t.modelExtensions || [];
 			t.topics = t.topics || {};
 
-			t.registerApi('core', 'sort', t.sort);
-			t.registerApi('core', 'refresh', t.refresh);
+			t.registerApi('core', 'sort', hitch(t, t.sort));
+			t.registerApi('core', 'refresh', hitch(t, t.refresh));
 
 			if(t.touch){
 				if(t.touchModules){
@@ -4740,7 +4744,7 @@ angular.module('aui.grid')
 	'use strict';
 	
 	var module = angular.module('aui.grid');
-	module.factory('GridSortService', ['GridUtil', function(GridUtil) {
+	module.factory('GridSortService', ['GridUtil', '$q', function(GridUtil, $q) {
 		var hitch = GridUtil.hitch;
 
 		var service = {
@@ -4753,21 +4757,22 @@ angular.module('aui.grid')
 			},
 
 			sort: function(list, options, grid) {
+				// technically, sort should be an async process
+				// there would be server-side sorting
 				var field, isDesc, option,
 					cols = grid._columnsById,
 					cache = grid.model._cache._cache,
-					da, db, optionsLen = options.length;
+					da, db, optionsLen = options.length,
+					def = $q.defer();
 
 				if (list[0] === undefined) list.shift();
 				list.sort(function(a, b) {
-					if (a === undefined) return 1;
-					if (b === undefined) return -1;
-
 					for (var i = 0; i < optionsLen; i++) {
 						option = options[i];
 						field = cols[option.field].field;
 						da = cache[a].rawData[field];
 						db = cache[b].rawData[field];
+						console.log(da, db);
 						if (da > db) {
 							return 1;
 						}
@@ -4778,15 +4783,8 @@ angular.module('aui.grid')
 					return 0;
 				});
 				list.unshift(undefined);
-				// console.log(arguments);
-				// console.log(grid.options.data);
-				// grid.options.data.sort(function(a, b) {
-				// 	a = a[field];
-				// 	b = b[field];
-				// 	if (a > b) return 1;
-				// 	if (a == b) return 0;
-				// 	if (a < b) return -1;
-				// });
+				def.resolve();
+				return def.promise;
 			}
 		};
 

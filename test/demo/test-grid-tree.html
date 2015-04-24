@@ -142,7 +142,7 @@ app.controller('appController', function($scope, $q) {
 	};
 
 	$scope.sort = function(field) {
-		$scope.api.core.sort({field: field});
+		$scope.api.core.sort([{field: field}]);
 	};
 
 	$scope.empty = function() {

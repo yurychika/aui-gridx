@@ -143,7 +143,7 @@ app.controller('appController', function($scope, $q) {
 	};
 
 	$scope.sort = function(colId) {
-		$scope.api.core.sort([{colId: colId, descending: true}]);
+		$scope.api.core.sort([{colId: colId, descending: false}]);
 	};
 
 	$scope.empty = function() {

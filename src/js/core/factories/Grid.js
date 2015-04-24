@@ -130,17 +130,6 @@ angular.module('aui.grid')
 			// });
 		},
 	
-		Grid.prototype.startup = function(){
-			// summary:
-			//		Startup this grid widget
-			// tags:
-			//		public extension
-			if(!this._started){
-				// this.inherited(arguments);
-				// this._deferStartup.callback();
-			}
-		},
-	
 		Grid.prototype.destroy = function(){
 			// summary:
 			//		Destroy this grid widget
@@ -151,7 +140,12 @@ angular.module('aui.grid')
 		},
 
 		Grid.prototype.sort = function(options) {
-			var t = this;
+			var t = this,
+				columns = t._columnsById;
+
+			options.forEach(function(opt) {
+				t._columnsById[opt.colId].sorting = opt.descending ? 1 : -1;
+			});
 
 			this.model.sort(options, t).then(function() {
 				console.log('%csort finished', 'color:green');

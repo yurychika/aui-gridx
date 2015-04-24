@@ -35,6 +35,7 @@
 						temp.style = 'width:' +  col.width + ';min-width:' + col.width + ';';
 						temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
 						temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
+						temp.sorting = col.sorting;
 						$scope.headerCells.push(temp);
 					});
 				}

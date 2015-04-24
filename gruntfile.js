@@ -32,29 +32,12 @@ module.exports = function (grunt) {
 				src: [
 					'src/js/bootstrap.js',
 
-					'src/js/core/directives/aui-grid.js',
-					'src/js/core/directives/aui-grid-header.js',
-					'src/js/core/directives/aui-grid-body.js',
-					'src/js/core/directives/aui-grid-footer.js',
-					'src/js/core/directives/aui-grid-row.js',
-					'src/js/core/directives/aui-grid-cell.js',
-					'src/js/core/directives/aui-grid-pagination.js',
-					'src/js/core/directives/aui-grid-pagination-bar.js',
-					'src/js/core/directives/aui-grid-sort.js',
-
-					'src/js/core/factories/Grid.js',
-					'src/js/core/factories/GridBody.js',
-					'src/js/core/factories/GridOption.js',
-					'src/js/core/factories/GridRow.js',
-					'src/js/core/factories/GridView.js',
-					'src/js/core/factories/model/Model.js',
-					'src/js/core/factories/model/Sync.js',
-
+					'src/js/core/directives/*.js',
+					'src/js/core/factories/*.js',
+					'src/js/core/factories/model/*.js',
 					'src/js/core/core.js',
-					'src/js/core/services/GridUtil.js',
-					'src/js/core/services/GridSortService.js',
+					'src/js/core/services/*.js',
 					'release/.tmp/template.js'
-					// 'src/outro.js'
 				],
 				dest: 'release/build.js',
 			},

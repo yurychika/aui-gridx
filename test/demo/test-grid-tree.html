@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html ng-app='app'>
+<meta charset="utf-8">
 <title>test aui-grid basic</title>
 <link rel='stylesheet' href='../../src/less/Gridx.css'>
 <style type='text/css'>
@@ -141,8 +142,8 @@ app.controller('appController', function($scope, $q) {
 		$scope.api.pagination.previous();
 	};
 
-	$scope.sort = function(field) {
-		$scope.api.core.sort([{field: field}]);
+	$scope.sort = function(colId) {
+		$scope.api.core.sort([{colId: colId, descending: true}]);
 	};
 
 	$scope.empty = function() {

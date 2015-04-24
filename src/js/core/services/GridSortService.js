@@ -17,7 +17,7 @@
 			sort: function(list, options, grid) {
 				// technically, sort should be an async process
 				// there would be server-side sorting
-				var field, isDesc, option,
+				var field, descending = false, option,
 					cols = grid._columnsById,
 					cache = grid.model._cache._cache,
 					da, db, optionsLen = options.length,
@@ -27,15 +27,16 @@
 				list.sort(function(a, b) {
 					for (var i = 0; i < optionsLen; i++) {
 						option = options[i];
-						field = cols[option.field].field;
+						field = cols[option.colId].field;
+						descending = option.descending ? -1 : 1;
 						da = cache[a].rawData[field];
 						db = cache[b].rawData[field];
 						console.log(da, db);
 						if (da > db) {
-							return 1;
+							return 1 * descending;
 						}
 						if (da < db) {
-							return -1;
+							return -1 * descending;
 						}
 					}
 					return 0;

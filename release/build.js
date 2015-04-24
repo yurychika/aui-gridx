@@ -8,66 +8,189 @@
 
 	var module = angular.module('aui.grid');
 
-	module.controller('auiGridController',
-		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', 'GridUtil',
-		function ($scope, $element, $attrs, Grid, GridBody, GridView, GridUtil) {
-			var grid;
-			window.grid = $scope.grid = new Grid($scope.auiGrid);
-			grid = this.grid = $scope.grid;
-			grid.body = new GridBody('basic', grid);
-			grid.view = new GridView(grid);
+	module.controller('auiGridBodyController', ['$scope', '$element', '$attrs', 'Grid', function ($scope, $element, $attrs, Grid) {
+		var self = this;
+		this.grid = $scope.grid;
+		this.renderedRows = this.grid.body.renderedRows;
 
-			var dataWatchDestroy= $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
-			var columnWatchDestroy = $scope.$parent.$watchCollection(function(){ return $scope.auiGrid.columnStructs; }, columnWatchFunction);
+		this.isEmpty = function() {
+			// console.log('is empty', grid.model.size());
+			return self.grid.model.size() !== 0;
+		}
+	}]);
 
-			function dataWatchFunction(newData) {
-				newData = newData || [];
-				grid.setData(newData);
-				grid.model.when({}, function() {
-					var size = grid.model.size(),
-						pageSize = grid.getOption('paginationPageSize'),
-						startPage = grid.getOption('startPage'),
-						firstIndex = 0;
-
-					pageSize = pageSize > 0 ? pageSize : size;
-					firstIndex = pageSize * (startPage - 1);
-					try {
-						grid.view.updateRootRange(firstIndex, pageSize);
-					} catch (e) {
-						console.log(e);
-					}
-					grid.refresh();
-				});
-				console.log('in data watch function;');
-			}
-
-			function columnWatchFunction(nv, ov) {
-				grid.setColumns(nv);
-				grid.publish('columnChange');
-				console.log('in column watch function');
-			}
-		}]);
-
-	module.directive('auiGrid', ['GridUtil', function(GridUtil) {
+	module.directive('auiGridBody', function() {
 		return {
-			templateUrl: 'aui-grid/aui-grid',
-			scope: {
-				auiGrid: '=',
-				getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
-			},
+			templateUrl: 'aui-grid/aui-grid-body',
+			require: ['^auiGrid', 'auiGridBody'],
 			replace: true,
-			// transclude: true,
-			controller: 'auiGridController',
-			link: function($scope, $elem) {
-				// debugger;
-				var grid = $scope.grid;
+			controller: 'auiGridBodyController as RenderContainer',
+			// controller: 'auiGridController',
+			link: function($scope, $elem, $attrs, controllers) {
+			// link: function($scope, $elem) {
+				var gridCtrl = controllers[0],
+					bodyCtrl = controllers[1],
+					bodyNode = $elem.find('div')[1];
 
-				if (GridUtil.isFunction($scope.auiGrid.onRegisterApi)) {
-					$scope.auiGrid.onRegisterApi(grid.api);
+				$scope.renderedRows = bodyCtrl.renderedRows;
+				$scope.isEmpty = bodyCtrl.isEmpty;
+				$scope.grid.bodyNode = $elem.find('div')[1];
+
+				$scope.grid.subscribe('columnChange', function() {
+					grid.body.render();
+				});
+				$scope.$watchCollection(function() {
+					return $scope.renderedRows;
+				}, function(newData) {
+				});
+
+				$scope.$watch(
+					function() { return gridCtrl.grid.model.size() === 0; },
+					function(newValue, oldValue) {
+						if (newValue) {
+							$scope.isEmpty = true;
+						} else {
+							$scope.isEmpty = false;
+						}
+					}
+				);
+
+				$scope.$on('onBodyRender', function() {
+					console.log('%cin on body render event', 'color:red');
+					if ($scope.grid.bodyNode.scrollHeight > $scope.grid.bodyNode.clientHeight) {
+						$scope.grid.hasVScroller = true;
+					} else {
+						$scope.grid.hasVScroller = false;
+					}
+					if ($scope.grid.bodyNode.scrollWidth > $scope.grid.bodyNode.clientWidth) {
+						$scope.grid.hasHScroller = true;
+					} else {
+						$scope.grid.hasHScroller = false;
+					}
+				});
+
+				angular.element(bodyNode).on('scroll', function() {
+					$scope.grid.headerInner.scrollLeft = bodyNode.scrollLeft;
+				});
+			}
+		};
+	});
+})();
+
+(function() {
+	'use strict';
+
+	var module = angular.module('aui.grid');
+	module.directive('auiGridCell', ['GridUtil', function(GridUtil) {
+		function cellWrapper(rowId, colIndex, data, grid, $scope) {
+			// if (colIndex === 0 && grid.model.hasChildren(rowId)) {
+			if (colIndex === 0) {
+				var treepath = grid.model.treePath(rowId);
+
+				var wrapper = document.createElement('div');
+				angular.element(wrapper).addClass('gridxTreeExpandoCell');
+				if (grid.view.isExpanded(rowId)) {
+					angular.element(wrapper).addClass('gridxTreeExpandoCellOpen');
+				}
+				wrapper.style.paddingLeft = ((treepath.length) * 16) + 'px';
+				var content = document.createElement('div');
+				angular.element(content).addClass('gridxTreeExpandoContent gridxCellContent').html(data);
+
+				if (grid.model.hasChildren(rowId)) {
+					var icon = document.createElement('div');
+					angular.element(icon).addClass('gridxTreeExpandoIcon');
+					var expando = document.createElement('div');
+					angular.element(expando).addClass('gridxTreeExpandoInner').html('+');
+					icon.style.left = ((treepath.length - 1) * 16) + 'px';
+
+					icon.addEventListener('click', function(e) {
+						if (grid.view.isExpanded(rowId)) {
+							grid.view.logicCollapse(rowId);
+						} else {
+							grid.view.logicExpand(rowId);
+						}
+						grid.body.render();
+						$scope.$apply();
+					});
+
+					wrapper.appendChild(icon);
+					wrapper.appendChild(content);
+
+					icon.appendChild(expando);
+				} else {
+					wrapper.appendChild(content);
+				}
+				// wrapper.innerHTML = data;
+				return wrapper;
+			}
+
+			return data;
+		}
+
+		return {
+			// templateUrl: 'aui-grid/aui-grid-cell',
+			replace: true,
+			require: ['^auiGrid'],
+			scope: {
+				row: '=',
+				field: '=',
+				colId: '=',
+				col: '='
+			},
+			// transclude: true,
+			link: function($scope, $elem, $attrs, controllers) {
+				var gridCtrl = controllers[0],
+					grid, temp;
+
+				$scope.grid = gridCtrl.grid;
+				$scope.columns = $scope.grid._columns;
+				$scope.domNode = $elem[0];
+				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
+				$scope.headerCells = [];
+				grid = $scope.grid;
+
+				var row = $scope.row;
+				var field = $scope.field;
+				var colId = $scope.colId;
+				var data = row.data()[field];
+				// console.log($scope.field
+				var col = grid._columnsById[colId];
+				var colIndex = $scope.col.index;
+				$elem[0].style.width = col.width;
+				$elem[0].style.maxWidth = col.width;
+				$elem[0].style.minWidth= col.width;
+
+				// 	data = '<a href="' + '#" class="expando">+</a>' + data;
+				// }
+				var cellContent = cellWrapper(row.id, colIndex, data, grid, $scope);
+				if (typeof cellContent === 'object') {
+					$elem[0].appendChild(cellContent);
+				} else {
+					$elem[0].innerHTML = data;
+				}
+
+				if ($scope.$parent.$last) {
+					$scope.$emit('onRowRender');
 				}
 			}
 		};
 	}]);
+})();
+
+(function() {
+	'use strict';
+
+	var module = angular.module('aui.grid');
+	module.directive('auiGridFooter', function() {
+		return {
+			templateUrl: 'aui-grid/aui-grid-footer',
+			// require: ['^auiGrid'],
+			replace: true,
+			link: function($scope, $elem) {
+				$scope.grid.footerNode = $elem[0];
+			}
+		};
+	});
 })();
 
 (function() {
@@ -107,6 +230,7 @@
 						temp.style = 'width:' +  col.width + ';min-width:' + col.width + ';';
 						temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
 						temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
+						temp.sorting = col.sorting;
 						$scope.headerCells.push(temp);
 					});
 				}
@@ -316,229 +440,36 @@
 
 	var module = angular.module('aui.grid');
 
-	module.controller('auiGridBodyController', ['$scope', '$element', '$attrs', 'Grid', function ($scope, $element, $attrs, Grid) {
-		var self = this;
-		this.grid = $scope.grid;
-		this.renderedRows = this.grid.body.renderedRows;
-
-		this.isEmpty = function() {
-			// console.log('is empty', grid.model.size());
-			return self.grid.model.size() !== 0;
-		}
-	}]);
-
-	module.directive('auiGridBody', function() {
+	module.directive('auiGridPaginationBar', ['GridUtil', function(GridUtil) {
 		return {
-			templateUrl: 'aui-grid/aui-grid-body',
-			require: ['^auiGrid', 'auiGridBody'],
-			replace: true,
-			controller: 'auiGridBodyController as RenderContainer',
-			// controller: 'auiGridController',
-			link: function($scope, $elem, $attrs, controllers) {
-			// link: function($scope, $elem) {
-				var gridCtrl = controllers[0],
-					bodyCtrl = controllers[1],
-					bodyNode = $elem.find('div')[1];
-
-				$scope.renderedRows = bodyCtrl.renderedRows;
-				$scope.isEmpty = bodyCtrl.isEmpty;
-				$scope.grid.bodyNode = $elem.find('div')[1];
-
-				$scope.grid.subscribe('columnChange', function() {
-					grid.body.render();
-				});
-				$scope.$watchCollection(function() {
-					return $scope.renderedRows;
-				}, function(newData) {
-				});
-
-				$scope.$watch(
-					function() { return gridCtrl.grid.model.size() === 0; },
-					function(newValue, oldValue) {
-						if (newValue) {
-							$scope.isEmpty = true;
-						} else {
-							$scope.isEmpty = false;
-						}
-					}
-				);
-
-				$scope.$on('onBodyRender', function() {
-					console.log('%cin on body render event', 'color:red');
-					if ($scope.grid.bodyNode.scrollHeight > $scope.grid.bodyNode.clientHeight) {
-						$scope.grid.hasVScroller = true;
-					} else {
-						$scope.grid.hasVScroller = false;
-					}
-					if ($scope.grid.bodyNode.scrollWidth > $scope.grid.bodyNode.clientWidth) {
-						$scope.grid.hasHScroller = true;
-					} else {
-						$scope.grid.hasHScroller = false;
-					}
-				});
-
-				angular.element(bodyNode).on('scroll', function() {
-					$scope.grid.headerInner.scrollLeft = bodyNode.scrollLeft;
-				});
-			}
-		};
-	});
-})();
-
-(function() {
-	'use strict';
-
-	var module = angular.module('aui.grid');
-	module.directive('auiGridFooter', function() {
-		return {
-			templateUrl: 'aui-grid/aui-grid-footer',
-			// require: ['^auiGrid'],
-			replace: true,
-			link: function($scope, $elem) {
-				$scope.grid.footerNode = $elem[0];
-			}
-		};
-	});
-})();
-
-(function() {
-	'use strict';
-
-	var module = angular.module('aui.grid');
-	module.directive('auiGridRow', ['GridUtil', function(GridUtil) {
-		return {
-			templateUrl: 'aui-grid/aui-grid-row',
+			templateUrl: 'aui-grid/aui-grid-pagination-bar',
 			replace: true,
 			require: ['^auiGrid'],
-			scope: {
-				row: '='
-			},
-			// transclude: true,
 			link: function($scope, $elem, $attrs, controllers) {
-				var gridCtrl = controllers[0],
-					grid,
-					temp;
+				var gridCtrl = controllers[0];
+				var grid = $scope.grid;
 
 				$scope.grid = gridCtrl.grid;
-				$scope.columns = $scope.grid._columns;
-				$scope.domNode = $elem[0];
-				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
-				$scope.headerCells = [];
-				// var $colMenu 
-				grid = $scope.grid;
+				$scope.paginationApi = $scope.grid.api.pagination;
+				$scope.paginationPageSizes = grid.getOption('paginationPageSizes');
 
-				$scope.$on('onRowRender', function() {
-					if ($scope.$parent.$last) {
-						$scope.$emit('onBodyRender');
+				var watchPageSize = $scope.$watch('grid.paginationPageSize', function (newValue, oldValue) {
+					if (newValue === oldValue) {
+						return;
+					} else {
+						grid.api.pagination.setPageSize(newValue);
 					}
 				});
 
-				$elem.on('mouseenter', function() {
-					$elem.addClass('gridxRowOver');
-				});
-				$elem.on('mouseleave', function() {
-					$elem.removeClass('gridxRowOver');
-				})
-			}
-		};
-	}]);
-})();
-
-(function() {
-	'use strict';
-
-	var module = angular.module('aui.grid');
-	module.directive('auiGridCell', ['GridUtil', function(GridUtil) {
-		function cellWrapper(rowId, colIndex, data, grid, $scope) {
-			// if (colIndex === 0 && grid.model.hasChildren(rowId)) {
-			if (colIndex === 0) {
-				var treepath = grid.model.treePath(rowId);
-
-				var wrapper = document.createElement('div');
-				angular.element(wrapper).addClass('gridxTreeExpandoCell');
-				if (grid.view.isExpanded(rowId)) {
-					angular.element(wrapper).addClass('gridxTreeExpandoCellOpen');
-				}
-				wrapper.style.paddingLeft = ((treepath.length) * 16) + 'px';
-				var content = document.createElement('div');
-				angular.element(content).addClass('gridxTreeExpandoContent gridxCellContent').html(data);
-
-				if (grid.model.hasChildren(rowId)) {
-					var icon = document.createElement('div');
-					angular.element(icon).addClass('gridxTreeExpandoIcon');
-					var expando = document.createElement('div');
-					angular.element(expando).addClass('gridxTreeExpandoInner').html('+');
-					icon.style.left = ((treepath.length - 1) * 16) + 'px';
-
-					icon.addEventListener('click', function(e) {
-						if (grid.view.isExpanded(rowId)) {
-							grid.view.logicCollapse(rowId);
-						} else {
-							grid.view.logicExpand(rowId);
+				var watchCurrentPage = $scope.$watch('grid.currentPage', function (newValue, oldValue) {
+					if (newValue === oldValue) {
+						return;
+					} else {
+						if (angular.isNumber(newValue)) {
+							grid.api.pagination.goto(newValue);
 						}
-						grid.body.render();
-						$scope.$apply();
-					});
-
-					wrapper.appendChild(icon);
-					wrapper.appendChild(content);
-
-					icon.appendChild(expando);
-				} else {
-					wrapper.appendChild(content);
-				}
-				// wrapper.innerHTML = data;
-				return wrapper;
-			}
-
-			return data;
-		}
-
-		return {
-			// templateUrl: 'aui-grid/aui-grid-cell',
-			replace: true,
-			require: ['^auiGrid'],
-			scope: {
-				row: '=',
-				field: '=',
-				colId: '=',
-				col: '='
-			},
-			// transclude: true,
-			link: function($scope, $elem, $attrs, controllers) {
-				var gridCtrl = controllers[0],
-					grid, temp;
-
-				$scope.grid = gridCtrl.grid;
-				$scope.columns = $scope.grid._columns;
-				$scope.domNode = $elem[0];
-				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
-				$scope.headerCells = [];
-				grid = $scope.grid;
-
-				var row = $scope.row;
-				var field = $scope.field;
-				var colId = $scope.colId;
-				var data = row.data()[field];
-				// console.log($scope.field
-				var col = grid._columnsById[colId];
-				var colIndex = $scope.col.index;
-				$elem[0].style.width = col.width;
-				$elem[0].style.maxWidth = col.width;
-				$elem[0].style.minWidth= col.width;
-
-				// 	data = '<a href="' + '#" class="expando">+</a>' + data;
-				// }
-				var cellContent = cellWrapper(row.id, colIndex, data, grid, $scope);
-				if (typeof cellContent === 'object') {
-					$elem[0].appendChild(cellContent);
-				} else {
-					$elem[0].innerHTML = data;
-				}
-
-				if ($scope.$parent.$last) {
-					$scope.$emit('onRowRender');
-				}
+					}
+				});
 			}
 		};
 	}]);
@@ -764,37 +695,40 @@
 	'use strict';
 
 	var module = angular.module('aui.grid');
-
-	module.directive('auiGridPaginationBar', ['GridUtil', function(GridUtil) {
+	module.directive('auiGridRow', ['GridUtil', function(GridUtil) {
 		return {
-			templateUrl: 'aui-grid/aui-grid-pagination-bar',
+			templateUrl: 'aui-grid/aui-grid-row',
 			replace: true,
 			require: ['^auiGrid'],
+			scope: {
+				row: '='
+			},
+			// transclude: true,
 			link: function($scope, $elem, $attrs, controllers) {
-				var gridCtrl = controllers[0];
-				var grid = $scope.grid;
+				var gridCtrl = controllers[0],
+					grid,
+					temp;
 
 				$scope.grid = gridCtrl.grid;
-				$scope.paginationApi = $scope.grid.api.pagination;
-				$scope.paginationPageSizes = grid.getOption('paginationPageSizes');
+				$scope.columns = $scope.grid._columns;
+				$scope.domNode = $elem[0];
+				$scope.innerNode = $scope.domNode.querySelectorAll('.gridxHeaderRowInner')[0];
+				$scope.headerCells = [];
+				// var $colMenu 
+				grid = $scope.grid;
 
-				var watchPageSize = $scope.$watch('grid.paginationPageSize', function (newValue, oldValue) {
-					if (newValue === oldValue) {
-						return;
-					} else {
-						grid.api.pagination.setPageSize(newValue);
+				$scope.$on('onRowRender', function() {
+					if ($scope.$parent.$last) {
+						$scope.$emit('onBodyRender');
 					}
 				});
 
-				var watchCurrentPage = $scope.$watch('grid.currentPage', function (newValue, oldValue) {
-					if (newValue === oldValue) {
-						return;
-					} else {
-						if (angular.isNumber(newValue)) {
-							grid.api.pagination.goto(newValue);
-						}
-					}
+				$elem.on('mouseenter', function() {
+					$elem.addClass('gridxRowOver');
 				});
+				$elem.on('mouseleave', function() {
+					$elem.removeClass('gridxRowOver');
+				})
 			}
 		};
 	}]);
@@ -838,6 +772,73 @@
 				var grid = $scope.grid = gridCtrl.grid;
 
 				GridSortService.init(grid);
+			}
+		};
+	}]);
+})();
+
+(function() {
+	'use strict';
+
+	var module = angular.module('aui.grid');
+
+	module.controller('auiGridController',
+		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', 'GridUtil',
+		function ($scope, $element, $attrs, Grid, GridBody, GridView, GridUtil) {
+			var grid;
+			window.grid = $scope.grid = new Grid($scope.auiGrid);
+			grid = this.grid = $scope.grid;
+			grid.body = new GridBody('basic', grid);
+			grid.view = new GridView(grid);
+
+			var dataWatchDestroy= $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
+			var columnWatchDestroy = $scope.$parent.$watchCollection(function(){ return $scope.auiGrid.columnStructs; }, columnWatchFunction);
+
+			function dataWatchFunction(newData) {
+				newData = newData || [];
+				grid.setData(newData);
+				grid.model.when({}, function() {
+					var size = grid.model.size(),
+						pageSize = grid.getOption('paginationPageSize'),
+						startPage = grid.getOption('startPage'),
+						firstIndex = 0;
+
+					pageSize = pageSize > 0 ? pageSize : size;
+					firstIndex = pageSize * (startPage - 1);
+					try {
+						grid.view.updateRootRange(firstIndex, pageSize);
+					} catch (e) {
+						console.log(e);
+					}
+					grid.refresh();
+				});
+				console.log('in data watch function;');
+			}
+
+			function columnWatchFunction(nv, ov) {
+				grid.setColumns(nv);
+				grid.publish('columnChange');
+				console.log('in column watch function');
+			}
+		}]);
+
+	module.directive('auiGrid', ['GridUtil', function(GridUtil) {
+		return {
+			templateUrl: 'aui-grid/aui-grid',
+			scope: {
+				auiGrid: '=',
+				getExternalScopes: '&?externalScopes' //optional functionwrapper around any needed external scope instances
+			},
+			replace: true,
+			// transclude: true,
+			controller: 'auiGridController',
+			link: function($scope, $elem) {
+				// debugger;
+				var grid = $scope.grid;
+
+				if (GridUtil.isFunction($scope.auiGrid.onRegisterApi)) {
+					$scope.auiGrid.onRegisterApi(grid.api);
+				}
 			}
 		};
 	}]);
@@ -975,17 +976,6 @@ angular.module('aui.grid')
 			// });
 		},
 	
-		Grid.prototype.startup = function(){
-			// summary:
-			//		Startup this grid widget
-			// tags:
-			//		public extension
-			if(!this._started){
-				// this.inherited(arguments);
-				// this._deferStartup.callback();
-			}
-		},
-	
 		Grid.prototype.destroy = function(){
 			// summary:
 			//		Destroy this grid widget
@@ -996,7 +986,12 @@ angular.module('aui.grid')
 		},
 
 		Grid.prototype.sort = function(options) {
-			var t = this;
+			var t = this,
+				columns = t._columnsById;
+
+			options.forEach(function(opt) {
+				t._columnsById[opt.colId].sorting = opt.descending ? 1 : -1;
+			});
 
 			this.model.sort(options, t).then(function() {
 				console.log('%csort finished', 'color:green');
@@ -4688,6 +4683,227 @@ angular.module('aui.grid')
 
 (function() {
 	angular.module('aui.grid')
+	.service('GridPaginationService', ['$q', '$compile', '$parse', '$timeout', function() {
+		var s = {
+			rowMixin: {
+				getPage: function(){
+					// summary:
+					//		Get the page index this row belongs to.
+					return this.grid.pagination.pageOfIndex(this.index());
+				},
+
+				indexInPage: function(){
+					// summary:
+					//		Get the index of this row in its page.
+					return this.grid.pagination.indexInPage(this.index());
+				}
+			},
+
+			preload: function(){
+				this.grid.view.paging = true;
+			},
+
+			init: function(grid){
+				var t = this;
+					// finish = function(){
+					// 	t._updateBody(1);
+					// 	t.connect(t.model, 'onSizeChange', '_onSizeChange');
+					// 	t.loaded.callback();
+					// };
+				t._pageSize = t.arg('initialPageSize') || t._pageSize;
+				t._page = t.arg('initialPage', t._page, function(arg){
+					return arg >= 0;
+				});
+				t.model.when({}).then(finish, finish);
+			},
+
+			// [Public API] --------------------------------------------------------
+			// GET functions
+			pageSize: function(){
+				var s = this._pageSize;
+				return s > 0 ? s : this.model.size();
+			},
+
+			isAll: function(){
+				return this._pageSize === 0;
+			},
+
+			pageCount: function(){
+				return this.isAll() ? 1 : Math.max(Math.ceil(this.model.size() / this.pageSize()), 1);	//Integer
+			},
+
+			currentPage: function(){
+				return this._page;
+			},
+
+			firstIndexInPage: function(page){
+				if(!page && page !== 0){
+					page = this._page;
+				}else if(!(page >= 0)){
+					return -1;	//Integer
+				}
+				var index = page * this.pageSize();
+				return index < this.model.size() ? index : -1;
+			},
+
+			lastIndexInPage: function(page){
+				var t = this,
+					firstIndex = t.firstIndexInPage(page);
+				if(firstIndex >= 0){
+					var lastIndex = firstIndex + parseInt(t.pageSize(), 10) - 1,
+						size = t.model.size();
+					return lastIndex < size ? lastIndex : size - 1;
+				}
+				return -1;
+			},
+
+			pageOfIndex: function(index){
+				return this.isAll() ? 0 : Math.floor(index / this.pageSize());
+			},
+
+			indexInPage: function(index){
+				return this.isAll() ? index : index % this.pageSize();
+			},
+
+			filterIndexesInPage: function(indexes, page){
+				var first = this.firstIndexInPage(page),
+					end = this.lastIndexInPage(page);
+				return first < 0 ? [] : array.filter(indexes, function(index){
+					return index >= first && index <= end;
+				});
+			},
+
+			//SET functions
+			gotoPage: function(page){
+				var t = this, oldPage = t._page;
+				if(page != oldPage && t.firstIndexInPage(page) >= 0){
+					t._page = page;
+					t._updateBody();
+					t.onSwitchPage(page, oldPage);
+				}
+			},
+
+			setPageSize: function(size){
+				var t = this, oldSize = t._pageSize;
+				if(size != oldSize && size >= 0){
+					var index = t.firstIndexInPage(),
+						oldPage = -1;
+					t._pageSize = size;
+					if(t._page >= t.pageCount()){
+						oldPage = t._page;
+						t._page = t.pageOfIndex(index);
+					}
+					t._updateBody();
+					t.onChangePageSize(size, oldSize);
+					if(oldPage >= 0){
+						t.onSwitchPage(t._page, oldPage);
+					}
+				}
+			},
+
+			// [Events] ----------------------------------------------------------------
+			onSwitchPage: function(/*currentPage, originalPage*/){},
+
+			onChangePageSize: function(/*currentSize, originalSize*/){},
+			
+			// [Private] -------------------------------------------------------
+			_page: 0,
+
+			_pageSize: 10,
+
+			_updateBody: function(noRefresh){
+				var t = this,
+					size = t.model.size(),
+					count = t.pageSize(),
+					start = t.firstIndexInPage();
+				if(size === 0 || start < 0){
+					start = 0;
+					count = 0;
+				}else if(size - start < count){
+					count = size - start;
+				}
+				t.grid.view.updateRootRange(start, count, 1);
+				if(!noRefresh){
+					t.grid.body.lazyRefresh();
+				}
+			},
+
+			_onSizeChange: function(size){
+				var t = this;
+				if(size === 0){
+					t._page = 0;
+					t.grid.view.updateRootRange(0, 0);
+				}else{
+					var first = t.firstIndexInPage();
+					if(first < 0 && t._page !== 0){
+						var oldPage = t._page;
+						t._page = 0;
+						t.onSwitchPage(0, oldPage);
+					}
+					t._updateBody();
+				}
+			}
+		}
+
+		return s;
+	}]);
+
+})();
+(function() {
+	'use strict';
+	
+	var module = angular.module('aui.grid');
+	module.factory('GridSortService', ['GridUtil', '$q', function(GridUtil, $q) {
+		var hitch = GridUtil.hitch;
+
+		var service = {
+			init: function(grid) {
+				// grid.registerApi('sort', 'sort', hitch(this, this.sort, grid))
+			},
+
+			basicSort: function(list, options) {
+
+			},
+
+			sort: function(list, options, grid) {
+				// technically, sort should be an async process
+				// there would be server-side sorting
+				var field, descending = false, option,
+					cols = grid._columnsById,
+					cache = grid.model._cache._cache,
+					da, db, optionsLen = options.length,
+					def = $q.defer();
+
+				if (list[0] === undefined) list.shift();
+				list.sort(function(a, b) {
+					for (var i = 0; i < optionsLen; i++) {
+						option = options[i];
+						field = cols[option.colId].field;
+						descending = option.descending ? -1 : 1;
+						da = cache[a].rawData[field];
+						db = cache[b].rawData[field];
+						console.log(da, db);
+						if (da > db) {
+							return 1 * descending;
+						}
+						if (da < db) {
+							return -1 * descending;
+						}
+					}
+					return 0;
+				});
+				list.unshift(undefined);
+				def.resolve();
+				return def.promise;
+			}
+		};
+
+		return service;
+	}]);
+})();
+
+(function() {
+	angular.module('aui.grid')
 	.service('GridUtil', ['$q', '$compile', '$parse', '$timeout', function() {
 		var s = {
 			delegate: function() {},
@@ -4740,58 +4956,6 @@ angular.module('aui.grid')
 	}]);
 
 })();
-(function() {
-	'use strict';
-	
-	var module = angular.module('aui.grid');
-	module.factory('GridSortService', ['GridUtil', '$q', function(GridUtil, $q) {
-		var hitch = GridUtil.hitch;
-
-		var service = {
-			init: function(grid) {
-				// grid.registerApi('sort', 'sort', hitch(this, this.sort, grid))
-			},
-
-			basicSort: function(list, options) {
-
-			},
-
-			sort: function(list, options, grid) {
-				// technically, sort should be an async process
-				// there would be server-side sorting
-				var field, isDesc, option,
-					cols = grid._columnsById,
-					cache = grid.model._cache._cache,
-					da, db, optionsLen = options.length,
-					def = $q.defer();
-
-				if (list[0] === undefined) list.shift();
-				list.sort(function(a, b) {
-					for (var i = 0; i < optionsLen; i++) {
-						option = options[i];
-						field = cols[option.field].field;
-						da = cache[a].rawData[field];
-						db = cache[b].rawData[field];
-						console.log(da, db);
-						if (da > db) {
-							return 1;
-						}
-						if (da < db) {
-							return -1;
-						}
-					}
-					return 0;
-				});
-				list.unshift(undefined);
-				def.resolve();
-				return def.promise;
-			}
-		};
-
-		return service;
-	}]);
-})();
-
 angular.module('aui.grid').run(['$templateCache', function($templateCache) {
   'use strict';
 
@@ -4823,7 +4987,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid-header',
-    "<div class=\"gridxHeader\" role=\"presentation\"><div class=\"gridxHeaderRow\"><div class=\"gridxHeaderRowInner\" role=\"row\" ng-class=\"{hasVScroller: grid.hasVScroller}\"><table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"cell in headerCells\" aria-readonly=\"true\" role=\"gridcell\" tabindex=\"-1\" aria-describedby=\"grid-id\" colid=\"{{cell.id}}\" class=\"gridxCell {{cell.domClass}}\" style=\"{{cell.style}}\">{{cell.content}}</td></tr></tbody></table></div></div></div>"
+    "<div class=\"gridxHeader\" role=\"presentation\"><div class=\"gridxHeaderRow\"><div class=\"gridxHeaderRowInner\" role=\"row\" ng-class=\"{hasVScroller: grid.hasVScroller}\"><table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"cell in headerCells\" aria-readonly=\"true\" role=\"gridcell\" tabindex=\"-1\" aria-describedby=\"grid-id\" colid=\"{{cell.id}}\" class=\"gridxCell {{cell.domClass}}\" style=\"{{cell.style}}\">{{cell.content}}<div role=\"presentation\" tabindex=\"0\" class=\"gridxArrowButtonNode\" ng-show=\"cell.sorting > 0\"><div class=\"gridxArrowButtonChar\">&#9662;</div></div><div role=\"presentation\" tabindex=\"0\" class=\"gridxArrowButtonNode\" ng-show=\"cell.sorting < 0\"><div class=\"gridxArrowButtonChar\">&#9652;</div></div></td></tr></tbody></table></div></div></div>"
   );
 
 

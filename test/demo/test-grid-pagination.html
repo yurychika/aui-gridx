@@ -152,12 +152,8 @@ app.controller('appController', function($scope, $q) {
 		$scope.api.pagination.previous();
 	};
 
-	$scope.sortName = function() {
-		$scope.api.sort.sort({field: 'name'});
-	};
-
-	$scope.sortAge = function() {
-		$scope.api.sort.sort({field: 'age'});
+	$scope.sort = function(colId) {
+		$scope.api.core.sort([{field: colId}]);
 	};
 
 	$scope.empty = function() {
@@ -171,10 +167,13 @@ app.controller('appController', function($scope, $q) {
 	<div aui-grid='gridOption' aui-grid-pagination aui-grid-sort></div>
 	<div style='margin-bottom: 10px;'></div>
 	<button ng-click='dummy()'>dummy</button>
-<!-- 	<button ng-click='removeRow()'>remove row</button>
-	<button ng-click='addRow()'>add row</button>
 	<button ng-click='sortName()'>sort name</button>
-	<button ng-click='sortAge()'>sort age</button> -->
-	<!-- <button ng-click='sortAge()'>sort item</button> -->
+	<button ng-click='sortAge()'>sort age</button>
+	<span class='buttonGroup'>
+		<button ng-click='sort("Name")'>sort name</button>
+		<button ng-click='sort("Year")'>sort year</button>
+		<button ng-click='sort("id")'>sort id</button>
+		<button ng-click='sort("country")'>sort country</button>
+	</span>
 </body>
 </html>

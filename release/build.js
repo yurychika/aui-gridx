@@ -841,6 +841,9 @@ angular.module('aui.grid')
 			var t = this,
 				columns = t._columnsById;
 
+			t._columns.forEach(function(col) {
+				col.sorting = 0;
+			});
 			options.forEach(function(opt) {
 				t._columnsById[opt.colId].sorting = opt.descending ? -1 : 1;
 			});

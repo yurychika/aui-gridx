@@ -117,12 +117,12 @@ angular.module('aui.grid')
 		mixin = GridUtil.mixin,
 		hitch = GridUtil.hitch;
 
-	function getDepends(mod){
+	function getDepends(mod) {
 		var p = mod.moduleClass.prototype;
 		return (p.forced || []).concat(p.ial || []);
 	}
 
-	function configColumns(columns){
+	function configColumns(columns) {
 		var cs = {}, c, i, len;
 		if(GridUtil.isArray(columns)){
 			for(i = 0, len = columns.length; i < len; ++i){
@@ -135,9 +135,9 @@ angular.module('aui.grid')
 		return cs;
 	}
 
-	function mixinAPI(base, apiPath){
-		if(apiPath){
-			for(var path in apiPath){
+	function mixinAPI(base, apiPath) {
+		if(apiPath) {
+			for(var path in apiPath) {
 				var bp = base[path],
 					ap = apiPath[path];
 				if(bp && lang.isObject(bp) && !angular.isFunction(bp)){
@@ -149,23 +149,23 @@ angular.module('aui.grid')
 		}
 	}
 
-	function normalizeModules(self){
+	function normalizeModules(self) {
 		var mods = self.modules,
 			len = mods.length,
 			modules = [],
 			i, m;
-		for(i = 0; i < len; ++i){
+		for (i = 0; i < len; ++i) {
 			m = mods[i];
-			if(angular.isString(m)){
+			if(angular.isString(m)) {
 				try{
 					m = require(m);
 				}catch(e){
 					console.error(e);
 				}
 			}
-			if(lang.isArray(m)){
+			if (lang.isArray(m)) {
 				modules = modules.concat(m);
-			}else{
+			} else {
 				modules.push(m);
 			}
 		}
@@ -198,10 +198,10 @@ angular.module('aui.grid')
 		self.modules = mods;
 	}
 	
-	function checkForced(self){
+	function checkForced(self) {
 		var registeredMods = _Module._modules,
 			modules = self.modules, i, j, k, p, deps, depName, err;
-		for(i = 0; i < modules.length; ++i){
+		for (i = 0; i < modules.length; ++i) {
 			p = modules[i].moduleClass.prototype;
 			deps = (p.forced || []).concat(p.required || []);
 			for(j = 0; j < deps.length; ++j){
@@ -322,11 +322,11 @@ angular.module('aui.grid')
 			}
 		},
 
-		setData: function(data){
+		setData: function(data) {
 			this.model.setData(data);
 		},
 
-		setColumns: function(columns){
+		setColumns: function(columns) {
 			var t = this;
 			t.structure = columns;
 			//make a shallow copy of columns here so one structure can be used in different grids.
@@ -344,7 +344,7 @@ angular.module('aui.grid')
 			}
 		},
 
-		row: function(row, isId, parentId){
+		row: function(row, isId, parentId) {
 			var t = this;
 			if(typeof row === "number" && !isId){
 				row = t.model.indexToId(row, parentId);
@@ -358,7 +358,7 @@ angular.module('aui.grid')
 			return null;
 		},
 
-		column: function(column, isId){
+		column: function(column, isId) {
 			var t = this, c, a, obj = {};
 			if(typeof column === "number" && !isId){
 				c = t._columns[column];
@@ -377,7 +377,7 @@ angular.module('aui.grid')
 			return null;
 		},
 
-		cell: function(row, column, isId, parentId){
+		cell: function(row, column, isId, parentId) {
 			var t = this, r = row instanceof Row ? row : t.row(row, isId, parentId);
 			if(r){
 				var c = column instanceof Column ? column : t.column(column, isId);
@@ -392,19 +392,19 @@ angular.module('aui.grid')
 			return null;
 		},
 
-		columnCount: function(){
+		columnCount: function() {
 			return this._columns.length;
 		},
 
-		rowCount: function(parentId){
+		rowCount: function(parentId) {
 			return this.model.size(parentId);
 		},
 
-		columns: function(start, count){
+		columns: function(start, count) {
 			return arr(this, this._columns.length, 'column', start, count);	//gridx.core.Column[]
 		},
 
-		rows: function(start, count, parentId){
+		rows: function(start, count, parentId) {
 			return arr(this, this.rowCount(parentId), 'row', start, count, parentId);	//gridx.core.Row[]
 		},
 
@@ -418,7 +418,7 @@ angular.module('aui.grid')
 			this.api[moduleName][apiName] = func;
 		},
 		//Private-------------------------------------------------------------------------------------
-		_init: function(){
+		_init: function() {
 			var t = this, s,
 				// d = t._deferStartup = new Deferred();
 				d = t._deferStartup = $q.defer();
@@ -459,7 +459,7 @@ angular.module('aui.grid')
 			// });
 		},
 
-		_uninit: function(){
+		_uninit: function() {
 			var t = this, mods = t._modules, m;
 			for(m in mods){
 				mods[m].mod.destroy();
@@ -469,7 +469,7 @@ angular.module('aui.grid')
 			}
 		},
 
-		_create: function(){
+		_create: function() {
 			var t = this,
 				i = 0, mod,
 				mods = t._modules = {};
@@ -489,7 +489,7 @@ angular.module('aui.grid')
 			}
 		},
 
-		_preload: function(){
+		_preload: function() {
 			var m, mods = this._modules;
 			for(m in mods){
 				m = mods[m];
@@ -499,7 +499,7 @@ angular.module('aui.grid')
 			}
 		},
 
-		_load: function(deferredStartup){
+		_load: function(deferredStartup) {
 			var dl = [], m;
 			for(m in this._modules){
 				dl.push(initMod(this, deferredStartup, m));
@@ -515,7 +515,7 @@ angular.module('aui.grid')
 			{id: 4, name: 'YUI'}
 		],
 
-		_parseData: function(data){
+		_parseData: function(data) {
 			var t = this;
 
 			if(typeof data ==='object' && data.constructor === Array){
@@ -531,7 +531,7 @@ angular.module('aui.grid')
 			return 1;
 		},
 
-		_parseStructure: function(data){
+		_parseStructure: function(data) {
 			if(!data || typeof data !== 'object'){
 				return [
 					{id: 1, name: 'id', field: 'id'},
@@ -544,7 +544,7 @@ angular.module('aui.grid')
 				keys, i, j, kl, key,
 				struct = [];
 
-			for(i = 0; i < len; i++){
+			for(i = 0; i < len; i++) {
 				keys = Object.keys(data[i]);
 				kl = keys.length;
 				for(j = 0; j < kl; j++){

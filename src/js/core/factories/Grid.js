@@ -44,7 +44,6 @@ angular.module('aui.grid')
 			});
 		};
 
-
 		Grid.prototype = GridCore.prototype;
 
 		Grid.prototype.version = version;
@@ -59,15 +58,15 @@ angular.module('aui.grid')
 			return this._options.getOption(name);
 		};
 
-		Grid.prototype._setTextDirAttr = function(textDir){
+		Grid.prototype._setTextDirAttr = function(textDir) {
 			// summary:
 			//		 Seamlessly changes grid 'textDir' property on the fly.
 			// textDir:
 			//		Grid text direction
-			if(this.textDir != textDir){
+			if(this.textDir != textDir) {
 				this.textDir = textDir;
 				this.header.refresh();
-				if(this.edit){
+				if(this.edit) {
 					this.edit._initAlwaysEdit();
 				}
 				this.body.refresh();
@@ -80,18 +79,18 @@ angular.module('aui.grid')
 			this.publish('refresh');
 		};
 
-		Grid.prototype.getTextDir = function(colId, text){
+		Grid.prototype.getTextDir = function(colId, text) {
 			var col = this._columnsById[colId],
 				textDir = (col && col.textDir) || this.textDir;
 			return textDir = (textDir === "auto") ? _BidiSupport.prototype._checkContextual(text) : textDir;
 		};
 
-		Grid.prototype.getTextDirStyle = function(colId, text){
+		Grid.prototype.getTextDirStyle = function(colId, text) {
 			var textDir = this.getTextDir(colId, text);
 			return textDir ? " direction:" + textDir + ";" : "";
 		};
 
-		Grid.prototype.enforceTextDirWithUcc = function(colId, text){
+		Grid.prototype.enforceTextDirWithUcc = function(colId, text) {
 			var textDir = this.getTextDir(colId, text);
 			//var LRE = '\u202A', RLE = '\u202B', PDF = '\u202C';
 			return textDir ? (textDir === "rtl" ? '\u202B' : '\u202A') + text + '\u202C' : text;
@@ -135,8 +134,8 @@ angular.module('aui.grid')
 			// 	t.resize();
 			// });
 		},
-	
-		Grid.prototype.destroy = function(){
+
+		Grid.prototype.destroy = function() {
 			// summary:
 			//		Destroy this grid widget
 			// tags:
@@ -182,7 +181,7 @@ angular.module('aui.grid')
 		//touch: undefined,
 	=====*/
 
-		Grid.prototype.resize = function(changeSize){
+		Grid.prototype.resize = function(changeSize) {
 			// summary:
 			//		Resize the grid using given width and height.
 			// tags:
@@ -208,11 +207,22 @@ angular.module('aui.grid')
 		Grid.prototype._onResizeBegin = function(){},
 		Grid.prototype._onResizeEnd = function(){},
 
-		Grid.prototype._escapeId = function(id){
+		Grid.prototype._getSortOptions = function() {
+			var cols = this._columns,
+				options = [];
+
+			cols.forEach(function(col) {
+				if(col.sorting) {
+					options.push({colId: col.id, descending: col.sorting === -1});
+				}
+			});
+		},
+
+		Grid.prototype._escapeId = function(id) {
 			return String(id).replace(/\\/g, "\\\\").replace(/\"/g, "\\\"").replace(/\'/g, "\\\'");
 		},
 
-		Grid.prototype._encodeHTML = function(id){
+		Grid.prototype._encodeHTML = function(id) {
 			return String(id).replace(/\"/g, "&quot;");
 		},
 
@@ -228,7 +238,7 @@ angular.module('aui.grid')
 			'KeyDown', 'KeyPress', 'KeyUp'
 		],
 	
-		Grid.prototype._initEvents = function(objNames, evtNames){
+		Grid.prototype._initEvents = function(objNames, evtNames) {
 			var i = 0, j, comp, evt, evtName;
 			while(comp = objNames[i++]){
 				for(j = 0; evt = evtNames[j++];){
@@ -238,7 +248,7 @@ angular.module('aui.grid')
 			}
 		};
 
-		Grid.prototype._connectEvents = function(node, connector, scope){
+		Grid.prototype._connectEvents = function(node, connector, scope) {
 			for(var t = this,
 					m = t.model,
 					eventName,
@@ -250,12 +260,12 @@ angular.module('aui.grid')
 			}
 		};
 	
-		Grid.prototype._isConnected = function(eventName){
+		Grid.prototype._isConnected = function(eventName) {
 			return this[eventName] !== dummyFunc;
 		};
 		//event handling end
 
-		Grid.prototype._isCtrlKey = function(evt){
+		Grid.prototype._isCtrlKey = function(evt) {
 			// summary:
 			//		On Mac Ctrl+click also opens a context menu. So call this to check ctrlKey instead of directly call evt.ctrlKey
 			//		if you need to implement some handler for Ctrl+click.

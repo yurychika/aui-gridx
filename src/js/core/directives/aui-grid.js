@@ -13,7 +13,7 @@
 			grid.view = new GridView(grid);
 
 			var dataWatchDestroy= $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
-			var columnWatchDestroy = $scope.$parent.$watchCollection(function(){ return $scope.auiGrid.columnStructs; }, columnWatchFunction);
+			var columnWatchDestroy = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.columnStructs; }, columnWatchFunction);
 
 			function dataWatchFunction(newData) {
 				newData = newData || [];

@@ -232,12 +232,49 @@
 						temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
 						temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
 						temp.sorting = col.sorting;
+						temp.sortable = col.enableSorting || true;
 						$scope.headerCells.push(temp);
 					});
 				}
 
-				$elem.on('click', function() {
+				function toggleHeaderSorting(colId) {
+					var col = grid._columnsById[colId],
+						sorting, newSorting;
+					if(!col || col.enableSorting === false) return;
 
+					sorting = col.sorting || 0;
+					switch(sorting) {
+						case 1:
+							newSorting = col.sorting = -1;
+							break;
+						case -1:
+							newSorting = col.sorting = 0;
+							break;
+						case 0:
+							newSorting = col.sorting = 1;
+							break;
+					}
+					console.log('current sorting', newSorting);
+					if (col.sorting !== 0) {
+						grid.sort([{colId: colId, descending: col.sorting === -1}]);
+					} else {
+						grid.publish('clearSort');
+					}
+				}
+
+				$elem.on('click', function(evt) {
+					var target = evt.target,
+						headerCell = GridUtil.closest(target, 'gridxCell'),
+						colId, col;
+
+					if(!headerCell) return;
+					
+					colId = target.getAttribute('colId');
+					col = grid._columnsById[colId];
+					if (col && col.enableSorting === false) {
+						console.warn('column:', colId, 'not allowed to do sorting');
+					}
+					toggleHeaderSorting(colId);
 				})
 			}
 		};
@@ -679,7 +716,7 @@ angular.module('aui.grid')
 			}
 		};
 		var Grid = function Grid(options){
-			var self = this;
+			var t = this;
 			this.name = 'aui gridx';
 			this.isIE = false;
 			this.options = options;
@@ -691,6 +728,12 @@ angular.module('aui.grid')
 			// console.log('childField', this.getOption('childField'));
 			// console.log('emptyInfo', this.getOption('emptyInfo'));
 			this.postCreate();
+			this.subscribe(['clearSort'], function() {
+				t.model.clearCache();
+				// t.model.when({}).then(function() {
+					t.refresh();
+				// });
+			});
 		};
 
 
@@ -799,7 +842,7 @@ angular.module('aui.grid')
 				columns = t._columnsById;
 
 			options.forEach(function(opt) {
-				t._columnsById[opt.colId].sorting = opt.descending ? 1 : -1;
+				t._columnsById[opt.colId].sorting = opt.descending ? -1 : 1;
 			});
 
 			this.model.sort(options, t).then(function() {
@@ -3081,7 +3124,7 @@ angular.module('aui.grid')
 	Model.prototype = {
 		childField: 'children',
 
-		destroy: function(){
+		destroy: function() {
 			this._cnnts.forEach(function(cnnt){
 				cnnt.remove();
 			});
@@ -3091,7 +3134,7 @@ angular.module('aui.grid')
 			this._cache.destroy();
 		},
 
-		clearCache: function(){
+		clearCache: function() {
 			this._cache.clear();
 		},
 
@@ -3503,10 +3546,6 @@ angular.module('aui.grid')
 							t._onSet(item);
 						}
 					});
-				}else{
-					// t[c](data, old ? "onSet" : "put", "_onSet");
-					// t[c](data, old ? "onNew" : "add", "_onNew");
-					// t[c](data, old ? "onDelete" : "remove", "_onDelete");
 				}
 			},
 
@@ -3525,7 +3564,7 @@ angular.module('aui.grid')
 			},
 
 			//Public----------------------------------------------
-			clear: function(){
+			clear: function() {
 				var t = this;
 				t._filled = 0;
 				t._priority = [];
@@ -4691,7 +4730,6 @@ angular.module('aui.grid')
 						descending = option.descending ? -1 : 1;
 						da = cache[a].rawData[field];
 						db = cache[b].rawData[field];
-						console.log(da, db);
 						if (da > db) {
 							return 1 * descending;
 						}
@@ -4727,6 +4765,15 @@ angular.module('aui.grid')
 
 			isArray: function(a) {
 				return angular.isArray(a);
+			},
+
+			closest: function(node, className) {
+				while(node) {
+					if(angular.element(node).hasClass(className)) {
+						return node;
+					}
+					node = node.parentNode;
+				}
 			},
 			
 			hitch: function(scope, method) {
@@ -4796,7 +4843,7 @@ angular.module('aui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('aui-grid/aui-grid-header',
-    "<div class=\"gridxHeader\" role=\"presentation\"><div class=\"gridxHeaderRow\"><div class=\"gridxHeaderRowInner\" role=\"row\" ng-class=\"{hasVScroller: grid.hasVScroller}\"><table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"cell in headerCells\" aria-readonly=\"true\" role=\"gridcell\" tabindex=\"-1\" aria-describedby=\"grid-id\" colid=\"{{cell.colId}}\" class=\"gridxCell {{cell.domClass}}\" style=\"{{cell.style}}\">{{cell.content}}<div role=\"presentation\" tabindex=\"0\" class=\"gridxArrowButtonNode\" ng-show=\"cell.sorting > 0\"><div class=\"gridxArrowButtonChar\">&#9662;</div></div><div role=\"presentation\" tabindex=\"0\" class=\"gridxArrowButtonNode\" ng-show=\"cell.sorting < 0\"><div class=\"gridxArrowButtonChar\">&#9652;</div></div></td></tr></tbody></table></div></div></div>"
+    "<div class=\"gridxHeader\" role=\"presentation\"><div class=\"gridxHeaderRow\"><div class=\"gridxHeaderRowInner\" role=\"row\" ng-class=\"{hasVScroller: grid.hasVScroller}\"><table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr><td ng-repeat=\"cell in headerCells\" aria-readonly=\"true\" role=\"gridcell\" tabindex=\"-1\" aria-describedby=\"grid-id\" colid=\"{{cell.colId}}\" class=\"gridxCell {{cell.domClass}}\" style=\"{{cell.style}}\" ng-class=\"{sortable: cell.sortable}\">{{cell.content}}<div role=\"presentation\" tabindex=\"0\" class=\"gridxArrowButtonNode\" ng-show=\"cell.sorting > 0\"><div class=\"gridxArrowButtonChar\">&#9662;</div></div><div role=\"presentation\" tabindex=\"0\" class=\"gridxArrowButtonNode\" ng-show=\"cell.sorting < 0\"><div class=\"gridxArrowButtonChar\">&#9652;</div></div></td></tr></tbody></table></div></div></div>"
   );
 
 

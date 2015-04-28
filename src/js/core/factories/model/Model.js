@@ -289,7 +289,7 @@
 	Model.prototype = {
 		childField: 'children',
 
-		destroy: function(){
+		destroy: function() {
 			this._cnnts.forEach(function(cnnt){
 				cnnt.remove();
 			});
@@ -299,7 +299,7 @@
 			this._cache.destroy();
 		},
 
-		clearCache: function(){
+		clearCache: function() {
 			this._cache.clear();
 		},
 

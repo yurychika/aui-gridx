@@ -190,10 +190,6 @@
 							t._onSet(item);
 						}
 					});
-				}else{
-					// t[c](data, old ? "onSet" : "put", "_onSet");
-					// t[c](data, old ? "onNew" : "add", "_onNew");
-					// t[c](data, old ? "onDelete" : "remove", "_onDelete");
 				}
 			},
 
@@ -212,7 +208,7 @@
 			},
 
 			//Public----------------------------------------------
-			clear: function(){
+			clear: function() {
 				var t = this;
 				t._filled = 0;
 				t._priority = [];

@@ -37,12 +37,49 @@
 						temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
 						temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
 						temp.sorting = col.sorting;
+						temp.sortable = col.enableSorting || true;
 						$scope.headerCells.push(temp);
 					});
 				}
 
-				$elem.on('click', function() {
+				function toggleHeaderSorting(colId) {
+					var col = grid._columnsById[colId],
+						sorting, newSorting;
+					if(!col || col.enableSorting === false) return;
 
+					sorting = col.sorting || 0;
+					switch(sorting) {
+						case 1:
+							newSorting = col.sorting = -1;
+							break;
+						case -1:
+							newSorting = col.sorting = 0;
+							break;
+						case 0:
+							newSorting = col.sorting = 1;
+							break;
+					}
+					console.log('current sorting', newSorting);
+					if (col.sorting !== 0) {
+						grid.sort([{colId: colId, descending: col.sorting === -1}]);
+					} else {
+						grid.publish('clearSort');
+					}
+				}
+
+				$elem.on('click', function(evt) {
+					var target = evt.target,
+						headerCell = GridUtil.closest(target, 'gridxCell'),
+						colId, col;
+
+					if(!headerCell) return;
+					
+					colId = target.getAttribute('colId');
+					col = grid._columnsById[colId];
+					if (col && col.enableSorting === false) {
+						console.warn('column:', colId, 'not allowed to do sorting');
+					}
+					toggleHeaderSorting(colId);
 				})
 			}
 		};

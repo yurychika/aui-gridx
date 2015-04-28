@@ -24,7 +24,7 @@ angular.module('aui.grid')
 			}
 		};
 		var Grid = function Grid(options){
-			var self = this;
+			var t = this;
 			this.name = 'aui gridx';
 			this.isIE = false;
 			this.options = options;
@@ -36,6 +36,12 @@ angular.module('aui.grid')
 			// console.log('childField', this.getOption('childField'));
 			// console.log('emptyInfo', this.getOption('emptyInfo'));
 			this.postCreate();
+			this.subscribe(['clearSort'], function() {
+				t.model.clearCache();
+				t.model.when({}).then(function() {
+					t.refresh();
+				});
+			});
 		};
 
 
@@ -144,7 +150,7 @@ angular.module('aui.grid')
 				columns = t._columnsById;
 
 			options.forEach(function(opt) {
-				t._columnsById[opt.colId].sorting = opt.descending ? 1 : -1;
+				t._columnsById[opt.colId].sorting = opt.descending ? -1 : 1;
 			});
 
 			this.model.sort(options, t).then(function() {

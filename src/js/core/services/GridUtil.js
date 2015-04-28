@@ -15,6 +15,15 @@
 			isArray: function(a) {
 				return angular.isArray(a);
 			},
+
+			closest: function(node, className) {
+				while(node) {
+					if(angular.element(node).hasClass(className)) {
+						return node;
+					}
+					node = node.parentNode;
+				}
+			},
 			
 			hitch: function(scope, method) {
 				scope = scope || window;

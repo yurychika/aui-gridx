@@ -31,7 +31,6 @@
 						descending = option.descending ? -1 : 1;
 						da = cache[a].rawData[field];
 						db = cache[b].rawData[field];
-						console.log(da, db);
 						if (da > db) {
 							return 1 * descending;
 						}

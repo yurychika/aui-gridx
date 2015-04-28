@@ -1,4 +1,13 @@
 //css3 utils
+.userSelect(@select) {
+	-webkit-touch-callout: @select;
+	-webkit-user-select: @select;
+	-khtml-user-select: @select;
+	-moz-user-select: @select;
+	-ms-user-select: @select;
+	user-select: @select;
+}
+
 .boxSizing(@style) {
 	-moz-box-sizing: @style; /* ff2 */
 	-ms-box-sizing: @style; /* ie8 */

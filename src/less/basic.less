@@ -96,9 +96,15 @@
 	border-width: 1px;
 	border-style: solid;
 	border-color: transparent #ccc transparent transparent;
-	padding: 3px;
 	text-align: left;
+	padding: 3px;
 	overflow: hidden;
+	/*user-select: none;*/
+	.userSelect(none);
+
+	&.sortable {
+		cursor: pointer;
+	}
 }
 
 .gridx .gridxHeader .gridxHeaderRow .gridxHeaderRowInner .gridxCell {

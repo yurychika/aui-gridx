@@ -232,7 +232,7 @@
 						temp.style += (GridUtil.isFunction(col.headerStyle) ? col.headerStyle(col) : col.headerStyle) || '';
 						temp.content = (GridUtil.isFunction(col.headerFormatter) ? col.headerFormatter(col) : col.name);
 						temp.sorting = col.sorting;
-						temp.sortable = col.enableSorting || true;
+						temp.sortable = col.enableSorting !== false;
 						$scope.headerCells.push(temp);
 					});
 				}
@@ -730,9 +730,9 @@ angular.module('aui.grid')
 			this.postCreate();
 			this.subscribe(['clearSort'], function() {
 				t.model.clearCache();
-				// t.model.when({}).then(function() {
+				t.model.when({}).then(function() {
 					t.refresh();
-				// });
+				});
 			});
 		};
 

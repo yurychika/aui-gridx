@@ -146,7 +146,14 @@ angular.module('aui.grid')
 
 		Grid.prototype.sort = function(options) {
 			var t = this,
-				columns = t._columnsById;
+				columns = t._columnsById,
+				optionsLen = options.length, i;
+
+			for (i = 0; i < optionsLen; i++) {
+				if (columns[options[i].colId].enableSorting === false) {
+					return console.warn(options[i].colId, 'can not be sorted');
+				}
+			}
 
 			t._columns.forEach(function(col) {
 				col.sorting = 0;

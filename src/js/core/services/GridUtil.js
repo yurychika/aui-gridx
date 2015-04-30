@@ -54,8 +54,16 @@
 				}
 
 				return a;
+			},
+
+			isColumnSortable: function(grid, col) {
+				if (angular.isString(col)) {
+					col = grid._columnsById[colId];
+				}
+
+				return col && col.enableSorting !== false;
 			}
-		}
+		};
 
 		return s;
 	}]);

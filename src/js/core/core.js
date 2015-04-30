@@ -330,15 +330,17 @@ angular.module('aui.grid')
 			var t = this;
 			t.structure = columns;
 			//make a shallow copy of columns here so one structure can be used in different grids.
+
 			t._columns = columns.map(function(col){
+				if (GridUtil.isColumnSortable(t, col) && col.sort) {
+					col.sorting = (col.sort && col.sort.descending) ? -1 : 1;
+				}
 				return GridUtil.mixin({}, col);
 			});
 			t._columnsById = configColumns(t._columns);
+			t.sortOptions = t._getSortOptions();
+			console.log('sort options', t.sortOptions);
 			
-			if(t.edit){			//FIX ME: this is ugly
-								//this will not run in the first setColumns function
-				t.edit._init();
-			}
 			if(t.model){
 				t.model._cache.onSetColumns(t._columnsById);
 			}

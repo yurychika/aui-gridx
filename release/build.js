@@ -638,7 +638,7 @@
 			grid.view = new GridView(grid);
 
 			var dataWatchDestroy= $scope.$parent.$watchCollection(function() { return $scope.auiGrid.data; }, dataWatchFunction);
-			var columnWatchDestroy = $scope.$parent.$watchCollection(function(){ return $scope.auiGrid.columnStructs; }, columnWatchFunction);
+			var columnWatchDestroy = $scope.$parent.$watchCollection(function() { return $scope.auiGrid.columnStructs; }, columnWatchFunction);
 
 			function dataWatchFunction(newData) {
 				newData = newData || [];
@@ -736,7 +736,6 @@ angular.module('aui.grid')
 			});
 		};
 
-
 		Grid.prototype = GridCore.prototype;
 
 		Grid.prototype.version = version;
@@ -747,19 +746,21 @@ angular.module('aui.grid')
 
 		Grid.prototype.enableRowHoverEffect = true;
 
+		Grid.prototype.sortOptions = [];
+
 		Grid.prototype.getOption = function(name) {
 			return this._options.getOption(name);
 		};
 
-		Grid.prototype._setTextDirAttr = function(textDir){
+		Grid.prototype._setTextDirAttr = function(textDir) {
 			// summary:
 			//		 Seamlessly changes grid 'textDir' property on the fly.
 			// textDir:
 			//		Grid text direction
-			if(this.textDir != textDir){
+			if(this.textDir != textDir) {
 				this.textDir = textDir;
 				this.header.refresh();
-				if(this.edit){
+				if(this.edit) {
 					this.edit._initAlwaysEdit();
 				}
 				this.body.refresh();
@@ -772,18 +773,18 @@ angular.module('aui.grid')
 			this.publish('refresh');
 		};
 
-		Grid.prototype.getTextDir = function(colId, text){
+		Grid.prototype.getTextDir = function(colId, text) {
 			var col = this._columnsById[colId],
 				textDir = (col && col.textDir) || this.textDir;
 			return textDir = (textDir === "auto") ? _BidiSupport.prototype._checkContextual(text) : textDir;
 		};
 
-		Grid.prototype.getTextDirStyle = function(colId, text){
+		Grid.prototype.getTextDirStyle = function(colId, text) {
 			var textDir = this.getTextDir(colId, text);
 			return textDir ? " direction:" + textDir + ";" : "";
 		};
 
-		Grid.prototype.enforceTextDirWithUcc = function(colId, text){
+		Grid.prototype.enforceTextDirWithUcc = function(colId, text) {
 			var textDir = this.getTextDir(colId, text);
 			//var LRE = '\u202A', RLE = '\u202B', PDF = '\u202C';
 			return textDir ? (textDir === "rtl" ? '\u202B' : '\u202A') + text + '\u202C' : text;
@@ -827,8 +828,8 @@ angular.module('aui.grid')
 			// 	t.resize();
 			// });
 		},
-	
-		Grid.prototype.destroy = function(){
+
+		Grid.prototype.destroy = function() {
 			// summary:
 			//		Destroy this grid widget
 			// tags:
@@ -839,7 +840,14 @@ angular.module('aui.grid')
 
 		Grid.prototype.sort = function(options) {
 			var t = this,
-				columns = t._columnsById;
+				columns = t._columnsById,
+				optionsLen = options.length, i;
+
+			for (i = 0; i < optionsLen; i++) {
+				if (columns[options[i].colId].enableSorting === false) {
+					return console.warn(options[i].colId, 'can not be sorted');
+				}
+			}
 
 			t._columns.forEach(function(col) {
 				col.sorting = 0;
@@ -874,7 +882,7 @@ angular.module('aui.grid')
 		//touch: undefined,
 	=====*/
 
-		Grid.prototype.resize = function(changeSize){
+		Grid.prototype.resize = function(changeSize) {
 			// summary:
 			//		Resize the grid using given width and height.
 			// tags:
@@ -900,11 +908,34 @@ angular.module('aui.grid')
 		Grid.prototype._onResizeBegin = function(){},
 		Grid.prototype._onResizeEnd = function(){},
 
-		Grid.prototype._escapeId = function(id){
+		Grid.prototype._getSortOptions = function() {
+			var cols = this._columns,
+				options = [];
+
+			cols.forEach(function(col) {
+				if(col.sort && col.enableSorting !== false) {
+					col.sort.colId = col.id;
+					options.push(col.sort);
+				}
+			});
+
+			options.sort(function(a, b) {
+				a.priority = a.priority || Infinity;
+				b.priority = b.priority || Infinity;
+
+				return a.priority - b.priority;
+			});
+
+			return options.map(function(item) {
+				return {colId: item.colId, descending: item.descending};
+			});
+		},
+
+		Grid.prototype._escapeId = function(id) {
 			return String(id).replace(/\\/g, "\\\\").replace(/\"/g, "\\\"").replace(/\'/g, "\\\'");
 		},
 
-		Grid.prototype._encodeHTML = function(id){
+		Grid.prototype._encodeHTML = function(id) {
 			return String(id).replace(/\"/g, "&quot;");
 		},
 
@@ -920,7 +951,7 @@ angular.module('aui.grid')
 			'KeyDown', 'KeyPress', 'KeyUp'
 		],
 	
-		Grid.prototype._initEvents = function(objNames, evtNames){
+		Grid.prototype._initEvents = function(objNames, evtNames) {
 			var i = 0, j, comp, evt, evtName;
 			while(comp = objNames[i++]){
 				for(j = 0; evt = evtNames[j++];){
@@ -930,7 +961,7 @@ angular.module('aui.grid')
 			}
 		};
 
-		Grid.prototype._connectEvents = function(node, connector, scope){
+		Grid.prototype._connectEvents = function(node, connector, scope) {
 			for(var t = this,
 					m = t.model,
 					eventName,
@@ -942,12 +973,12 @@ angular.module('aui.grid')
 			}
 		};
 	
-		Grid.prototype._isConnected = function(eventName){
+		Grid.prototype._isConnected = function(eventName) {
 			return this[eventName] !== dummyFunc;
 		};
 		//event handling end
 
-		Grid.prototype._isCtrlKey = function(evt){
+		Grid.prototype._isCtrlKey = function(evt) {
 			// summary:
 			//		On Mac Ctrl+click also opens a context menu. So call this to check ctrlKey instead of directly call evt.ctrlKey
 			//		if you need to implement some handler for Ctrl+click.
@@ -3117,10 +3148,13 @@ angular.module('aui.grid')
 			cacheClass = grid.cacheClass || Sync;
 
 		cacheClass = typeof cacheClass == 'string' ? require(cacheClass) : cacheClass;
+		t.grid = grid;
 		t.childField = grid.getOption('childField');
 		t.store = grid.store;
+		t.sortOptions = grid.sortOptions;
 		t._exts = {};
 		t._cmdQueue = [];
+
 		t._model = t._cache = new cacheClass(t, grid);
 	};
 
@@ -3149,24 +3183,67 @@ angular.module('aui.grid')
 		},
 
 		sort: function(options, grid) {
-			// option.length
 			var rootIndex = this._cache._struct[''],
 				t = this;
 
-			return GridSortService.sort(rootIndex, options, grid);
+			return this.sortCache(rootIndex, options, grid);
+		},
+		
+		sortCache: function(list, options, grid) {
+			// technically, sort should be an async process
+			// there would be server-side sorting
+			var field, descending = false, option,
+				cols = grid._columnsById,
+				cache = grid.model._cache._cache,
+				da, db, optionsLen = options.length,
+				def = $q.defer();
+
+			if (list[0] === undefined) list.shift();
+			list.sort(function(a, b) {
+				for (var i = 0; i < optionsLen; i++) {
+					option = options[i];
+					field = cols[option.colId].field;
+					descending = option.descending ? -1 : 1;
+					da = cache[a].rawData[field];
+					db = cache[b].rawData[field];
+					if (da > db) {
+						return 1 * descending;
+					}
+					if (da < db) {
+						return -1 * descending;
+					}
+				}
+				return 0;
+			});
+			list.unshift(undefined);
+			def.resolve();
+			return def.promise;
 		},
 
 		//Public-------------------------------------------------------------------
-		when: function(args, callback, scope){
-			this._oldSize = this.size();
+		when: function(args, callback, scope) {
+			var t = this;
+			t._oldSize = t.size();
 			// execute pending operations and then fetch data
-			this._addCmd({
+			t._addCmd({
 				name: '_cmdRequest',
-				scope: this,
+				scope: t,
 				args: arguments,
 				async: 1
 			});
-			return this._exec();
+
+			if (t._inSortMode) {
+				// add cmd after _cmdQueue is ready.
+				t._addCmd({
+					name: '_cmdSort',
+					scope: t,
+					args: [t.sortOptions, t.grid],
+					async: 1
+				});
+			}
+			// t.sort(t.sortOptions, t.grid);
+
+			return t._exec();
 		},
 
 		scan: function(args, callback){
@@ -3264,7 +3341,15 @@ angular.module('aui.grid')
 
 		_onParentSizeChange: function(parentId, isAdd) {},
 
-		_cmdRequest: function(){
+		_cmdSort: function() {
+			var rootIndex = this._cache._struct[''],
+				t = this,
+				a = arguments[arguments.length - 1];
+
+			return this.sortCache.apply(this, [rootIndex].concat(a));
+		},
+
+		_cmdRequest: function() {
 			var t = this;
 			return new $q.all([].map.apply(arguments, [function(args){
 				var arg = args[0],
@@ -3286,7 +3371,7 @@ angular.module('aui.grid')
 			}]), 0, 1);
 		},
 
-		_exec: function(){
+		_exec: function() {
 			//Execute commands one by one.
 			var t = this,
 				c = t._cache,
@@ -3307,7 +3392,7 @@ angular.module('aui.grid')
 					if(cmds.some(function(cmd){
 						return cmd.name == '_cmdRequest';
 					})){
-						try{
+						try {
 							while(cmds.length){
 								var cmd = cmds.shift(),
 									dd = cmd.scope[cmd.name].apply(cmd.scope, cmd.args);
@@ -3316,7 +3401,8 @@ angular.module('aui.grid')
 									return;
 								}
 							}
-						}catch(e){
+						} catch(e) {
+							console.error(e);
 							finish(d, e);
 							return;
 						}
@@ -3331,7 +3417,7 @@ angular.module('aui.grid')
 			return d && d.promise;
 		},
 
-		_createExts: function(exts, args){
+		_createExts: function(exts, args) {
 			//Ensure the given extensions are valid
 			exts = array.filter(array.map(exts, function(ext){
 				return typeof ext == 'string' ? require(ext) : ext;
@@ -3350,11 +3436,14 @@ angular.module('aui.grid')
 					this._exts[ext.name] = ext;
 				}
 			}
+		},
+
+		_inSortMode: function() {
+			return this.sortOptions && this.sortOptions.length;
 		}
 	};
 	
 	return Model;
-
 	}]);
 })();
 (function(){
@@ -4085,12 +4174,12 @@ angular.module('aui.grid')
 		mixin = GridUtil.mixin,
 		hitch = GridUtil.hitch;
 
-	function getDepends(mod){
+	function getDepends(mod) {
 		var p = mod.moduleClass.prototype;
 		return (p.forced || []).concat(p.ial || []);
 	}
 
-	function configColumns(columns){
+	function configColumns(columns) {
 		var cs = {}, c, i, len;
 		if(GridUtil.isArray(columns)){
 			for(i = 0, len = columns.length; i < len; ++i){
@@ -4103,9 +4192,9 @@ angular.module('aui.grid')
 		return cs;
 	}
 
-	function mixinAPI(base, apiPath){
-		if(apiPath){
-			for(var path in apiPath){
+	function mixinAPI(base, apiPath) {
+		if(apiPath) {
+			for(var path in apiPath) {
 				var bp = base[path],
 					ap = apiPath[path];
 				if(bp && lang.isObject(bp) && !angular.isFunction(bp)){
@@ -4117,23 +4206,23 @@ angular.module('aui.grid')
 		}
 	}
 
-	function normalizeModules(self){
+	function normalizeModules(self) {
 		var mods = self.modules,
 			len = mods.length,
 			modules = [],
 			i, m;
-		for(i = 0; i < len; ++i){
+		for (i = 0; i < len; ++i) {
 			m = mods[i];
-			if(angular.isString(m)){
+			if(angular.isString(m)) {
 				try{
 					m = require(m);
 				}catch(e){
 					console.error(e);
 				}
 			}
-			if(lang.isArray(m)){
+			if (lang.isArray(m)) {
 				modules = modules.concat(m);
-			}else{
+			} else {
 				modules.push(m);
 			}
 		}
@@ -4166,10 +4255,10 @@ angular.module('aui.grid')
 		self.modules = mods;
 	}
 	
-	function checkForced(self){
+	function checkForced(self) {
 		var registeredMods = _Module._modules,
 			modules = self.modules, i, j, k, p, deps, depName, err;
-		for(i = 0; i < modules.length; ++i){
+		for (i = 0; i < modules.length; ++i) {
 			p = modules[i].moduleClass.prototype;
 			deps = (p.forced || []).concat(p.required || []);
 			for(j = 0; j < deps.length; ++j){
@@ -4290,29 +4379,31 @@ angular.module('aui.grid')
 			}
 		},
 
-		setData: function(data){
+		setData: function(data) {
 			this.model.setData(data);
 		},
 
-		setColumns: function(columns){
+		setColumns: function(columns) {
 			var t = this;
 			t.structure = columns;
 			//make a shallow copy of columns here so one structure can be used in different grids.
+
 			t._columns = columns.map(function(col){
+				if (GridUtil.isColumnSortable(t, col) && col.sort) {
+					col.sorting = (col.sort && col.sort.descending) ? -1 : 1;
+				}
 				return GridUtil.mixin({}, col);
 			});
 			t._columnsById = configColumns(t._columns);
+			t.sortOptions = t._getSortOptions();
+			console.log('sort options', t.sortOptions);
 			
-			if(t.edit){			//FIX ME: this is ugly
-								//this will not run in the first setColumns function
-				t.edit._init();
-			}
 			if(t.model){
 				t.model._cache.onSetColumns(t._columnsById);
 			}
 		},
 
-		row: function(row, isId, parentId){
+		row: function(row, isId, parentId) {
 			var t = this;
 			if(typeof row === "number" && !isId){
 				row = t.model.indexToId(row, parentId);
@@ -4326,7 +4417,7 @@ angular.module('aui.grid')
 			return null;
 		},
 
-		column: function(column, isId){
+		column: function(column, isId) {
 			var t = this, c, a, obj = {};
 			if(typeof column === "number" && !isId){
 				c = t._columns[column];
@@ -4345,7 +4436,7 @@ angular.module('aui.grid')
 			return null;
 		},
 
-		cell: function(row, column, isId, parentId){
+		cell: function(row, column, isId, parentId) {
 			var t = this, r = row instanceof Row ? row : t.row(row, isId, parentId);
 			if(r){
 				var c = column instanceof Column ? column : t.column(column, isId);
@@ -4360,19 +4451,19 @@ angular.module('aui.grid')
 			return null;
 		},
 
-		columnCount: function(){
+		columnCount: function() {
 			return this._columns.length;
 		},
 
-		rowCount: function(parentId){
+		rowCount: function(parentId) {
 			return this.model.size(parentId);
 		},
 
-		columns: function(start, count){
+		columns: function(start, count) {
 			return arr(this, this._columns.length, 'column', start, count);	//gridx.core.Column[]
 		},
 
-		rows: function(start, count, parentId){
+		rows: function(start, count, parentId) {
 			return arr(this, this.rowCount(parentId), 'row', start, count, parentId);	//gridx.core.Row[]
 		},
 
@@ -4386,7 +4477,7 @@ angular.module('aui.grid')
 			this.api[moduleName][apiName] = func;
 		},
 		//Private-------------------------------------------------------------------------------------
-		_init: function(){
+		_init: function() {
 			var t = this, s,
 				// d = t._deferStartup = new Deferred();
 				d = t._deferStartup = $q.defer();
@@ -4427,7 +4518,7 @@ angular.module('aui.grid')
 			// });
 		},
 
-		_uninit: function(){
+		_uninit: function() {
 			var t = this, mods = t._modules, m;
 			for(m in mods){
 				mods[m].mod.destroy();
@@ -4437,7 +4528,7 @@ angular.module('aui.grid')
 			}
 		},
 
-		_create: function(){
+		_create: function() {
 			var t = this,
 				i = 0, mod,
 				mods = t._modules = {};
@@ -4457,7 +4548,7 @@ angular.module('aui.grid')
 			}
 		},
 
-		_preload: function(){
+		_preload: function() {
 			var m, mods = this._modules;
 			for(m in mods){
 				m = mods[m];
@@ -4467,7 +4558,7 @@ angular.module('aui.grid')
 			}
 		},
 
-		_load: function(deferredStartup){
+		_load: function(deferredStartup) {
 			var dl = [], m;
 			for(m in this._modules){
 				dl.push(initMod(this, deferredStartup, m));
@@ -4483,7 +4574,7 @@ angular.module('aui.grid')
 			{id: 4, name: 'YUI'}
 		],
 
-		_parseData: function(data){
+		_parseData: function(data) {
 			var t = this;
 
 			if(typeof data ==='object' && data.constructor === Array){
@@ -4499,7 +4590,7 @@ angular.module('aui.grid')
 			return 1;
 		},
 
-		_parseStructure: function(data){
+		_parseStructure: function(data) {
 			if(!data || typeof data !== 'object'){
 				return [
 					{id: 1, name: 'id', field: 'id'},
@@ -4512,7 +4603,7 @@ angular.module('aui.grid')
 				keys, i, j, kl, key,
 				struct = [];
 
-			for(i = 0; i < len; i++){
+			for(i = 0; i < len; i++) {
 				keys = Object.keys(data[i]);
 				kl = keys.length;
 				for(j = 0; j < kl; j++){
@@ -4716,7 +4807,7 @@ angular.module('aui.grid')
 
 			},
 
-			sort: function(list, options, grid) {
+			sortCache: function(list, options, cache) {
 				// technically, sort should be an async process
 				// there would be server-side sorting
 				var field, descending = false, option,
@@ -4808,8 +4899,16 @@ angular.module('aui.grid')
 				}
 
 				return a;
+			},
+
+			isColumnSortable: function(grid, col) {
+				if (angular.isString(col)) {
+					col = grid._columnsById[colId];
+				}
+
+				return col && col.enableSorting !== false;
 			}
-		}
+		};
 
 		return s;
 	}]);

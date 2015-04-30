@@ -14,7 +14,7 @@
 
 			},
 
-			sort: function(list, options, grid) {
+			sortCache: function(list, options, cache) {
 				// technically, sort should be an async process
 				// there would be server-side sorting
 				var field, descending = false, option,

@@ -279,10 +279,13 @@
 			cacheClass = grid.cacheClass || Sync;
 
 		cacheClass = typeof cacheClass == 'string' ? require(cacheClass) : cacheClass;
+		t.grid = grid;
 		t.childField = grid.getOption('childField');
 		t.store = grid.store;
+		t.sortOptions = grid.sortOptions;
 		t._exts = {};
 		t._cmdQueue = [];
+
 		t._model = t._cache = new cacheClass(t, grid);
 	};
 
@@ -311,24 +314,67 @@
 		},
 
 		sort: function(options, grid) {
-			// option.length
 			var rootIndex = this._cache._struct[''],
 				t = this;
 
-			return GridSortService.sort(rootIndex, options, grid);
+			return this.sortCache(rootIndex, options, grid);
+		},
+		
+		sortCache: function(list, options, grid) {
+			// technically, sort should be an async process
+			// there would be server-side sorting
+			var field, descending = false, option,
+				cols = grid._columnsById,
+				cache = grid.model._cache._cache,
+				da, db, optionsLen = options.length,
+				def = $q.defer();
+
+			if (list[0] === undefined) list.shift();
+			list.sort(function(a, b) {
+				for (var i = 0; i < optionsLen; i++) {
+					option = options[i];
+					field = cols[option.colId].field;
+					descending = option.descending ? -1 : 1;
+					da = cache[a].rawData[field];
+					db = cache[b].rawData[field];
+					if (da > db) {
+						return 1 * descending;
+					}
+					if (da < db) {
+						return -1 * descending;
+					}
+				}
+				return 0;
+			});
+			list.unshift(undefined);
+			def.resolve();
+			return def.promise;
 		},
 
 		//Public-------------------------------------------------------------------
-		when: function(args, callback, scope){
-			this._oldSize = this.size();
+		when: function(args, callback, scope) {
+			var t = this;
+			t._oldSize = t.size();
 			// execute pending operations and then fetch data
-			this._addCmd({
+			t._addCmd({
 				name: '_cmdRequest',
-				scope: this,
+				scope: t,
 				args: arguments,
 				async: 1
 			});
-			return this._exec();
+
+			if (t._inSortMode) {
+				// add cmd after _cmdQueue is ready.
+				t._addCmd({
+					name: '_cmdSort',
+					scope: t,
+					args: [t.sortOptions, t.grid],
+					async: 1
+				});
+			}
+			// t.sort(t.sortOptions, t.grid);
+
+			return t._exec();
 		},
 
 		scan: function(args, callback){
@@ -426,7 +472,15 @@
 
 		_onParentSizeChange: function(parentId, isAdd) {},
 
-		_cmdRequest: function(){
+		_cmdSort: function() {
+			var rootIndex = this._cache._struct[''],
+				t = this,
+				a = arguments[arguments.length - 1];
+
+			return this.sortCache.apply(this, [rootIndex].concat(a));
+		},
+
+		_cmdRequest: function() {
 			var t = this;
 			return new $q.all([].map.apply(arguments, [function(args){
 				var arg = args[0],
@@ -448,7 +502,7 @@
 			}]), 0, 1);
 		},
 
-		_exec: function(){
+		_exec: function() {
 			//Execute commands one by one.
 			var t = this,
 				c = t._cache,
@@ -469,7 +523,7 @@
 					if(cmds.some(function(cmd){
 						return cmd.name == '_cmdRequest';
 					})){
-						try{
+						try {
 							while(cmds.length){
 								var cmd = cmds.shift(),
 									dd = cmd.scope[cmd.name].apply(cmd.scope, cmd.args);
@@ -478,7 +532,8 @@
 									return;
 								}
 							}
-						}catch(e){
+						} catch(e) {
+							console.error(e);
 							finish(d, e);
 							return;
 						}
@@ -493,7 +548,7 @@
 			return d && d.promise;
 		},
 
-		_createExts: function(exts, args){
+		_createExts: function(exts, args) {
 			//Ensure the given extensions are valid
 			exts = array.filter(array.map(exts, function(ext){
 				return typeof ext == 'string' ? require(ext) : ext;
@@ -512,10 +567,13 @@
 					this._exts[ext.name] = ext;
 				}
 			}
+		},
+
+		_inSortMode: function() {
+			return this.sortOptions && this.sortOptions.length;
 		}
 	};
 	
 	return Model;
-
 	}]);
 })();

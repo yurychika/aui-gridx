@@ -54,6 +54,8 @@ angular.module('aui.grid')
 
 		Grid.prototype.enableRowHoverEffect = true;
 
+		Grid.prototype.sortOptions = [];
+
 		Grid.prototype.getOption = function(name) {
 			return this._options.getOption(name);
 		};
@@ -219,9 +221,21 @@ angular.module('aui.grid')
 				options = [];
 
 			cols.forEach(function(col) {
-				if(col.sorting) {
-					options.push({colId: col.id, descending: col.sorting === -1});
+				if(col.sort && col.enableSorting !== false) {
+					col.sort.colId = col.id;
+					options.push(col.sort);
 				}
+			});
+
+			options.sort(function(a, b) {
+				a.priority = a.priority || Infinity;
+				b.priority = b.priority || Infinity;
+
+				return a.priority - b.priority;
+			});
+
+			return options.map(function(item) {
+				return {colId: item.colId, descending: item.descending};
 			});
 		},
 

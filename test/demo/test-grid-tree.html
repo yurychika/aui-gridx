@@ -97,7 +97,7 @@ app.controller('appController', function($scope, $q) {
 
 	$scope.gridOption.columnStructs = [
 		{id: 'name', field: 'name', name: 'my name', width: '200px', 
-			sortt: {descending: false, priority: 2},
+			sort: {descending: false, priority: 2},
 			formatter: function(cellData, rowData, rowId, columnId, model) {
 				return cellData;
 				// return cellData + model.hasChildren(rowId)? '+' :;
@@ -105,7 +105,7 @@ app.controller('appController', function($scope, $q) {
 				return "<p class>" + cellData + ' ' + rowData['age'] + "</p>";
 			}
 		},
-		{id: 'age', field: 'age', name: 'my age', width: '100px', sortt: {descending: true, priority: 2},
+		{id: 'age', field: 'age', name: 'my age', width: '100px', sort: {descending: true, priority: 2},
 			formatter: function(cellData, rowData, rowId, columnId, model) {
 				return cellData;
 				return parseInt(cellData) + Math.floor(Math.random() * 100) % 20;

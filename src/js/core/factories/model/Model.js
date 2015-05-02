@@ -323,6 +323,8 @@
 		sortCache: function(list, options, grid) {
 			// technically, sort should be an async process
 			// there would be server-side sorting
+			if (!options.length) return false;
+
 			var field, descending = false, option,
 				cols = grid._columnsById,
 				cache = grid.model._cache._cache,
@@ -337,12 +339,8 @@
 					descending = option.descending ? -1 : 1;
 					da = cache[a].rawData[field];
 					db = cache[b].rawData[field];
-					if (da > db) {
-						return 1 * descending;
-					}
-					if (da < db) {
-						return -1 * descending;
-					}
+					if (da > db) return 1 * descending;
+					if (da < db) return -1 * descending;
 				}
 				return 0;
 			});
@@ -363,7 +361,7 @@
 				async: 1
 			});
 
-			if (t._inSortMode()) {
+			if (t._inSortMode) {
 				// add cmd after _cmdQueue is ready.
 				t._addCmd({
 					name: '_cmdSort',

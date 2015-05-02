@@ -62,6 +62,12 @@
 				}
 
 				return col && col.enableSorting !== false;
+			},
+
+			concat: function(ary1, ary2) {
+				ary2.forEach(function(item) {
+					ary1.push(item);
+				});
 			}
 		};
 

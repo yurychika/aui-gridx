@@ -1,8 +1,8 @@
 (function(){
 	
 angular.module('aui.grid')
-.factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridOption',
-	function($q, $compile, $parse, $timeout, GridCore, GridOption) {
+.factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridOption', 'GridUtil',
+	function($q, $compile, $parse, $timeout, GridCore, GridOption, GridUtil) {
 		var dummyFunc = function(){};
 		var version = {
 			// summary:
@@ -159,7 +159,7 @@ angular.module('aui.grid')
 			}
 
 			t.sortOptions.length = 0;
-			t.sortOptions.concat(options);
+			GridUtil.concat(t.sortOptions, options);
 			t._columns.forEach(function(col) {
 				col.sorting = 0;
 			});

@@ -14,7 +14,7 @@
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
 				grid.subscribe(['columnChange', 'refresh'], function() {
-					console.log('%cin column change callback', 'color:red');
+					console.log('%cin column change callback', 'color:green');
 					buildHeader();
 				});
 				grid.headerNode = $elem[0];

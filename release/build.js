@@ -209,7 +209,7 @@
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
 				grid.subscribe(['columnChange', 'refresh'], function() {
-					console.log('%cin column change callback', 'color:red');
+					console.log('%cin column change callback', 'color:green');
 					buildHeader();
 				});
 				grid.headerNode = $elem[0];
@@ -693,8 +693,8 @@
 (function(){
 	
 angular.module('aui.grid')
-.factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridOption',
-	function($q, $compile, $parse, $timeout, GridCore, GridOption) {
+.factory('Grid', ['$q', '$compile', '$parse', '$timeout', 'GridCore', 'GridOption', 'GridUtil',
+	function($q, $compile, $parse, $timeout, GridCore, GridOption, GridUtil) {
 		var dummyFunc = function(){};
 		var version = {
 			// summary:
@@ -851,7 +851,7 @@ angular.module('aui.grid')
 			}
 
 			t.sortOptions.length = 0;
-			t.sortOptions.concat(options);
+			GridUtil.concat(t.sortOptions, options);
 			t._columns.forEach(function(col) {
 				col.sorting = 0;
 			});
@@ -3195,6 +3195,8 @@ angular.module('aui.grid')
 		sortCache: function(list, options, grid) {
 			// technically, sort should be an async process
 			// there would be server-side sorting
+			if (!options.length) return false;
+
 			var field, descending = false, option,
 				cols = grid._columnsById,
 				cache = grid.model._cache._cache,
@@ -3209,12 +3211,8 @@ angular.module('aui.grid')
 					descending = option.descending ? -1 : 1;
 					da = cache[a].rawData[field];
 					db = cache[b].rawData[field];
-					if (da > db) {
-						return 1 * descending;
-					}
-					if (da < db) {
-						return -1 * descending;
-					}
+					if (da > db) return 1 * descending;
+					if (da < db) return -1 * descending;
 				}
 				return 0;
 			});
@@ -3235,7 +3233,7 @@ angular.module('aui.grid')
 				async: 1
 			});
 
-			if (t._inSortMode()) {
+			if (t._inSortMode) {
 				// add cmd after _cmdQueue is ready.
 				t._addCmd({
 					name: '_cmdSort',
@@ -4399,7 +4397,7 @@ angular.module('aui.grid')
 			});
 			t._columnsById = configColumns(t._columns);
 			t.sortOptions.length = 0;
-			t.sortOptions.concat(t._getSortOptions());
+			GridUtil.concat(t.sortOptions, t._getSortOptions());
 			console.log('sort options', t.sortOptions);
 			
 			if(t.model){
@@ -4911,6 +4909,12 @@ angular.module('aui.grid')
 				}
 
 				return col && col.enableSorting !== false;
+			},
+
+			concat: function(ary1, ary2) {
+				ary2.forEach(function(item) {
+					ary1.push(item);
+				});
 			}
 		};
 

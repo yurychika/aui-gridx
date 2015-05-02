@@ -729,6 +729,7 @@ angular.module('aui.grid')
 			// console.log('emptyInfo', this.getOption('emptyInfo'));
 			this.postCreate();
 			this.subscribe(['clearSort'], function() {
+				t.sortOptions.length = 0;
 				t.model.clearCache();
 				t.model.when({}).then(function() {
 					t.refresh();
@@ -849,6 +850,8 @@ angular.module('aui.grid')
 				}
 			}
 
+			t.sortOptions.length = 0;
+			t.sortOptions.concat(options);
 			t._columns.forEach(function(col) {
 				col.sorting = 0;
 			});
@@ -4395,7 +4398,8 @@ angular.module('aui.grid')
 				return GridUtil.mixin({}, col);
 			});
 			t._columnsById = configColumns(t._columns);
-			t.sortOptions = t._getSortOptions();
+			t.sortOptions.length = 0;
+			t.sortOptions.concat(t._getSortOptions());
 			console.log('sort options', t.sortOptions);
 			
 			if(t.model){

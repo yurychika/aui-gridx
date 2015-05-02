@@ -338,7 +338,8 @@ angular.module('aui.grid')
 				return GridUtil.mixin({}, col);
 			});
 			t._columnsById = configColumns(t._columns);
-			t.sortOptions = t._getSortOptions();
+			t.sortOptions.length = 0;
+			t.sortOptions.concat(t._getSortOptions());
 			console.log('sort options', t.sortOptions);
 			
 			if(t.model){

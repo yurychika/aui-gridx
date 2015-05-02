@@ -3235,7 +3235,7 @@ angular.module('aui.grid')
 				async: 1
 			});
 
-			if (t._inSortMode) {
+			if (t._inSortMode()) {
 				// add cmd after _cmdQueue is ready.
 				t._addCmd({
 					name: '_cmdSort',

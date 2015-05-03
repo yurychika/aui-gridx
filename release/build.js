@@ -730,6 +730,9 @@ angular.module('aui.grid')
 			this.postCreate();
 			this.subscribe(['clearSort'], function() {
 				t.sortOptions.length = 0;
+				t._columns.forEach(function(col) {
+					col.sorting = 0;
+				});
 				t.model.clearCache();
 				t.model.when({}).then(function() {
 					t.refresh();

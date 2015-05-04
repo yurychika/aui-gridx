@@ -36,6 +36,10 @@
 				$scope.grid.subscribe('columnChange', function() {
 					grid.body.render();
 				});
+				$scope.grid.subscribe('renderVLayout', function() {
+					updateScrollBar();
+				});
+				
 				$scope.$watchCollection(function() {
 					return $scope.renderedRows;
 				}, function(newData) {
@@ -52,7 +56,7 @@
 					}
 				);
 
-				$scope.$on('onBodyRender', function() {
+				function updateScrollBar() {
 					console.log(new Date().getTime());
 					console.log('%cin on body render event', 'color:red');
 					if ($scope.grid.bodyNode.scrollHeight > $scope.grid.bodyNode.clientHeight) {
@@ -65,6 +69,11 @@
 					} else {
 						$scope.grid.hasHScroller = false;
 					}
+				}
+
+				$scope.$on('onBodyRender', function() {
+					updateScrollBar();
+					// grid.publish('renderVLayout');
 					// console.log(grid.domNode)
 				});
 

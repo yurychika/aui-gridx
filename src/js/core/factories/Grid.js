@@ -47,6 +47,9 @@ angular.module('aui.grid')
 					t.refresh();
 				});
 			});
+			this.subscribe(['renderVLayout'], function() {
+				t.renderVLayout();
+			});
 		};
 
 		Grid.prototype = GridCore.prototype;
@@ -82,6 +85,18 @@ angular.module('aui.grid')
 
 		Grid.prototype.registerVLayout = function(node) {
 			this._vLayouts.push(node);
+		};
+
+		Grid.prototype.renderVLayout = function(node) {
+			if (!this._vLayouts.length) return;
+			console.log('IN RENDERVLAYOUT');
+			var total = 0;
+
+			this._vLayouts.forEach(function(item) {
+				total += item.clientHeight;
+			});
+
+			grid.mainNode.style.height = grid.domNode.clientHeight - total + 'px';
 		};
 
 		Grid.prototype.refresh = function() {

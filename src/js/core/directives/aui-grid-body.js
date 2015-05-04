@@ -36,9 +36,6 @@
 				$scope.grid.subscribe('columnChange', function() {
 					grid.body.render();
 				});
-				$scope.grid.subscribe('renderVLayout', function() {
-					grid.mainNode.style.height = grid.domNode.clientHeight - grid.headerNode.clientHeight + 'px';
-				});
 				$scope.$watchCollection(function() {
 					return $scope.renderedRows;
 				}, function(newData) {

@@ -341,17 +341,17 @@ angular.module('aui.grid')
 
 			render: function() {
 				var g = this.grid,
-					size = g.model.size(), i = 0,
+					size = g.model.size(), i = 0, t = this,
 					rr = this.renderedRows,
 					cache = g.model._cache._cache, rowInfo;
 
 				g.view.updateVisualCount().then(function(){
 					rr.splice(0, rr.length);
-					for (i = 0; i < grid.view.visualCount; i++) {
+					for (i = 0; i < g.view.visualCount; i++) {
 						rowInfo = g.view.getRowInfo({visualIndex: i});
 
 						if (rowInfo) {
-							rr.push(new GridRow(rowInfo.rowId, this.grid));
+							rr.push(new GridRow(rowInfo.rowId, t.grid));
 						}
 					}
 				});

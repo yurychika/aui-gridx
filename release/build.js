@@ -44,7 +44,7 @@
 				$scope.grid.subscribe('renderVLayout', function() {
 					updateScrollBar();
 				});
-				
+
 				$scope.$watchCollection(function() {
 					return $scope.renderedRows;
 				}, function(newData) {
@@ -63,7 +63,7 @@
 
 				function updateScrollBar() {
 					console.log(new Date().getTime());
-					console.log('%cin on body render event', 'color:red');
+					console.log('%cin on body render event', 'color:pink');
 					if ($scope.grid.bodyNode.scrollHeight > $scope.grid.bodyNode.clientHeight) {
 						$scope.grid.hasVScroller = true;
 					} else {
@@ -654,7 +654,8 @@
 		['$scope', '$element', '$attrs', 'Grid', 'GridBody', 'GridView', 'GridUtil',
 		function ($scope, $element, $attrs, Grid, GridBody, GridView, GridUtil) {
 			var grid;
-			window.grid = $scope.grid = new Grid($scope.auiGrid);
+			$scope.grid = new Grid($scope.auiGrid);
+			// window.grid = $scope.grid;
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
 			grid.view = new GridView(grid);
@@ -811,7 +812,7 @@ angular.module('aui.grid')
 				total += item.clientHeight;
 			});
 
-			grid.mainNode.style.height = grid.domNode.clientHeight - total + 'px';
+			this.mainNode.style.height = this.domNode.clientHeight - total + 'px';
 		};
 
 		Grid.prototype.refresh = function() {
@@ -1381,17 +1382,17 @@ angular.module('aui.grid')
 
 			render: function() {
 				var g = this.grid,
-					size = g.model.size(), i = 0,
+					size = g.model.size(), i = 0, t = this,
 					rr = this.renderedRows,
 					cache = g.model._cache._cache, rowInfo;
 
 				g.view.updateVisualCount().then(function(){
 					rr.splice(0, rr.length);
-					for (i = 0; i < grid.view.visualCount; i++) {
+					for (i = 0; i < g.view.visualCount; i++) {
 						rowInfo = g.view.getRowInfo({visualIndex: i});
 
 						if (rowInfo) {
-							rr.push(new GridRow(rowInfo.rowId, this.grid));
+							rr.push(new GridRow(rowInfo.rowId, t.grid));
 						}
 					}
 				});

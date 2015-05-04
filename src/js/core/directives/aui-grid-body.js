@@ -39,7 +39,7 @@
 				$scope.grid.subscribe('renderVLayout', function() {
 					updateScrollBar();
 				});
-				
+
 				$scope.$watchCollection(function() {
 					return $scope.renderedRows;
 				}, function(newData) {
@@ -58,7 +58,7 @@
 
 				function updateScrollBar() {
 					console.log(new Date().getTime());
-					console.log('%cin on body render event', 'color:red');
+					console.log('%cin on body render event', 'color:pink');
 					if ($scope.grid.bodyNode.scrollHeight > $scope.grid.bodyNode.clientHeight) {
 						$scope.grid.hasVScroller = true;
 					} else {

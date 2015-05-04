@@ -96,7 +96,7 @@ angular.module('aui.grid')
 				total += item.clientHeight;
 			});
 
-			grid.mainNode.style.height = grid.domNode.clientHeight - total + 'px';
+			this.mainNode.style.height = this.domNode.clientHeight - total + 'px';
 		};
 
 		Grid.prototype.refresh = function() {

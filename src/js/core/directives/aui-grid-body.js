@@ -25,14 +25,19 @@
 			// link: function($scope, $elem) {
 				var gridCtrl = controllers[0],
 					bodyCtrl = controllers[1],
-					bodyNode = $elem.find('div')[1];
+					bodyNode = $elem.find('div')[1],
+					grid = $scope.grid;
 
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
 				$scope.grid.bodyNode = $elem.find('div')[1];
+				$scope.grid.mainNode = $elem[0];
 
 				$scope.grid.subscribe('columnChange', function() {
 					grid.body.render();
+				});
+				$scope.grid.subscribe('renderVLayout', function() {
+					grid.mainNode.style.height = grid.domNode.clientHeight - grid.headerNode.clientHeight + 'px';
 				});
 				$scope.$watchCollection(function() {
 					return $scope.renderedRows;
@@ -63,6 +68,7 @@
 					} else {
 						$scope.grid.hasHScroller = false;
 					}
+					// console.log(grid.domNode)
 				});
 
 				angular.element(bodyNode).on('scroll', function() {

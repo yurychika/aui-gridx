@@ -30,14 +30,19 @@
 			// link: function($scope, $elem) {
 				var gridCtrl = controllers[0],
 					bodyCtrl = controllers[1],
-					bodyNode = $elem.find('div')[1];
+					bodyNode = $elem.find('div')[1],
+					grid = $scope.grid;
 
 				$scope.renderedRows = bodyCtrl.renderedRows;
 				$scope.isEmpty = bodyCtrl.isEmpty;
 				$scope.grid.bodyNode = $elem.find('div')[1];
+				$scope.grid.mainNode = $elem[0];
 
 				$scope.grid.subscribe('columnChange', function() {
 					grid.body.render();
+				});
+				$scope.grid.subscribe('renderVLayout', function() {
+					grid.mainNode.style.height = grid.domNode.clientHeight - grid.headerNode.clientHeight + 'px';
 				});
 				$scope.$watchCollection(function() {
 					return $scope.renderedRows;
@@ -68,6 +73,7 @@
 					} else {
 						$scope.grid.hasHScroller = false;
 					}
+					// console.log(grid.domNode)
 				});
 
 				angular.element(bodyNode).on('scroll', function() {
@@ -199,7 +205,7 @@
 
 	var module = angular.module('aui.grid');
 
-	module.directive('auiGridHeader', ['GridUtil', function(GridUtil) {
+	module.directive('auiGridHeader', ['GridUtil', '$timeout', function(GridUtil, $timeout) {
 		return {
 			templateUrl: 'aui-grid/aui-grid-header',
 			replace: true,
@@ -207,14 +213,18 @@
 			link: function($scope, $elem, $attrs, controllers) {
 				var gridCtrl = controllers[0];
 
+
 				$scope.grid = gridCtrl.grid;
 				var grid = $scope.grid;
 				grid.subscribe(['columnChange', 'refresh'], function() {
 					console.log('%cin column change callback', 'color:green');
 					buildHeader();
 				});
+
 				grid.headerNode = $elem[0];
-				grid.headerInner = $elem[0].querySelectorAll('.gridxHeaderRowInner')[0];;
+				grid.headerInner = $elem[0].querySelectorAll('.gridxHeaderRowInner')[0];
+				grid.registerVLayout(grid.headerNode);
+
 				$scope.columns = gridCtrl._columns;
 				$scope.domNode = $elem[0];
 				$scope.innerNode = grid.headerInner;
@@ -236,6 +246,11 @@
 						temp.sortable = col.enableSorting !== false;
 						$scope.headerCells.push(temp);
 					});
+					$timeout(function() {
+						$scope.$emit('onHeaderRender');
+						grid.publish('renderVLayout');
+						console.log('header height', $elem[0].clientHeight);
+					}, 0);
 				}
 
 				function toggleHeaderSorting(colId) {
@@ -682,6 +697,7 @@
 			link: function($scope, $elem) {
 				// debugger;
 				var grid = $scope.grid;
+				grid.domNode = $elem[0];
 
 				if (GridUtil.isFunction($scope.auiGrid.onRegisterApi)) {
 					$scope.auiGrid.onRegisterApi(grid.api);
@@ -725,6 +741,7 @@ angular.module('aui.grid')
 			this.hasHScroller = false;
 			this.api = {};		//GridApi
 			this._options = new GridOption(options);
+			this._vLayouts = [];
 			this.enableRowHoverEffect = this.getOption('enableRowHoverEffect');
 			// console.log('childField', this.getOption('childField'));
 			// console.log('emptyInfo', this.getOption('emptyInfo'));
@@ -771,6 +788,10 @@ angular.module('aui.grid')
 				this.body.refresh();
 			}
 		},
+
+		Grid.prototype.registerVLayout = function(node) {
+			this._vLayouts.push(node);
+		};
 
 		Grid.prototype.refresh = function() {
 			// debugger;

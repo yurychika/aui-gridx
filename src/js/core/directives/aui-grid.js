@@ -56,6 +56,7 @@
 			link: function($scope, $elem) {
 				// debugger;
 				var grid = $scope.grid;
+				grid.domNode = $elem[0];
 
 				if (GridUtil.isFunction($scope.auiGrid.onRegisterApi)) {
 					$scope.auiGrid.onRegisterApi(grid.api);

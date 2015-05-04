@@ -32,6 +32,7 @@ angular.module('aui.grid')
 			this.hasHScroller = false;
 			this.api = {};		//GridApi
 			this._options = new GridOption(options);
+			this._vLayouts = [];
 			this.enableRowHoverEffect = this.getOption('enableRowHoverEffect');
 			// console.log('childField', this.getOption('childField'));
 			// console.log('emptyInfo', this.getOption('emptyInfo'));
@@ -78,6 +79,10 @@ angular.module('aui.grid')
 				this.body.refresh();
 			}
 		},
+
+		Grid.prototype.registerVLayout = function(node) {
+			this._vLayouts.push(node);
+		};
 
 		Grid.prototype.refresh = function() {
 			// debugger;

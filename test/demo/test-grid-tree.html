@@ -95,9 +95,14 @@ app.controller('appController', function($scope, $q) {
 		{name: "Tiancum", age: 34, id: 'item-14', country: 'US'},
 	];
 
+
+	// for(var i = 100; i < 1000; i++) {
+	// 	$scope.gridOption.data.push({name: "Tiancum", age: 34, id: 'item-' + i, country: 'US'})
+	// }
+	console.log(new Date().getTime())
 	$scope.gridOption.columnStructs = [
 		{id: 'name', field: 'name', name: 'my name', width: '200px', 
-			sort: {descending: false, priority: 2},
+			sortt: {descending: false, priority: 2},
 			formatter: function(cellData, rowData, rowId, columnId, model) {
 				return cellData;
 				// return cellData + model.hasChildren(rowId)? '+' :;
@@ -105,7 +110,7 @@ app.controller('appController', function($scope, $q) {
 				return "<p class>" + cellData + ' ' + rowData['age'] + "</p>";
 			}
 		},
-		{id: 'age', field: 'age', name: 'my age', width: '100px', sort: {descending: true, priority: 2},
+		{id: 'age', field: 'age', name: 'my age', width: '100px', sortt: {descending: true, priority: 2},
 			formatter: function(cellData, rowData, rowId, columnId, model) {
 				return cellData;
 				return parseInt(cellData) + Math.floor(Math.random() * 100) % 20;

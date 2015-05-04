@@ -51,6 +51,7 @@
 				);
 
 				$scope.$on('onBodyRender', function() {
+					console.log(new Date().getTime());
 					console.log('%cin on body render event', 'color:red');
 					if ($scope.grid.bodyNode.scrollHeight > $scope.grid.bodyNode.clientHeight) {
 						$scope.grid.hasVScroller = true;

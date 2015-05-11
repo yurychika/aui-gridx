@@ -92,7 +92,7 @@ app.controller('appController', function($scope, $q) {
 		{name: "Jacob", age: 29, id: 'item-11', country: 'US'},
 		{name: "Enos", age: 32, id: 'item-12', country: 'CN'},
 		{name: "Jacob", age: 30, id: 'item-13', country: 'UK'},
-		{name: "Tiancum", age: 34, id: 'item-14', country: 'US'},
+		{name: "Tiancum", age: 34, id: 'item-15', country: 'US'},
 	];
 
 
@@ -134,7 +134,7 @@ app.controller('appController', function($scope, $q) {
 		$scope.gridOption.data.push({
 			name: names[Math.floor(Math.random() * 100) % names.length],
 			age: new Date().getTime() % 50,
-			id: new Date().getTime(),
+			id: 'item-' + new Date().getTime() + '',
 			country: countries[Math.floor(Math.random() * 100) % countries.length]
 		});
 		console.log('add row');

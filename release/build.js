@@ -655,7 +655,7 @@
 		function ($scope, $element, $attrs, Grid, GridBody, GridView, GridUtil) {
 			var grid;
 			$scope.grid = new Grid($scope.auiGrid);
-			// window.grid = $scope.grid;
+			window.grid = $scope.grid;
 			grid = this.grid = $scope.grid;
 			grid.body = new GridBody('basic', grid);
 			grid.view = new GridView(grid);

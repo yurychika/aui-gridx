@@ -22,8 +22,8 @@ If you are using the source code version of the aui-grid, you can find the js fi
 
 * include aui-grid CSS
 ```HTML
-<link rel='stylesheet' href='../../src/le theme of gridx,
-.ss/Gridx.css'>
+<link rel='stylesheet' href='../../src/less/Gridx.css'>
+```
 
 If you want to use the dlBlue please add below css file
 ```HTML
@@ -37,6 +37,7 @@ In order to make the dlBlue theme working, you will need to add class "dlBlue" i
 * Creat your own angular app and inject dependency into it.
 ```js
 var app = angular.module('app', ['aui.grid']);
+```
 After all above steps, you are ready to create your own aui-gridx instance.
 
 5. Using aui-ridx directive

@@ -40,11 +40,11 @@ var app = angular.module('app', ['aui.grid']);
 ```
 After all above steps, you are ready to create your own aui-gridx instance.
 
-5. Using aui-ridx directive
-     <div aui-grid='gridOption'></div>
+* Using aui-ridx directive
+<div aui-grid='gridOption'></div>
 
 gridOption here refers to the options feed to the grid instance. You will always need to feed aui-grid directive with data and structure(colum structure)
-
+```JS
 window.data = $scope.gridOption.data = [
           {name: "Tiancum", age: 43, id: 'item-3', country: 'US'},
           {name: "Jacob", age: 27, id: 'item-4', country: 'US'},
@@ -74,17 +74,17 @@ window.data = $scope.gridOption.data = [
           {id: 'country', field: 'country', name: 'my  country', width: '110px', enableSorting: false},
        
      ];
-
+```
 
 6. give grid a width & height.
 
 Please note that grid instance will always need a width and height to be rendering correcly.
-
+```css
 .myGrid{
      width: 600px;
      height: 350px;
 }
-
+```
 How 
 
 

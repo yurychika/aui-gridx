@@ -41,7 +41,7 @@ var app = angular.module('app', ['aui.grid']);
 After all above steps, you are ready to create your own aui-gridx instance.
 
 * Using aui-ridx directive
-<div aui-grid='gridOption'></div>
+<div aui-grid='gridOption' class='myGrid'></div>
 
 gridOption here refers to the options feed to the grid instance. You will always need to feed aui-grid directive with data and structure(colum structure)
 ```JS
@@ -54,25 +54,10 @@ window.data = $scope.gridOption.data = [
      ];
 
      $scope.gridOption.columnStructs = [
-          {id: 'name', field: 'name', name: 'my name', width: '200px',
-               formatter: function(cellData, rowData, rowId, columnId, model) {
-                    // console.log(arguments);
-                    // model._cache._cache.hasChildren(rowId);
-                    return cellData;
-                    // return cellData + model.hasChildren(rowId)? '+' :;
-                    return model.size();
-                    return "<p class>" + cellData + ' ' + rowData['age'] + "</p>";
-               }
-          },
-          {id: 'age', field: 'age', name: 'my age', width: '100px',
-               formatter: function(cellData, rowData, rowId, columnId, model) {
-                    return cellData;
-                    return parseInt(cellData) + Math.floor(Math.random() * 100) % 20;
-               }
-          },
+          {id: 'name', field: 'name', name: 'my name', width: '200px'},
+          {id: 'age', field: 'age', name: 'my age', width: '100px'},
           {id: 'id', field: 'id', name: 'my id', width: '200px'},
-          {id: 'country', field: 'country', name: 'my  country', width: '110px', enableSorting: false},
-       
+          {id: 'country', field: 'country', name: 'my  country', width: '110px', enableSorting: false}
      ];
 ```
 

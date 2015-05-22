@@ -16,18 +16,18 @@ How to create a grid using aui-gridx?
 ```
 * include aui-grid JS
 ```HTML
-<script type='text/javascript' src='build.js'></script>
+<script type='text/javascript' src='aui-gridx/build.js'></script>
 ```
-If you are using the source code version of the aui-grid, you can find the js file in /release/build.js. 
+    If you are using the source code version of the aui-grid, you can find the js file in /release/build.js. 
 
 * include aui-grid CSS
 ```HTML
-<link rel='stylesheet' href='../../src/less/Gridx.css'>
+<link rel='stylesheet' href='aui-grid/theme/Gridx.css'>
 ```
 
-If you want to use the dlBlue please add below css file
+    If you want to use the dlBlue please add below css file
 ```HTML
-<link rel='stylesheet' href='../../src/less/dlBlue/gridx.css'>
+<link rel='stylesheet' href='theme/dlBlue/gridx.css'>
 ```
 In order to make the dlBlue theme working, you will need to add class "dlBlue" in the <body> tag.
 ```HTML
@@ -61,7 +61,7 @@ window.data = $scope.gridOption.data = [
      ];
 ```
 
-6. give grid a width & height.
+* give grid a width & height.
 
 Please note that grid instance will always need a width and height to be rendering correcly.
 ```css
@@ -70,6 +70,8 @@ Please note that grid instance will always need a width and height to be renderi
      height: 350px;
 }
 ```
-How 
+
+###Notes
+AUi-Gridx is still in the process of developing and not ready for production yet. We will soon adding features like 
 
 
